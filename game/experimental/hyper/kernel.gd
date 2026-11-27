@@ -2,6 +2,7 @@ extends "res://experimental/apex2/driver_kernel_12.gd"
 ## Hyper Evolution: isolated playable successor to Racecraft 1.3.
 const Resolver = preload("res://experimental/hyper/traffic.gd")
 const Control306 = preload("res://experimental/hyper2/race_control_306.gd")
+const Sector3062 = preload("res://experimental/hyper2/sector_control_3062.gd")
 const Pit3061 = preload("res://experimental/hyper2/pit_strategy_3061.gd")
 const RACECRAFT_TAG: String = "APEX2_HYPER_2.0_ALPHA1"
 
@@ -105,8 +106,14 @@ func step_tick() -> bool:
 			Resolver._phase(r, "RECOVER", int(state.tick), [], id, "pass_confirmed")
 			r.cooldown_until = int(state.tick) + 35
 	if not control_snapshot.is_empty():
-		for warning in Control306.settle(state[Control306.KEY],control_snapshot.rows,Control306.snapshot(state.cars),int(state.mega_control.remaining)<=1,int(state.lap_length_mm)):
+		var after_control:Dictionary=Control306.snapshot(state.cars)
+		for warning in Control306.settle(state[Control306.KEY],control_snapshot.rows,after_control,int(state.mega_control.remaining)<=1,int(state.lap_length_mm)):
 			_event(str(warning.type),int(warning.car_id),warning)
+		for car in state.cars:
+			if not car.has(Sector3062.KEY):continue
+			var id:int=int(car.id)
+			for evidence in Sector3062.observe(car[Sector3062.KEY],control_snapshot.rows[id],after_control[id],int(state.lap_length_mm),int(state.tick),int(state.mega_control.deployments)):
+				_event(str(evidence.type),id,evidence)
 	return true
 
 func _apply_command(command: Dictionary) -> Dictionary:
