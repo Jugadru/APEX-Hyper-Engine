@@ -1,0 +1,51 @@
+name: Wet race audit matrix
+on:
+  pull_request:
+    branches: [hyper/3.0.6.1-strategy]
+    paths:
+      - 'tools/wet_matrix_audit.py'
+      - '.github/workflows/wet-matrix-audit.yml'
+      - 'game/tests/hyper2/full_race.gd'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  paired-wet:
+    strategy:
+      fail-fast: false
+      max-parallel: 3
+      matrix:
+        seed: [2026, 2027, 2028]
+        weather: ['Chuva intensa', 'Variável']
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Verify exact source and inventory
+        env:
+          EXPECTED: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          python3 tools/verify_evolution_inventory.py
+          python3 -m py_compile tools/wet_matrix_audit.py
+      - uses: chickensoft-games/setup-godot@ac93246ea68518a384c1c280a496e5989341f2f6
+        with:
+          version: '4.7.2'
+          use-dotnet: false
+      - name: Import actual game
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 300s godot --headless --path game --rendering-method gl_compatibility --editor --import > /tmp/import.log 2>&1 || { tail -150 /tmp/import.log; exit 1; }
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/import.log; then exit 1; fi
+      - name: Run paired full GPs, diagnostic only
+        env:
+          SEED: ${{ matrix.seed }}
+          WEATHER: ${{ matrix.weather }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 tools/wet_matrix_audit.py --godot "$(command -v godot)" --game game --output /tmp/wet-audit --seeds "$SEED" --weather "$WEATHER"
