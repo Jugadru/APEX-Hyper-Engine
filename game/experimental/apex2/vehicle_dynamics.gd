@@ -7,6 +7,7 @@ extends RefCounted
 ## segment lengths/radii are synthetic approximations for isolated tests.
 const Powertrain22 = preload("res://experimental/hyper2/powertrain_22.gd")
 const Dynamics23 = preload("res://experimental/hyper2/dynamics_23.gd")
+const Energy301 = preload("res://experimental/hyper2/energy_301.gd")
 const STEP_MS: int = 200
 const LAP_UNITS: int = 1000000
 const MAX_V_MM_S: int = 106000
@@ -161,6 +162,11 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	var old_velocity: int = int(dyn.speed_mm_s)
 	var advanced: bool = dyn.has(Powertrain22.KEY)
 	var combined: bool = dyn.has(Dynamics23.KEY)
+	var settle_energy:bool=dyn.has(Energy301.KEY)
+	var proposal_n:int=0
+	var share:int=0
+	var v8_budget:int=0
+	var kers_budget:int=0
 	var mass_kg: int = int(dyn.dry_mass_kg) + int(dyn.fuel_g / 1000)
 	var mu: int = friction_mu(str(car.tire), water_microns, int(dyn.tire_temp_centi), int(dyn.wear_micro))
 	if car.has("hyper_setup_grip_permille"): mu=int(mu*clampi(int(car.hyper_setup_grip_permille),980,1030)/1000)
@@ -222,15 +228,23 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	if advanced:
 		var offer: int = int(car.get("hyper_kers_power_w",0))
 		var base_power: int = maxi(0,int(dyn.wheel_power_w)-offer) if int(dyn.fuel_g)>0 else 0
-		var p: Dictionary = Powertrain22.evaluate(dyn[Powertrain22.KEY],old_velocity,throttle,base_power,offer if base_power>0 else 0,long_limit,braking,step_ms)
+		var p: Dictionary = Powertrain22.evaluate(dyn[Powertrain22.KEY],old_velocity,throttle,base_power,offer if base_power>0 else 0,long_limit,braking,step_ms,settle_energy)
 		p.drag_n=drag_n;p.rolling_n=rolling_n;p.mass_g=int(dyn.dry_mass_kg)*1000+int(dyn.fuel_g)
 		dyn[Powertrain22.KEY]=p
 		engine_n=int(p.engine_force_n)
+		if settle_energy:
+			proposal_n=engine_n;share=int(p.energy_share);v8_budget=int(p.energy_v8_budget);kers_budget=int(p.energy_kers_budget)
+			p.erase("energy_share");p.erase("energy_v8_budget");p.erase("energy_kers_budget")
+			if not braking:
+				var upper_speed:int=mini(cap,clampi(old_velocity+int((engine_n-drag_n-rolling_n)*step_ms/mass_kg),0,MAX_V_MM_S))
+				var upper_distance:int=int((old_velocity+upper_speed)*step_ms/2+int(dyn.distance_remainder))/1000
+				engine_n=Energy301.limit(proposal_n,share,v8_budget,kers_budget,upper_distance)
 		available_drive_n=engine_n-drag_n-rolling_n
 	var force_n: int = -brake_force if braking else available_drive_n
 	if advanced and braking: force_n-=drag_n+rolling_n
 	var acceleration_mm_s2: int = int(force_n * 1000 / mass_kg)
 	var next_speed: int = clampi(old_velocity + int(acceleration_mm_s2 * step_ms / 1000), 0, MAX_V_MM_S)
+	var unclamped_speed:int=next_speed
 	if not braking:
 		next_speed = mini(next_speed, cap if combined else cap + maxi(1500, int(brake_decel * step_ms / 1000)))
 	var distance_numerator: int = int((old_velocity + next_speed) * step_ms / 2) + int(dyn.distance_remainder)
@@ -239,6 +253,14 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	dyn.distance_mm = int(dyn.distance_mm) + distance_delta_mm
 	dyn.speed_mm_s = next_speed
 	if advanced: dyn[Powertrain22.KEY].rpm=clampi(Powertrain22.raw_rpm(next_speed,int(dyn[Powertrain22.KEY].gear)),Powertrain22.IDLE,Powertrain22.LIMIT)
+	if settle_energy:
+		var energy:Dictionary=Energy301.settle(proposal_n,engine_n,brake_force,drag_n+rolling_n,mass_kg,old_velocity,next_speed,step_ms,distance_delta_mm,share,v8_budget,kers_budget,next_speed<unclamped_speed)
+		dyn[Energy301.KEY]=energy
+		dyn[Powertrain22.KEY].engine_force_n=int(energy.applied_n)
+		dyn[Powertrain22.KEY].v8_wheel_w=int(int(energy.v8_j)*1000/step_ms)
+		dyn[Powertrain22.KEY].kers_used_j=int(energy.kers_j)
+		if not braking:
+			engine_n=int(energy.applied_n);force_n=engine_n-drag_n-rolling_n
 	dyn.last_force_n = force_n
 	dyn.last_brake_n = brake_force
 	dyn.last_grip_n = grip_n

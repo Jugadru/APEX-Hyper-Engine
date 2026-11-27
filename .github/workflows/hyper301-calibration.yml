@@ -1,0 +1,64 @@
+name: Hyper 3.0.1 wheel work calibration
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'game/**'
+      - 'tools/**'
+      - '.github/workflows/hyper301-calibration.yml'
+      - 'docs/HYPER301_ENERGY.md'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  compare:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - track: ITA
+            weather: Seco
+          - track: GBR
+            weather: Chuva intensa
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Isolate test user data
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyper-calibration-data"
+          echo "XDG_DATA_HOME=$RUNNER_TEMP/hyper-calibration-data" >> "$GITHUB_ENV"
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Verify exact source and test contracts
+        env:
+          EXPECTED: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          python3 tools/verify_evolution_inventory.py
+          python3 -m unittest discover -s tools/tests -p test_compare_hyper_gp.py -v
+      - uses: chickensoft-games/setup-godot@ac93246ea68518a384c1c280a496e5989341f2f6
+        with:
+          version: '4.7.2'
+          use-dotnet: false
+      - name: Import Godot
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 300s godot --headless --path game --rendering-method gl_compatibility --editor --import > /tmp/import.log 2>&1 || { tail -150 /tmp/import.log; exit 1; }
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/import.log; then exit 1; fi
+      - name: Paired complete GP runs
+        shell: bash
+        env:
+          TRACK: ${{ matrix.track }}
+          WEATHER: ${{ matrix.weather }}
+        run: |
+          set -euo pipefail
+          for mode in hyper30 hyper301; do
+            echo "MODE=$mode TRACK=$TRACK WEATHER=$WEATHER SEED=2026"
+            timeout 360s godot --headless --path game --rendering-method gl_compatibility --script res://tests/hyper2/full_race.gd -- "$TRACK" "$WEATHER" "$mode" 2>&1 | tee "/tmp/$mode.log"
+            if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' "/tmp/$mode.log"; then exit 1; fi
+          done
+          python3 tools/compare_hyper_gp.py /tmp/hyper30.log /tmp/hyper301.log "$TRACK" "$WEATHER"

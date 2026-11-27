@@ -11,6 +11,8 @@ const SAVE23: String = "user://hyper_engine_23_checkpoint.bin"
 var physics_choice: CheckBox
 var dynamics_choice: CheckBox
 var mega_choice: CheckBox
+var energy_choice: CheckBox
+const SAVE301: String = "user://hyper_engine_301_checkpoint.bin"
 const SAVE30: String = "user://hyper_engine_30_checkpoint.bin"
 const CAREER_SAVE30: String = "user://hyper_career_30_race_checkpoint.bin"
 const Quality = preload("res://experimental/hyper2/quality.gd")
@@ -93,12 +95,15 @@ func _ready() -> void:
 	physics_choice=CheckBox.new(); physics_choice.text="Física 2.2 (GP livre)"; config.add_child(physics_choice)
 	dynamics_choice=CheckBox.new(); dynamics_choice.text="Física 2.3 (GP livre)"; config.add_child(dynamics_choice)
 	mega_choice=CheckBox.new();mega_choice.text="HYPER-MEGA 3.0";config.add_child(mega_choice)
+	energy_choice=CheckBox.new();energy_choice.text="Física 3.0.1 (energia experimental)";config.add_child(energy_choice)
 	physics_choice.toggled.connect(func(on:bool):
-		if on:dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false))
+		if on:dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false))
 	dynamics_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false))
 	mega_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false))
+	energy_choice.toggled.connect(func(on:bool):
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false))
 	start_button = _button(config,"INICIAR",_start)
 	var controls := HFlowContainer.new(); outer.add_child(controls)
 	pause_button = _button(controls,"PAUSAR",_pause)
@@ -158,7 +163,8 @@ func _start() -> void:
 	s.hyper22_physics=physics_choice.button_pressed
 	s.hyper23_physics=dynamics_choice.button_pressed
 	s.hyper30_physics=mega_choice.button_pressed
-	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30]: checkpoint_path=SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE))
+	s.hyper301_physics=energy_choice.button_pressed
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301]: checkpoint_path=SAVE301 if energy_choice.button_pressed else (SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE)))
 	var selected_count:int=0
 	for car in s.get("cars",[]):
 		if str(car.team)==team.get_item_text(team.selected):
@@ -220,6 +226,9 @@ func _redraw() -> void:
 		if selected.has("mega_30"):
 			var m:Dictionary=selected.mega_30
 			telemetry.text += " • condição %d%% / dano %d%% / %s" % [int(m.health)/10,int(m.damage)/10,"SC VIRTUAL" if int(k.state.mega_control.remaining)>0 else "VERDE"]
+		if selected.dynamics.has("energy_301") and selected.pit_stage=="TRACK":
+			var energy:Dictionary=selected.dynamics.energy_301
+			telemetry.text += " • trabalho %d J V8 / %d J KERS" % [energy.v8_j,energy.kers_j]
 		telemetry.text += " • última %.1fs / melhor %.1fs • %d erros" % [float(selected.evolution.last_lap_ticks)*0.2,float(selected.evolution.best_lap_ticks)*0.2,int(selected.evolution.error_count)]
 	var events: Array = k.state.events
 	while event_cursor < events.size():
@@ -253,7 +262,7 @@ func _pit() -> void:
 func _cancel() -> void: _command({"type":"cancel_pit"})
 func _save() -> void:
 	if not k.initialized: return
-	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30]: checkpoint_path=SAVE30 if int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV else (SAVE23 if int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV else (SAVE22 if int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV else SAVE))
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301]: checkpoint_path=SAVE301 if int(k.state.hyper_evolution_revision)==Kernel.ENERGY_REV else (SAVE30 if int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV else (SAVE23 if int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV else (SAVE22 if int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV else SAVE)))
 	if checkpoint_path==SAVE30 and k.state.has("hyper_career_token"):checkpoint_path=CAREER_SAVE30
 	if checkpoint_path==SAVE30:
 		var prior=_read_checkpoint(SAVE30)
@@ -280,19 +289,19 @@ func _read_checkpoint(path: String):
 	var saved: Variant = f.get_var(false); f.close()
 	var candidate = Kernel.new()
 	if not saved is Dictionary or not candidate.restore(saved): return null
-	var expected_rev:int=5 if path in [SAVE30,SAVE30+".bak",CAREER_SAVE30,CAREER_SAVE30+".bak"] else (4 if path in [SAVE23,SAVE23+".bak"] else (3 if path in [SAVE22,SAVE22+".bak"] else (2 if path in [SAVE,SAVE+".bak"] else 0)))
+	var expected_rev:int=6 if path in [SAVE301,SAVE301+".bak"] else (5 if path in [SAVE30,SAVE30+".bak",CAREER_SAVE30,CAREER_SAVE30+".bak"] else (4 if path in [SAVE23,SAVE23+".bak"] else (3 if path in [SAVE22,SAVE22+".bak"] else (2 if path in [SAVE,SAVE+".bak"] else 0))))
 	if expected_rev!=0 and int(candidate.state.hyper_evolution_revision)!=expected_rev: return null
 	if path in [CAREER_SAVE30,CAREER_SAVE30+".bak"] and not candidate.state.has("hyper_career_token"):return null
 	return candidate
 func _load() -> void:
-	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30]: checkpoint_path=SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE))
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301]: checkpoint_path=SAVE301 if energy_choice.button_pressed else (SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE)))
 	var candidate = _read_checkpoint(checkpoint_path)
 	var from_backup: bool = false
 	if candidate == null:
 		candidate = _read_checkpoint(checkpoint_path+".bak"); from_backup = candidate != null
 	if candidate == null: status.text = "Checkpoint ausente, inválido ou incompatível."; return
 	if checkpoint_path==SAVE30 and candidate.state.has("hyper_career_token"):status.text="Este é um checkpoint de carreira. Abra Living Factory 3.0.";return
-	k = candidate; physics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV); dynamics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV); mega_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV); running = false; _bind_session(); pause_button.text = "RETOMAR"; status.text = "Checkpoint restaurado do backup." if from_backup else "Checkpoint restaurado."
+	k = candidate; physics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV); dynamics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV); mega_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV); energy_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.ENERGY_REV); running = false; _bind_session(); pause_button.text = "RETOMAR"; status.text = "Checkpoint restaurado do backup." if from_backup else "Checkpoint restaurado."
 func _close() -> void:
 	if get_parent() is Window and get_parent() != get_tree().root: get_parent().queue_free()
 	else: get_tree().change_scene_to_file("res://scenes/main.tscn")
@@ -410,7 +419,8 @@ func _career_gp() -> void:
 	physics_choice.set_pressed_no_signal(false)
 	dynamics_choice.set_pressed_no_signal(false)
 	mega_choice.set_pressed_no_signal(career.mega_mode)
-	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30]: checkpoint_path=CAREER_SAVE30 if career.mega_mode else SAVE
+	energy_choice.set_pressed_no_signal(false)
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301]: checkpoint_path=CAREER_SAVE30 if career.mega_mode else SAVE
 	if career.mega_mode and not s.is_empty():
 		var resumed=_reserved_mega_checkpoint(s)
 		if resumed!=null:

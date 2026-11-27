@@ -36,7 +36,7 @@ static func valid(p: Variant) -> bool:
 ## Average tractive force for one fixed tick, including torque ceiling
 ## and traction interruption during shifts. KERS is the already allocated
 ## offer, not a second reservoir. No state mutation.
-static func evaluate(previous: Dictionary, speed: int, throttle: int, base_power: int, kers_offer_w: int, grip_n: int, braking: bool, dt: int) -> Dictionary:
+static func evaluate(previous: Dictionary, speed: int, throttle: int, base_power: int, kers_offer_w: int, grip_n: int, braking: bool, dt: int, energy_settlement:bool=false) -> Dictionary:
 	var out: Dictionary=previous.duplicate()
 	var gear: int=int(previous.gear)
 	var left: int=int(previous.shift_left_ms)
@@ -65,4 +65,8 @@ static func evaluate(previous: Dictionary, speed: int, throttle: int, base_power
 	var kers_w: int=mini(kers_request,int(wheel_w*kers_force/maxi(1,total)))
 	out.gear=gear;out.rpm=rpm;out.shift_left_ms=left-cut;out.shift_cut_ms=cut
 	out.engine_force_n=drive;out.kers_used_j=int(kers_w*dt/1000);out.v8_wheel_w=mini(v8_request,maxi(0,wheel_w-kers_w))
+	if energy_settlement:
+		out["energy_share"]=int(kers_force*1000/maxi(1,total))
+		out["energy_v8_budget"]=int(v8_request*usable/1000)
+		out["energy_kers_budget"]=int(kers_request*usable/1000)
 	return out

@@ -67,7 +67,7 @@ func submit(command: Dictionary, state: Dictionary) -> Dictionary:
 		return {"accepted": false, "reason": "method_source_or_car_invalid"}
 	if bool(car.get("finished", false)):
 		return {"accepted": false, "reason": "car_finished"}
-	if mode == "set_auto" and (int(state.get("hyper_evolution_revision",0)) not in [2,3,4,5] or source!="Manual"):
+	if mode == "set_auto" and (int(state.get("hyper_evolution_revision",0)) not in [2,3,4,5,6] or source!="Manual"):
 		return {"accepted":false,"reason":"control_mode_unavailable"}
 	if target_tick <= int(state.get("tick", 0)) or target_tick > 400000:
 		return {"accepted": false, "reason": "invalid_tick"}

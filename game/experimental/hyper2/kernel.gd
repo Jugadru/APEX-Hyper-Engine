@@ -5,13 +5,15 @@ const EVOLUTION_REV := 2
 const PHYSICS_REV := 3
 const DYNAMICS_REV := 4
 const MEGA_REV := 5
+const ENERGY_REV := 6
+const Energy = preload("res://experimental/hyper2/energy_301.gd")
 const Mega = preload("res://experimental/hyper2/mega_30.gd")
 const Dynamics = preload("res://experimental/hyper2/dynamics_23.gd")
 const Powertrain = preload("res://experimental/hyper2/powertrain_22.gd")
 func initialize(scenario: Dictionary) -> bool:
 	if not super.initialize(scenario): return false
-	state["hyper_evolution_revision"]=MEGA_REV if bool(scenario.get("hyper30_physics",false)) else (DYNAMICS_REV if bool(scenario.get("hyper23_physics",false)) else (PHYSICS_REV if bool(scenario.get("hyper22_physics",false)) else EVOLUTION_REV))
-	if int(state.hyper_evolution_revision)==MEGA_REV:state["mega_control"]=Mega.control()
+	state["hyper_evolution_revision"]=ENERGY_REV if bool(scenario.get("hyper301_physics",false)) else (MEGA_REV if bool(scenario.get("hyper30_physics",false)) else (DYNAMICS_REV if bool(scenario.get("hyper23_physics",false)) else (PHYSICS_REV if bool(scenario.get("hyper22_physics",false)) else EVOLUTION_REV)))
+	if int(state.hyper_evolution_revision)>=MEGA_REV:state["mega_control"]=Mega.control()
 	state["hyper_errors_enabled"]=bool(scenario.get("hyper_errors_enabled",true))
 	var skill_by_name: Dictionary={}
 	var historical: Variant=JSON.parse_string(FileAccess.get_file_as_string("res://data/season_2012.json"))
@@ -21,13 +23,14 @@ func initialize(scenario: Dictionary) -> bool:
 		car["evolution"]=Intelligence.initial(int(state.seed),int(car.id),int(skill_by_name.get(str(car.name),80)))
 		if int(state.hyper_evolution_revision)>=PHYSICS_REV: car.dynamics[Powertrain.KEY]=Powertrain.initial()
 		if int(state.hyper_evolution_revision)>=DYNAMICS_REV: car.dynamics[Dynamics.KEY]=Dynamics.initial()
-		if int(state.hyper_evolution_revision)==MEGA_REV:
+		if int(state.hyper_evolution_revision)>=MEGA_REV:
 			var spec:Dictionary=scenario.get("hyper_specs",{}).get(str(car.id),{})
 			car[Mega.KEY]=Mega.initial(int(spec.get("condition",100)))
+		if int(state.hyper_evolution_revision)==ENERGY_REV:car.dynamics[Energy.KEY]=Energy.initial()
 	return true
 func step_tick() -> bool:
 	if not initialized or bool(state.finished) or int(state.tick)>=MAX_TICKS: return false
-	var mega:bool=int(state.hyper_evolution_revision)==MEGA_REV
+	var mega:bool=int(state.hyper_evolution_revision)>=MEGA_REV
 	var old_distances:Dictionary={}
 	if mega:
 		var control:Dictionary=state.mega_control
@@ -158,8 +161,8 @@ func strategy_report(id: int) -> Dictionary:
 	return report
 func restore(data: Dictionary) -> bool:
 	var candidate: Variant=data.get("state",null)
-	if not candidate is Dictionary or int(candidate.get("hyper_evolution_revision",0)) not in [EVOLUTION_REV,PHYSICS_REV,DYNAMICS_REV,MEGA_REV] or typeof(candidate.get("hyper_errors_enabled"))!=TYPE_BOOL: return false
-	if int(candidate.hyper_evolution_revision)==MEGA_REV:
+	if not candidate is Dictionary or int(candidate.get("hyper_evolution_revision",0)) not in [EVOLUTION_REV,PHYSICS_REV,DYNAMICS_REV,MEGA_REV,ENERGY_REV] or typeof(candidate.get("hyper_errors_enabled"))!=TYPE_BOOL: return false
+	if int(candidate.hyper_evolution_revision)>=MEGA_REV:
 		if not Mega.valid_control(candidate.get("mega_control")):return false
 	elif candidate.has("mega_control"):return false
 	for car in candidate.get("cars",[]):
@@ -171,13 +174,16 @@ func restore(data: Dictionary) -> bool:
 		if int(candidate.hyper_evolution_revision)>=DYNAMICS_REV:
 			if not Dynamics.valid(car.dynamics.get(Dynamics.KEY)): return false
 		elif car.dynamics.has(Dynamics.KEY): return false
-		if int(candidate.hyper_evolution_revision)==MEGA_REV:
+		if int(candidate.hyper_evolution_revision)>=MEGA_REV:
 			if not Mega.valid(car.get(Mega.KEY)):return false
 			var condition:Dictionary=car[Mega.KEY]
 			if not car.get("hyper") is Dictionary:return false
 			if int(condition.seen_errors)!=int(car.evolution.get("error_count",-1)) or int(condition.seen_stops)!=int(car.hyper.get("pit_count",-1)) or int(condition.radio_tick)>int(candidate.get("tick",-1)):return false
 			if bool(condition.failure)!=(int(condition.health)==0):return false
 		elif car.has(Mega.KEY):return false
+		if int(candidate.hyper_evolution_revision)==ENERGY_REV:
+			if not Energy.valid(car.dynamics.get(Energy.KEY)):return false
+		elif car.dynamics.has(Energy.KEY):return false
 		var e: Dictionary=car.evolution
 		if not e.has_all(["skill","reaction_ticks","error_kind","error_left","error_total","error_ref_speed","error_count","recovery_ticks","cooldown","last_cross_tick","last_lap_ticks","best_lap_ticks","lap_times","traffic_ticks","blue_ticks","last_radio_tick"]): return false
 		for key in ["skill","reaction_ticks","error_left","error_total","error_ref_speed","error_count","recovery_ticks","cooldown","last_cross_tick","last_lap_ticks","best_lap_ticks","traffic_ticks","blue_ticks"]:
