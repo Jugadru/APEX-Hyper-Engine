@@ -1,0 +1,7 @@
+; Isolated test project; NOT the full Alpha 2 game.
+config_version=5
+[application]
+config/name="APEX Hyper Longitudinal Lab"
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
