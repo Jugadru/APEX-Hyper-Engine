@@ -47,8 +47,13 @@ static func begin(x:Dictionary,roster:Array,lap:int)->Dictionary:
 	var rows:Dictionary=snapshot(roster)
 	var field:Array=[]
 	for id in rows:
-		if bool(rows[id].eligible):field.append([posmod(int(rows[id].distance),lap),int(id)])
-	field.sort_custom(func(a:Array,b:Array)->bool:return int(a[1])<int(b[1]) if int(a[0])==int(b[0]) else int(a[0])<int(b[0]))
+		if bool(rows[id].eligible):field.append([posmod(int(rows[id].distance),lap),int(id),int(rows[id].distance)])
+	# Increasing physical coordinate, then absolute progress. At identical
+	# sporting progress the lower ID is ahead, matching classification.
+	field.sort_custom(func(a:Array,b:Array)->bool:
+		if int(a[0])!=int(b[0]):return int(a[0])<int(b[0])
+		if int(a[2])!=int(b[2]):return int(a[2])<int(b[2])
+		return int(a[1])>int(b[1]))
 	var caps:Dictionary={}
 	for i in range(field.size()):
 		var id:int=int(field[i][1])
@@ -57,11 +62,14 @@ static func begin(x:Dictionary,roster:Array,lap:int)->Dictionary:
 		var ahead:Array=field[(i+1)%field.size()]
 		var gap:int=posmod(int(ahead[0])-int(field[i][0]),lap)
 		# Lane-independent following target. No direct distance correction.
-		if gap>0 and gap<=40000:
+		# Equal positions within the sorted group must not bypass the cap.
+		# The wrap from the final car to the first at the same coordinate is
+		# a whole lap, not another zero-gap follower relationship.
+		if (gap>0 or i<field.size()-1) and gap<=40000:
 			caps[id]=mini(CAP_MM_S,int(rows[int(ahead[1])].speed)+maxi(0,gap-12000)/5)
 	return {"rows":rows,"caps":caps}
 
-static func settle(x:Dictionary,before:Dictionary,after:Dictionary,last_tick:bool)->Array:
+static func settle(x:Dictionary,before:Dictionary,after:Dictionary,last_tick:bool,lap:int=0)->Array:
 	x.total_ticks=int(x.total_ticks)+1
 	var warnings:Array=[]
 	var ids:Array=before.keys();ids.sort()
@@ -83,16 +91,23 @@ static func settle(x:Dictionary,before:Dictionary,after:Dictionary,last_tick:boo
 		for j in range(i+1,ids.size()):
 			var b:int=int(ids[j])
 			if not after.has(b) or not bool(before[b].eligible) or not bool(after[b].eligible):continue
-			var old:int=int(before[a].distance)-int(before[b].distance)
-			var now:int=int(after[a].distance)-int(after[b].distance)
+			var old_absolute:int=int(before[a].distance)-int(before[b].distance)
+			var now_absolute:int=int(after[a].distance)-int(after[b].distance)
+			# Use the same lap offset for both samples. Independently wrapping
+			# the second sample can manufacture a pass at the half-lap seam.
+			var old:int=posmod(old_absolute+lap/2,lap)-lap/2 if lap>100000 else old_absolute
+			var now:int=old+(now_absolute-old_absolute)
 			if absi(old)>50000:continue
-			# Classification breaks equal distances by ascending car id.
-			# Since a < b, an exact tie places a ahead; do not lose a
-			# crossing that lands exactly on the other car for one tick.
-			var crossing:bool=(old>=0)!=(now>=0)
+			var lapped:bool=old!=old_absolute
+			# For a same-lap tie, lower ID is ranked ahead. For a physical
+			# tie involving a lap offset, prefer larger absolute progress.
+			var a_tie_ahead:bool=not lapped or old_absolute-old>0
+			var old_ahead:bool=old>0 or (old==0 and a_tie_ahead)
+			var now_ahead:bool=now>0 or (now==0 and a_tie_ahead)
+			var crossing:bool=old_ahead!=now_ahead
 			var pair:String="%d:%d"%[a,b]
 			if crossing and not x.reported_pairs.has(pair):
 				x.reported_pairs[pair]=true;x.order_warnings=int(x.order_warnings)+1
-				warnings.append({"type":"race_control_order_warning","car_id":a if now>=0 else b,"other_id":b if now>=0 else a})
+				warnings.append({"type":"race_control_order_warning","car_id":a if now_ahead else b,"other_id":b if now_ahead else a,"crossing_kind":"lapped_traffic" if lapped else "sporting_order"})
 	if last_tick:x.phase="GREEN"
 	return warnings

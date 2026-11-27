@@ -40,13 +40,41 @@ func run()->void:
 	ck(tie_monitor.order_warnings==1 and tie_warnings[0].car_id==a,"exact tie uses classification order")
 	C.settle(tie_monitor,tie,after,false)
 	ck(tie_monitor.order_warnings==1,"crossing not double counted after tie")
+	# Wrapped physical position, including lapped traffic and the finish line.
+	var lapped_before:Dictionary=before.rows.duplicate(true)
+	lapped_before[a].distance=1099000;lapped_before[b].distance=102000
+	var lapped_after:Dictionary=lapped_before.duplicate(true)
+	lapped_after[a].distance=1110000;lapped_after[b].distance=106000
+	var lap_monitor:Dictionary=C.initial()
+	var lap_warnings:Array=C.settle(lap_monitor,lapped_before,lapped_after,false,1000000)
+	ck(lap_monitor.order_warnings==1 and lap_warnings[0].crossing_kind=="lapped_traffic" and lap_warnings[0].car_id==a,"lapped physical crossing detected")
+	var seam_before:Dictionary=before.rows.duplicate(true)
+	seam_before[a].distance=990000;seam_before[b].distance=1002000
+	var seam_after:Dictionary=seam_before.duplicate(true)
+	seam_after[a].distance=1001000;seam_after[b].distance=1013000
+	var seam_monitor:Dictionary=C.initial()
+	C.settle(seam_monitor,seam_before,seam_after,false,1000000)
+	ck(seam_monitor.order_warnings==0,"finish line alone is not a crossing")
+	var half_before:Dictionary=before.rows.duplicate(true)
+	half_before[a].distance=499000;half_before[b].distance=0
+	var half_after:Dictionary=half_before.duplicate(true)
+	half_after[a].distance=501000
+	var half_monitor:Dictionary=C.initial()
+	C.settle(half_monitor,half_before,half_after,false,1000000)
+	ck(half_monitor.order_warnings==0,"half lap seam does not manufacture pass")
+	var tied_field:Array=field.duplicate(true)
+	tied_field[0].dynamics.distance_mm=200000;tied_field[1].dynamics.distance_mm=200000
+	tied_field[0].dynamics.speed_mm_s=30000;tied_field[1].dynamics.speed_mm_s=50000
+	var tied_caps:Dictionary=C.begin(C.initial(),tied_field,1000000)
+	ck(int(tied_caps.caps[b])==30000 and int(tied_caps.caps[a])==50000,"exact physical tie follows classification")
 	k.step_ticks(300)
 	# Trigger the normal incident → damage → neutralization path, not a
 	# direct edit to the neutralization timer. Errors otherwise disabled.
 	var incident:Dictionary=k.state.cars[0]
 	incident.evolution.error_count+=1;incident.evolution.error_kind="SPIN"
+	incident.evolution.error_total=40;incident.evolution.error_left=40;incident.evolution.error_ref_speed=int(incident.dynamics.speed_mm_s)
 	k.step_tick()
-	ck(int(incident.mega_30.damage)==85 and int(k.state.mega_control.remaining)==100,"spin deploys control through kernel")
+	ck(int(incident.mega_30.damage)==85 and int(k.state.mega_control.remaining)==100 and int(incident.evolution.error_left)==39,"spin deploys control through kernel with active error")
 	var pre=K.new();ck(pre.restore(k.checkpoint()),"restore announced deployment before first tick")
 	var replay=R.new();replay.attach(k)
 	var attempts:int=int(k.state.racecraft_attempts)

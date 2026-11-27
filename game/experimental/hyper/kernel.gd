@@ -104,7 +104,7 @@ func step_tick() -> bool:
 			Resolver._phase(r, "RECOVER", int(state.tick), [], id, "pass_confirmed")
 			r.cooldown_until = int(state.tick) + 35
 	if not control_snapshot.is_empty():
-		for warning in Control306.settle(state[Control306.KEY],control_snapshot.rows,Control306.snapshot(state.cars),int(state.mega_control.remaining)<=1):
+		for warning in Control306.settle(state[Control306.KEY],control_snapshot.rows,Control306.snapshot(state.cars),int(state.mega_control.remaining)<=1,int(state.lap_length_mm)):
 			_event(str(warning.type),int(warning.car_id),warning)
 	return true
 
