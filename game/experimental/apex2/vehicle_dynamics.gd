@@ -10,6 +10,7 @@ const Dynamics23 = preload("res://experimental/hyper2/dynamics_23.gd")
 const Energy301 = preload("res://experimental/hyper2/energy_301.gd")
 const Geometry302 = preload("res://experimental/hyper2/geometry_302.gd")
 const Wet303 = preload("res://experimental/hyper2/wet_303.gd")
+const Tyres304 = preload("res://experimental/hyper2/tyres_304.gd")
 const STEP_MS: int = 200
 const LAP_UNITS: int = 1000000
 const MAX_V_MM_S: int = 106000
@@ -199,6 +200,9 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	var advanced: bool = dyn.has(Powertrain22.KEY)
 	var combined: bool = dyn.has(Dynamics23.KEY)
 	var settle_energy:bool=dyn.has(Energy301.KEY)
+	var four_wheels:bool=dyn.has(Tyres304.KEY)
+	var wheel_state:Dictionary={}
+	var preview_mu:int=0
 	var proposal_n:int=0
 	var share:int=0
 	var v8_budget:int=0
@@ -206,6 +210,7 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	var mass_kg: int = int(dyn.dry_mass_kg) + int(dyn.fuel_g / 1000)
 	var mu: int = friction_mu(str(car.tire), water_microns, int(dyn.tire_temp_centi), int(dyn.wear_micro))
 	if car.has("hyper_setup_grip_permille"): mu=int(mu*clampi(int(car.hyper_setup_grip_permille),980,1030)/1000)
+	preview_mu=mu
 	var grip_n: int = _grip_force_n(mass_kg, old_velocity, mu, int(dyn.downforce_milli))
 	var brake_decel: int = maxi(2500, int(grip_n * 1000 / mass_kg))
 	var position_mm: int = posmod(int(dyn.distance_mm), lap_mm)
@@ -226,11 +231,19 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 		var radius_now:int=current_radius
 		# The sentinel describes a straight, not a physical 1000 m curve.
 		lateral_demand=0 if radius_now>=MAX_RADIUS_MM else int(mass_kg*old_velocity*old_velocity/maxi(1,radius_now*1000))
+		if four_wheels:
+			var curvature:int=Geometry302.curvature_at(profile,lap_mm,position_mm)
+			var signed_lateral:int=lateral_demand if curvature>=0 else -lateral_demand
+			wheel_state=Tyres304.prepare(dyn[Tyres304.KEY],mass_kg,_aero_force_n(int(dyn.downforce_milli),old_velocity),int(dyn[Dynamics23.KEY].accel_mm_s2),signed_lateral,mu)
+			grip_n=int(wheel_state.front_grip_n)+int(wheel_state.rear_grip_n)
+			preview_mu=int(mu*int(wheel_state.scale_permille)/1000)
+			load.front_n=int(wheel_state.fl)+int(wheel_state.fr);load.rear_n=int(wheel_state.rl)+int(wheel_state.rr);load.transfer_n=int(wheel_state.long_transfer_n)
 		budget=Dynamics23.budget(grip_n,lateral_demand)
 		long_limit=int(budget.long_limit_n)
+		if four_wheels:Tyres304.allocate(wheel_state,int(budget.lateral_alloc_n),long_limit)
 		brake_decel=maxi(2500,int(long_limit*1000/mass_kg))
 	if canonical:
-		cap=canonical_preview(profile,lap_mm,position_mm,index,current_radius,mass_kg,mu,int(dyn.downforce_milli),old_velocity,corner_margin)
+		cap=canonical_preview(profile,lap_mm,position_mm,index,current_radius,mass_kg,preview_mu,int(dyn.downforce_milli),old_velocity,corner_margin)
 	else:
 		# Anticipate upcoming geometry by stopping-distance energy equation v²=v0²+2*a*s.
 		for ahead in range(mini(10, profile.size())):
@@ -267,6 +280,7 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	var rolling_n: int = int(mass_kg * 14 / 100)
 	var available_drive_n: int = engine_n - drag_n - rolling_n if car.has("hyper") else maxi(0, engine_n - drag_n - rolling_n)
 	var braking: bool = old_velocity > cap
+	if four_wheels:long_limit=int(wheel_state.brake_limit_n) if braking else int(wheel_state.drive_limit_n)
 	var brake_force: int = grip_n if braking else 0
 	if combined: brake_force=Dynamics23.brake_force(old_velocity,cap,mass_kg,drag_n+rolling_n,long_limit,step_ms)
 	if advanced:
@@ -305,6 +319,9 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 		dyn[Powertrain22.KEY].kers_used_j=int(energy.kers_j)
 		if not braking:
 			engine_n=int(energy.applied_n);force_n=engine_n-drag_n-rolling_n
+	if four_wheels:
+		wheel_state.applied_drive_n=0 if braking else engine_n;wheel_state.applied_brake_n=brake_force
+		dyn[Tyres304.KEY]=wheel_state
 	dyn.last_force_n = force_n
 	dyn.last_brake_n = brake_force
 	dyn.last_grip_n = grip_n
@@ -341,6 +358,7 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	var lateral_force: int = int(mass_kg * old_velocity * old_velocity / maxi(1, radius * 1000))
 	var lateral_use: int = mini(1000, int(lateral_force * 1000 / maxi(1, grip_n)))
 	var work_multiplier: int = 1000 + int(lateral_use / 3) + (220 if braking else 0)
+	if four_wheels:work_multiplier=int(work_multiplier*int(wheel_state.wear_factor)/1000)
 	var wear_rate: int = int(spec.wear_per_km)
 	if car.has("hyper"):
 		# Initial gameplay calibration, not measured tyre data. Preserve thermal load.
