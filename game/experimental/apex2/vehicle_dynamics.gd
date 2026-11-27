@@ -9,6 +9,7 @@ const Powertrain22 = preload("res://experimental/hyper2/powertrain_22.gd")
 const Dynamics23 = preload("res://experimental/hyper2/dynamics_23.gd")
 const Energy301 = preload("res://experimental/hyper2/energy_301.gd")
 const Geometry302 = preload("res://experimental/hyper2/geometry_302.gd")
+const Wet303 = preload("res://experimental/hyper2/wet_303.gd")
 const STEP_MS: int = 200
 const LAP_UNITS: int = 1000000
 const MAX_V_MM_S: int = 106000
@@ -221,6 +222,7 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 		load= Dynamics23.loads(mass_kg,_aero_force_n(int(dyn.downforce_milli),old_velocity),int(dyn[Dynamics23.KEY].accel_mm_s2))
 		grip_n=int(grip_n*int(load.scale)/1000)
 		corner_margin=Dynamics23.margin(car,water_microns)
+		if car.has(Wet303.KEY):corner_margin=Wet303.margin(corner_margin,car[Wet303.KEY],water_microns)
 		var radius_now:int=current_radius
 		# The sentinel describes a straight, not a physical 1000 m curve.
 		lateral_demand=0 if radius_now>=MAX_RADIUS_MM else int(mass_kg*old_velocity*old_velocity/maxi(1,radius_now*1000))
@@ -258,6 +260,7 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 		cap = mini(cap, clampi(int(car.traffic_speed_cap_mm_s), 0, MAX_V_MM_S))
 	# Power-to-wheel tractive force P/v, limited by longitudinal tyre traction.
 	var throttle: int = _pace_throttle(str(car.pace))
+	if car.has(Wet303.KEY):throttle=Wet303.throttle(throttle,car[Wet303.KEY],water_microns)
 	var power_requested_w: int = int(int(dyn.wheel_power_w) * throttle / 1000) if int(dyn.fuel_g) > 0 else 0
 	var engine_n: int = mini(grip_n, int(power_requested_w * 1000 / maxi(14000, old_velocity)))
 	var drag_n: int = _aero_force_n(int(dyn.drag_milli), old_velocity)

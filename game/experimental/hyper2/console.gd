@@ -13,6 +13,8 @@ var dynamics_choice: CheckBox
 var mega_choice: CheckBox
 var energy_choice: CheckBox
 var geometry_choice: CheckBox
+var wet_choice: CheckBox
+const SAVE303: String = "user://hyper_engine_303_checkpoint.bin"
 const SAVE302: String = "user://hyper_engine_302_checkpoint.bin"
 const SAVE301: String = "user://hyper_engine_301_checkpoint.bin"
 const SAVE30: String = "user://hyper_engine_30_checkpoint.bin"
@@ -99,16 +101,19 @@ func _ready() -> void:
 	mega_choice=CheckBox.new();mega_choice.text="HYPER-MEGA 3.0";config.add_child(mega_choice)
 	energy_choice=CheckBox.new();energy_choice.text="Física 3.0.1 (energia experimental)";config.add_child(energy_choice)
 	geometry_choice=CheckBox.new();geometry_choice.text="Física 3.0.2 (geometria experimental)";config.add_child(geometry_choice)
+	wet_choice=CheckBox.new();wet_choice.text="Física 3.0.3 (Wet Intelligence)";config.add_child(wet_choice)
 	physics_choice.toggled.connect(func(on:bool):
-		if on:dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false))
+		if on:dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false))
 	dynamics_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false))
 	mega_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false))
 	energy_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false))
 	geometry_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false))
+	wet_choice.toggled.connect(func(on:bool):
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false))
 	start_button = _button(config,"INICIAR",_start)
 	var controls := HFlowContainer.new(); outer.add_child(controls)
 	pause_button = _button(controls,"PAUSAR",_pause)
@@ -170,7 +175,8 @@ func _start() -> void:
 	s.hyper30_physics=mega_choice.button_pressed
 	s.hyper301_physics=energy_choice.button_pressed
 	s.hyper302_physics=geometry_choice.button_pressed
-	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302]: checkpoint_path=SAVE302 if geometry_choice.button_pressed else (SAVE301 if energy_choice.button_pressed else (SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE))))
+	s.hyper303_physics=wet_choice.button_pressed
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302,SAVE303]: checkpoint_path=SAVE303 if wet_choice.button_pressed else (SAVE302 if geometry_choice.button_pressed else (SAVE301 if energy_choice.button_pressed else (SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE)))))
 	var selected_count:int=0
 	for car in s.get("cars",[]):
 		if str(car.team)==team.get_item_text(team.selected):
@@ -188,7 +194,7 @@ func _bind_session() -> void:
 	for c in k.state.compounds: compound.add_item(str(c))
 	for track in data.tracks:
 		if str(track.code) == str(k.state.track_code):
-			if int(k.state.hyper_evolution_revision)==Kernel.GEOMETRY_REV:map_view.configure_profile(k.state.track_profile,int(k.state.lap_length_mm),team_colors)
+			if int(k.state.hyper_evolution_revision)>=Kernel.GEOMETRY_REV:map_view.configure_profile(k.state.track_profile,int(k.state.lap_length_mm),team_colors)
 			else:map_view.configure(track.points,team_colors)
 			break
 	if is_instance_valid(view_3d): _configure_3d()
@@ -238,6 +244,9 @@ func _redraw() -> void:
 		if selected.dynamics.has("energy_301") and selected.pit_stage=="TRACK":
 			var energy:Dictionary=selected.dynamics.energy_301
 			telemetry.text += " • trabalho %d J V8 / %d J KERS" % [energy.v8_j,energy.kers_j]
+		if selected.has("wet_303"):
+			var wet:Dictionary=selected.wet_303
+			telemetry.text += " • chuva %d / controle %d / confiança %d%%" % [wet.wet_skill,wet.control,int(wet.confidence)/10]
 		telemetry.text += " • última %.1fs / melhor %.1fs • %d erros" % [float(selected.evolution.last_lap_ticks)*0.2,float(selected.evolution.best_lap_ticks)*0.2,int(selected.evolution.error_count)]
 	var events: Array = k.state.events
 	while event_cursor < events.size():
@@ -271,7 +280,7 @@ func _pit() -> void:
 func _cancel() -> void: _command({"type":"cancel_pit"})
 func _save() -> void:
 	if not k.initialized: return
-	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302]: checkpoint_path=SAVE302 if int(k.state.hyper_evolution_revision)==Kernel.GEOMETRY_REV else (SAVE301 if int(k.state.hyper_evolution_revision)==Kernel.ENERGY_REV else (SAVE30 if int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV else (SAVE23 if int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV else (SAVE22 if int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV else SAVE))))
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302,SAVE303]: checkpoint_path=SAVE303 if int(k.state.hyper_evolution_revision)==Kernel.WET_REV else (SAVE302 if int(k.state.hyper_evolution_revision)==Kernel.GEOMETRY_REV else (SAVE301 if int(k.state.hyper_evolution_revision)==Kernel.ENERGY_REV else (SAVE30 if int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV else (SAVE23 if int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV else (SAVE22 if int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV else SAVE)))))
 	if checkpoint_path==SAVE30 and k.state.has("hyper_career_token"):checkpoint_path=CAREER_SAVE30
 	if checkpoint_path==SAVE30:
 		var prior=_read_checkpoint(SAVE30)
@@ -298,19 +307,19 @@ func _read_checkpoint(path: String):
 	var saved: Variant = f.get_var(false); f.close()
 	var candidate = Kernel.new()
 	if not saved is Dictionary or not candidate.restore(saved): return null
-	var expected_rev:int=7 if path in [SAVE302,SAVE302+".bak"] else (6 if path in [SAVE301,SAVE301+".bak"] else (5 if path in [SAVE30,SAVE30+".bak",CAREER_SAVE30,CAREER_SAVE30+".bak"] else (4 if path in [SAVE23,SAVE23+".bak"] else (3 if path in [SAVE22,SAVE22+".bak"] else (2 if path in [SAVE,SAVE+".bak"] else 0)))))
+	var expected_rev:int=8 if path in [SAVE303,SAVE303+".bak"] else (7 if path in [SAVE302,SAVE302+".bak"] else (6 if path in [SAVE301,SAVE301+".bak"] else (5 if path in [SAVE30,SAVE30+".bak",CAREER_SAVE30,CAREER_SAVE30+".bak"] else (4 if path in [SAVE23,SAVE23+".bak"] else (3 if path in [SAVE22,SAVE22+".bak"] else (2 if path in [SAVE,SAVE+".bak"] else 0))))))
 	if expected_rev!=0 and int(candidate.state.hyper_evolution_revision)!=expected_rev: return null
 	if path in [CAREER_SAVE30,CAREER_SAVE30+".bak"] and not candidate.state.has("hyper_career_token"):return null
 	return candidate
 func _load() -> void:
-	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302]: checkpoint_path=SAVE302 if geometry_choice.button_pressed else (SAVE301 if energy_choice.button_pressed else (SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE))))
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302,SAVE303]: checkpoint_path=SAVE303 if wet_choice.button_pressed else (SAVE302 if geometry_choice.button_pressed else (SAVE301 if energy_choice.button_pressed else (SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE)))))
 	var candidate = _read_checkpoint(checkpoint_path)
 	var from_backup: bool = false
 	if candidate == null:
 		candidate = _read_checkpoint(checkpoint_path+".bak"); from_backup = candidate != null
 	if candidate == null: status.text = "Checkpoint ausente, inválido ou incompatível."; return
 	if checkpoint_path==SAVE30 and candidate.state.has("hyper_career_token"):status.text="Este é um checkpoint de carreira. Abra Living Factory 3.0.";return
-	k = candidate; physics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV); dynamics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV); mega_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV); energy_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.ENERGY_REV); geometry_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.GEOMETRY_REV); running = false; _bind_session(); pause_button.text = "RETOMAR"; status.text = "Checkpoint restaurado do backup." if from_backup else "Checkpoint restaurado."
+	k = candidate; physics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV); dynamics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV); mega_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV); energy_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.ENERGY_REV); geometry_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.GEOMETRY_REV); wet_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.WET_REV); running = false; _bind_session(); pause_button.text = "RETOMAR"; status.text = "Checkpoint restaurado do backup." if from_backup else "Checkpoint restaurado."
 func _close() -> void:
 	if get_parent() is Window and get_parent() != get_tree().root: get_parent().queue_free()
 	else: get_tree().change_scene_to_file("res://scenes/main.tscn")
@@ -430,7 +439,8 @@ func _career_gp() -> void:
 	mega_choice.set_pressed_no_signal(career.mega_mode)
 	energy_choice.set_pressed_no_signal(false)
 	geometry_choice.set_pressed_no_signal(false)
-	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302]: checkpoint_path=CAREER_SAVE30 if career.mega_mode else SAVE
+	wet_choice.set_pressed_no_signal(false)
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302,SAVE303]: checkpoint_path=CAREER_SAVE30 if career.mega_mode else SAVE
 	if career.mega_mode and not s.is_empty():
 		var resumed=_reserved_mega_checkpoint(s)
 		if resumed!=null:
@@ -481,7 +491,7 @@ func _open_3d()->void:
 func _configure_3d()->void:
 	for t in data.tracks:
 		if str(t.code)==str(k.state.track_code):
-			if int(k.state.hyper_evolution_revision)==Kernel.GEOMETRY_REV:view_3d.configure_profile(k.state.track_profile,int(k.state.lap_length_mm),str(t.name),data.teams,team_colors)
+			if int(k.state.hyper_evolution_revision)>=Kernel.GEOMETRY_REV:view_3d.configure_profile(k.state.track_profile,int(k.state.lap_length_mm),str(t.name),data.teams,team_colors)
 			else:view_3d.configure(t.points,str(t.name),data.teams,team_colors)
 			break
 	view_3d.feed(k.state.cars,selected_id)

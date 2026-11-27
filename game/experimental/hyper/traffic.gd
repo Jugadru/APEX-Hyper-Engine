@@ -6,6 +6,7 @@ extends RefCounted
 ## Lane/corner capacity is a synthetic corridor abstraction, NOT surveyed geometry.
 const Dynamics23 = preload("res://experimental/hyper2/dynamics_23.gd")
 const Geometry302 = preload("res://experimental/hyper2/geometry_302.gd")
+const Wet303 = preload("res://experimental/hyper2/wet_303.gd")
 const SCHEMA: int = 13
 const PHASES: Array[String] = ["CRUISE", "APPROACH", "PREPARE", "ATTACK", "SIDE_BY_SIDE", "DEFEND", "ABORT", "RECOVER"]
 const LANES: Array[String] = ["CENTER", "LEFT", "RIGHT"]
@@ -84,6 +85,8 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 			if physical.size()<2:break
 			var front:Array=physical[(i+1)%physical.size()]
 			physical_next[int(physical[i][1])]=[int(front[1]),posmod(int(front[0])-int(physical[i][0]),lap_mm),int(front[2])]
+	var wet_reasons:Dictionary={}
+	if not roster.is_empty() and roster[0].has(Wet303.KEY):wet_reasons=Wet303.counters()
 	var proposed: Dictionary = {}
 	var transitions: Array = []
 	var claims: Dictionary = {}
@@ -151,10 +154,16 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 				_phase(r, "ABORT", tick, transitions, id, "approach_timeout")
 				r.aborts = int(r.aborts) + 1
 		elif phase == "PREPARE":
+			var wet_mode:bool=car.has(Wet303.KEY) and water>700
+			var wet_reason:String=""
+			if wet_mode and by_id.has(target_id) and target_gap<=INITIATE_MM:
+				wet_reason=Wet303.attack_reason(car,Geometry302.radius_at(profile,lap_mm,distance),target_gap,speed-int(by_id[target_id].dynamics.speed_mm_s),water)
+				if wet_reason=="eligible" and claims.has(target_id):wet_reason="claim"
+				wet_reasons[wet_reason]=int(wet_reasons[wet_reason])+1
 			if not by_id.has(target_id) or bool(by_id[target_id].finished) or str(by_id[target_id].pit_stage) != "TRACK" or target_gap < -5000 or target_gap > SEARCH_MM:
 				_phase(r, "ABORT", tick, transitions, id, "gap_changed")
 				r.aborts = int(r.aborts) + 1
-			elif target_gap <= INITIATE_MM and _can_pass(profile, lap_mm, distance) and not claims.has(target_id) and _evolution_commit(car, profile, lap_mm, distance, target_gap,water):
+			elif target_gap <= INITIATE_MM and not claims.has(target_id) and (wet_reason=="eligible" if wet_mode else (_can_pass(profile, lap_mm, distance) and _evolution_commit(car, profile, lap_mm, distance, target_gap,water))):
 				var defender: Dictionary = by_id[target_id]
 				var defensive_lane: String = "LEFT" if target_id % 2 == 0 else "RIGHT"
 				var incoming_state: Dictionary = proposed.get(target_id, defender.racecraft).duplicate(true)
@@ -176,6 +185,8 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 					r.attempts = int(r.attempts) + 1
 					claims[target_id] = id
 					_phase(r, "ATTACK", tick, transitions, id, "clear_alternative_corridor")
+					if wet_mode:wet_reasons.committed=int(wet_reasons.committed)+1
+				elif wet_mode:wet_reasons.lane=int(wet_reasons.lane)+1
 			if str(r.phase) == "PREPARE" and tick - int(r.phase_tick) >= 150:
 				_phase(r, "ABORT", tick, transitions, id, "no_safe_corridor")
 				r.aborts = int(r.aborts) + 1
@@ -228,7 +239,7 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 				if rival_gap <= FOLLOW_MM:
 					var available: int = maxi(0,rival_gap-SAFE_MM)
 					caps[id] = mini(int(caps[id]),maxi(0,int(rival[2])+int(available/4)))
-	return {"states": proposed, "speed_caps": caps, "transitions": transitions, "wake_gaps": wakes, "physical_front_gaps": front_gaps}
+	return {"states": proposed, "speed_caps": caps, "transitions": transitions, "wake_gaps": wakes, "physical_front_gaps": front_gaps,"wet_reasons":wet_reasons}
 
 static func _evolution_commit(car: Dictionary, profile: Array, lap_mm: int, distance: int, gap: int,water:int=0) -> bool:
 	if bool(car.get("mega_30",{}).get("neutral",false)):return false
