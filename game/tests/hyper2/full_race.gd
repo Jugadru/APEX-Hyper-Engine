@@ -8,6 +8,7 @@ func run() -> void:
 	var weather: String = args[1] if args.size() > 1 else "Seco"
 	var k = K.new()
 	var scenario: Dictionary = S.create(code, weather, 2026)
+	if "hyper22" in args: scenario.hyper22_physics=true
 	if not k.initialize(scenario): quit(1); return
 	var begin: int = Time.get_ticks_msec()
 	var resume_checked: bool = false

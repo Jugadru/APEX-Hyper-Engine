@@ -223,7 +223,9 @@ func _advance_reference_car(car: Dictionary, previous: int) -> void:
 	var mismatch: int = absi(int(h.setup_wet) - int(int(state.water_microns) / 6))
 	d.downforce_milli = int(downforce * int(h.wake_downforce) * (1000 - int(mismatch / 15)) / 1000000)
 	super._advance_reference_car(car, previous)
-	if int(d.last_brake_n) == 0:
+	if d.has("powertrain_22"):
+		h.kers_j=maxi(0,int(h.kers_j)-mini(boost,int(d.powertrain_22.kers_used_j)))
+	elif int(d.last_brake_n) == 0:
 		h.kers_j = int(h.kers_j) - boost
 	car.erase("hyper_kers_power_w")
 	d.wheel_power_w = power

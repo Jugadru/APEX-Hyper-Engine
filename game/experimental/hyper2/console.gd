@@ -6,6 +6,8 @@ const Kernel = preload("res://experimental/hyper2/kernel.gd")
 const Scenario = preload("res://experimental/hyper/scenario.gd")
 const TrackMap = preload("res://experimental/hyper/track_map.gd")
 const SAVE: String = "user://hyper_engine_21_checkpoint.bin"
+const SAVE22: String = "user://hyper_engine_22_checkpoint.bin"
+var physics_choice: CheckBox
 const Quality = preload("res://experimental/hyper2/quality.gd")
 const View3D = preload("res://experimental/hyper2/view_3d.gd")
 var quality = Quality.new()
@@ -64,8 +66,8 @@ func _ready() -> void:
 	add_child(margin)
 	var outer := VBoxContainer.new(); outer.add_theme_constant_override("separation",10); margin.add_child(outer)
 	var header := HBoxContainer.new(); outer.add_child(header)
-	var heading := _label(header,"APEX  /  NEXT ENGINE 2.1",30); heading.modulate = Color("ff8126"); heading.size_flags_horizontal = SIZE_EXPAND_FILL
-	_label(header,"HYPER EVOLUTION  •  ALPHA 2",18)
+	var heading := _label(header,"APEX  /  NEXT ENGINE 2.2",30); heading.modulate = Color("ff8126"); heading.size_flags_horizontal = SIZE_EXPAND_FILL
+	_label(header,"HYPER EVOLUTION  •  2.2 EXPERIMENTAL",18)
 	_label(outer,"LABORATÓRIO JOGÁVEL  |  GP independente • física longitudinal experimental • sem alterar a carreira oficial",16)
 	var config := HFlowContainer.new(); outer.add_child(config)
 	circuit = _option(config,"Circuito")
@@ -83,6 +85,7 @@ func _ready() -> void:
 	setup_second=_option(config,"Acerto P2")
 	for text in ["Seco","Misto","Molhado"]:setup_second.add_item(text)
 	_label(config,"Seed"); seed_field = SpinBox.new(); seed_field.max_value = 2147483647; seed_field.value = 2026; seed_field.custom_minimum_size.x = 110; config.add_child(seed_field)
+	physics_choice=CheckBox.new(); physics_choice.text="Física 2.2 (GP livre)"; config.add_child(physics_choice)
 	start_button = _button(config,"INICIAR",_start)
 	var controls := HFlowContainer.new(); outer.add_child(controls)
 	pause_button = _button(controls,"PAUSAR",_pause)
@@ -138,6 +141,8 @@ func _start() -> void:
 	var code: String = str(circuit.get_item_metadata(circuit.selected))
 	var w: String = "Chuva intensa" if weather.selected == 1 else "Seco"
 	var s: Dictionary = Scenario.create(code,w,int(seed_field.value),team.get_item_text(team.selected),auto_pit.button_pressed,setup_choice.selected*500)
+	s.hyper22_physics=physics_choice.button_pressed
+	if checkpoint_path in [SAVE,SAVE22]: checkpoint_path=SAVE22 if physics_choice.button_pressed else SAVE
 	var selected_count:int=0
 	for car in s.get("cars",[]):
 		if str(car.team)==team.get_item_text(team.selected):
@@ -190,6 +195,9 @@ func _redraw() -> void:
 	var selected: Dictionary = k._lookup_car(selected_id)
 	if not selected.is_empty():
 		telemetry.text = "%s • %.0f km/h • %.1f kg combustível • %.1f °C pneus • %.0f kJ KERS • %s • BOX %s" % [selected.name,float(selected.dynamics.speed_mm_s)*0.0036,float(selected.dynamics.fuel_g)/1000.0,float(selected.dynamics.tire_temp_centi)/100.0,float(selected.hyper.kers_j)/1000.0,"DRS ABERTO" if selected.hyper.drs_active else "DRS FECHADO",str(selected.pit_requested_lap) if int(selected.pit_requested_lap)>0 else "—"]
+		if selected.dynamics.has("powertrain_22"):
+			var pt: Dictionary=selected.dynamics.powertrain_22
+			telemetry.text += " • M%d / %d rpm / %.0f kW V8 / %.1f kg" % [pt.gear,pt.rpm,float(pt.v8_wheel_w)/1000.0,float(pt.mass_g)/1000.0] if selected.pit_stage=="TRACK" else " • box / motor não medido"
 		telemetry.text += " • última %.1fs / melhor %.1fs • %d erros" % [float(selected.evolution.last_lap_ticks)*0.2,float(selected.evolution.best_lap_ticks)*0.2,int(selected.evolution.error_count)]
 	var events: Array = k.state.events
 	while event_cursor < events.size():
@@ -223,6 +231,7 @@ func _pit() -> void:
 func _cancel() -> void: _command({"type":"cancel_pit"})
 func _save() -> void:
 	if not k.initialized: return
+	if checkpoint_path in [SAVE,SAVE22]: checkpoint_path=SAVE22 if int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV else SAVE
 	var f := FileAccess.open(checkpoint_path+".tmp",FileAccess.WRITE)
 	if f == null: status.text = "Falha ao abrir arquivo de checkpoint."; return
 	f.store_var(k.checkpoint(),false); f.flush(); var write_error: Error = f.get_error(); f.close()
@@ -242,14 +251,16 @@ func _read_checkpoint(path: String):
 	var saved: Variant = f.get_var(false); f.close()
 	var candidate = Kernel.new()
 	if not saved is Dictionary or not candidate.restore(saved): return null
+	if path in [SAVE,SAVE+".bak",SAVE22,SAVE22+".bak"] and (int(candidate.state.hyper_evolution_revision)==Kernel.PHYSICS_REV)!=(path in [SAVE22,SAVE22+".bak"]): return null
 	return candidate
 func _load() -> void:
+	if checkpoint_path in [SAVE,SAVE22]: checkpoint_path=SAVE22 if physics_choice.button_pressed else SAVE
 	var candidate = _read_checkpoint(checkpoint_path)
 	var from_backup: bool = false
 	if candidate == null:
 		candidate = _read_checkpoint(checkpoint_path+".bak"); from_backup = candidate != null
 	if candidate == null: status.text = "Checkpoint ausente, inválido ou incompatível."; return
-	k = candidate; running = false; _bind_session(); pause_button.text = "RETOMAR"; status.text = "Checkpoint restaurado do backup." if from_backup else "Checkpoint restaurado."
+	k = candidate; physics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV); running = false; _bind_session(); pause_button.text = "RETOMAR"; status.text = "Checkpoint restaurado do backup." if from_backup else "Checkpoint restaurado."
 func _close() -> void:
 	if get_parent() is Window and get_parent() != get_tree().root: get_parent().queue_free()
 	else: get_tree().change_scene_to_file("res://scenes/main.tscn")
@@ -354,6 +365,8 @@ func _career_gp() -> void:
 		career_window.queue_free(); return
 	var w: String = weather.get_item_text(weather.selected)
 	var s: Dictionary = career.prepare(w,auto_pit.button_pressed,setup_choice.selected*500,setup_second.selected*500)
+	physics_choice.set_pressed_no_signal(false)
+	if checkpoint_path in [SAVE,SAVE22]: checkpoint_path=SAVE
 	var candidate = Kernel.new()
 	if s.is_empty() or not candidate.initialize(s): _career_action("Falha ao preparar etapa."); return
 	k = candidate; _bind_session(); running = true; pause_button.text = "PAUSAR"; status.text = "Etapa oficial da carreira Hyper em andamento."; career_window.queue_free()
