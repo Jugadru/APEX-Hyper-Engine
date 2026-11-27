@@ -18,6 +18,8 @@ var tyre_choice: CheckBox
 var racecraft_choice: CheckBox
 var control_choice: CheckBox
 var strategy_choice: CheckBox
+var sector_choice: CheckBox
+const SAVE3062: String = "user://hyper_engine_3062_checkpoint.bin"
 const SAVE3061: String = "user://hyper_engine_3061_checkpoint.bin"
 const SAVE306: String = "user://hyper_engine_306_checkpoint.bin"
 const SAVE305: String = "user://hyper_engine_305_checkpoint.bin"
@@ -114,26 +116,29 @@ func _ready() -> void:
 	racecraft_choice=CheckBox.new();racecraft_choice.text="Física 3.0.5 (Identidade e Racecraft)";config.add_child(racecraft_choice)
 	control_choice=CheckBox.new();control_choice.text="Física 3.0.6 (Direção de prova)";config.add_child(control_choice)
 	strategy_choice=CheckBox.new();strategy_choice.text="Física 3.0.6.1 (Estratégia de pneus)";config.add_child(strategy_choice)
+	sector_choice=CheckBox.new();sector_choice.text="Física 3.0.6.2 (Delta por setores)";config.add_child(sector_choice)
 	physics_choice.toggled.connect(func(on:bool):
-		if on:dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false))
+		if on:dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false);sector_choice.set_pressed_no_signal(false))
 	dynamics_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false);sector_choice.set_pressed_no_signal(false))
 	mega_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false);sector_choice.set_pressed_no_signal(false))
 	energy_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false);sector_choice.set_pressed_no_signal(false))
 	geometry_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false);sector_choice.set_pressed_no_signal(false))
 	wet_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false);sector_choice.set_pressed_no_signal(false))
 	tyre_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false);sector_choice.set_pressed_no_signal(false))
 	racecraft_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false);sector_choice.set_pressed_no_signal(false))
 	control_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false);sector_choice.set_pressed_no_signal(false))
 	strategy_choice.toggled.connect(func(on:bool):
-		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false))
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);sector_choice.set_pressed_no_signal(false))
+	sector_choice.toggled.connect(func(on:bool):
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false);energy_choice.set_pressed_no_signal(false);geometry_choice.set_pressed_no_signal(false);wet_choice.set_pressed_no_signal(false);tyre_choice.set_pressed_no_signal(false);racecraft_choice.set_pressed_no_signal(false);control_choice.set_pressed_no_signal(false);strategy_choice.set_pressed_no_signal(false))
 	start_button = _button(config,"INICIAR",_start)
 	var controls := HFlowContainer.new(); outer.add_child(controls)
 	pause_button = _button(controls,"PAUSAR",_pause)
@@ -200,7 +205,8 @@ func _start() -> void:
 	s.hyper305_physics=racecraft_choice.button_pressed
 	s.hyper306_physics=control_choice.button_pressed
 	s.hyper3061_physics=strategy_choice.button_pressed
-	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302,SAVE303,SAVE304,SAVE305,SAVE306,SAVE3061]: checkpoint_path=SAVE3061 if strategy_choice.button_pressed else (SAVE306 if control_choice.button_pressed else (SAVE305 if racecraft_choice.button_pressed else (SAVE304 if tyre_choice.button_pressed else (SAVE303 if wet_choice.button_pressed else (SAVE302 if geometry_choice.button_pressed else (SAVE301 if energy_choice.button_pressed else (SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE)))))))))
+	s.hyper3062_physics=sector_choice.button_pressed
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302,SAVE303,SAVE304,SAVE305,SAVE306,SAVE3061,SAVE3062]: checkpoint_path=SAVE3062 if sector_choice.button_pressed else (SAVE3061 if strategy_choice.button_pressed else (SAVE306 if control_choice.button_pressed else (SAVE305 if racecraft_choice.button_pressed else (SAVE304 if tyre_choice.button_pressed else (SAVE303 if wet_choice.button_pressed else (SAVE302 if geometry_choice.button_pressed else (SAVE301 if energy_choice.button_pressed else (SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE))))))))))
 	var selected_count:int=0
 	for car in s.get("cars",[]):
 		if str(car.team)==team.get_item_text(team.selected):
@@ -283,11 +289,14 @@ func _redraw() -> void:
 		if selected.has("pit_strategy_3061"):
 			var decision:Dictionary=selected.pit_strategy_3061
 			telemetry.text += " • estratégia %s / ganho %.1f s / box %.1f s" % [decision.reason,float(decision.gain_ms)/1000.0,float(decision.cost_ms)/1000.0]
+		if selected.has("sector_control_3062"):
+			var sector:Dictionary=selected.sector_control_3062
+			telemetry.text += " • setor %s / avisos %d" % ["%+.3f s" % (float(sector.delta_us)/1000000.0) if int(sector.samples)>0 else "sem amostra",int(sector.warnings)]
 		telemetry.text += " • última %.1fs / melhor %.1fs • %d erros" % [float(selected.evolution.last_lap_ticks)*0.2,float(selected.evolution.best_lap_ticks)*0.2,int(selected.evolution.error_count)]
 	var events: Array = k.state.events
 	while event_cursor < events.size():
 		var ev: Dictionary = events[event_cursor]; event_cursor += 1
-		if not str(ev.type) in ["hyper_pit_serviced","hyper_pit_exit","hyper_weather_change","hyper_strategy_order","hyper_retired","racecraft_overtake_confirmed","driver_intent_changed","command_rejected","race_finished","hyper_driver_error","hyper_error_recovered","hyper_error_interrupted","mega_damage","mega_repair","mega_virtual_sc","mega_green","mega_mechanical_retirement","mega_radio","race_control_speed_warning","race_control_order_warning"]: continue
+		if not str(ev.type) in ["hyper_pit_serviced","hyper_pit_exit","hyper_weather_change","hyper_strategy_order","hyper_retired","racecraft_overtake_confirmed","driver_intent_changed","command_rejected","race_finished","hyper_driver_error","hyper_error_recovered","hyper_error_interrupted","mega_damage","mega_repair","mega_virtual_sc","mega_green","mega_mechanical_retirement","mega_radio","race_control_speed_warning","race_control_order_warning","race_control_sector_warning"]: continue
 		if str(ev.type) in ["driver_intent_changed","mega_radio"] and int(ev.car_id) != selected_id: continue
 		var c: Dictionary = k._lookup_car(int(ev.car_id)); var name_text: String = str(c.get("name","DIREÇÃO"))
 		var msg:String=_radio_text(ev)
@@ -316,7 +325,7 @@ func _pit() -> void:
 func _cancel() -> void: _command({"type":"cancel_pit"})
 func _save() -> void:
 	if not k.initialized: return
-	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302,SAVE303,SAVE304,SAVE305,SAVE306,SAVE3061]: checkpoint_path=SAVE3061 if int(k.state.hyper_evolution_revision)==Kernel.STRATEGY_REV else (SAVE306 if int(k.state.hyper_evolution_revision)==Kernel.CONTROL_REV else (SAVE305 if int(k.state.hyper_evolution_revision)==Kernel.RACECRAFT_REV else (SAVE304 if int(k.state.hyper_evolution_revision)==Kernel.TYRE_REV else (SAVE303 if int(k.state.hyper_evolution_revision)==Kernel.WET_REV else (SAVE302 if int(k.state.hyper_evolution_revision)==Kernel.GEOMETRY_REV else (SAVE301 if int(k.state.hyper_evolution_revision)==Kernel.ENERGY_REV else (SAVE30 if int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV else (SAVE23 if int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV else (SAVE22 if int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV else SAVE)))))))))
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302,SAVE303,SAVE304,SAVE305,SAVE306,SAVE3061,SAVE3062]: checkpoint_path=SAVE3062 if int(k.state.hyper_evolution_revision)==Kernel.SECTOR_REV else (SAVE3061 if int(k.state.hyper_evolution_revision)==Kernel.STRATEGY_REV else (SAVE306 if int(k.state.hyper_evolution_revision)==Kernel.CONTROL_REV else (SAVE305 if int(k.state.hyper_evolution_revision)==Kernel.RACECRAFT_REV else (SAVE304 if int(k.state.hyper_evolution_revision)==Kernel.TYRE_REV else (SAVE303 if int(k.state.hyper_evolution_revision)==Kernel.WET_REV else (SAVE302 if int(k.state.hyper_evolution_revision)==Kernel.GEOMETRY_REV else (SAVE301 if int(k.state.hyper_evolution_revision)==Kernel.ENERGY_REV else (SAVE30 if int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV else (SAVE23 if int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV else (SAVE22 if int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV else SAVE))))))))))
 	if checkpoint_path==SAVE30 and k.state.has("hyper_career_token"):checkpoint_path=CAREER_SAVE30
 	if checkpoint_path==SAVE30:
 		var prior=_read_checkpoint(SAVE30)
@@ -343,19 +352,19 @@ func _read_checkpoint(path: String):
 	var saved: Variant = f.get_var(false); f.close()
 	var candidate = Kernel.new()
 	if not saved is Dictionary or not candidate.restore(saved): return null
-	var expected_rev:int=12 if path in [SAVE3061,SAVE3061+".bak"] else (11 if path in [SAVE306,SAVE306+".bak"] else (10 if path in [SAVE305,SAVE305+".bak"] else (9 if path in [SAVE304,SAVE304+".bak"] else (8 if path in [SAVE303,SAVE303+".bak"] else (7 if path in [SAVE302,SAVE302+".bak"] else (6 if path in [SAVE301,SAVE301+".bak"] else (5 if path in [SAVE30,SAVE30+".bak",CAREER_SAVE30,CAREER_SAVE30+".bak"] else (4 if path in [SAVE23,SAVE23+".bak"] else (3 if path in [SAVE22,SAVE22+".bak"] else (2 if path in [SAVE,SAVE+".bak"] else 0))))))))))
+	var expected_rev:int=13 if path in [SAVE3062,SAVE3062+".bak"] else (12 if path in [SAVE3061,SAVE3061+".bak"] else (11 if path in [SAVE306,SAVE306+".bak"] else (10 if path in [SAVE305,SAVE305+".bak"] else (9 if path in [SAVE304,SAVE304+".bak"] else (8 if path in [SAVE303,SAVE303+".bak"] else (7 if path in [SAVE302,SAVE302+".bak"] else (6 if path in [SAVE301,SAVE301+".bak"] else (5 if path in [SAVE30,SAVE30+".bak",CAREER_SAVE30,CAREER_SAVE30+".bak"] else (4 if path in [SAVE23,SAVE23+".bak"] else (3 if path in [SAVE22,SAVE22+".bak"] else (2 if path in [SAVE,SAVE+".bak"] else 0)))))))))))
 	if expected_rev!=0 and int(candidate.state.hyper_evolution_revision)!=expected_rev: return null
 	if path in [CAREER_SAVE30,CAREER_SAVE30+".bak"] and not candidate.state.has("hyper_career_token"):return null
 	return candidate
 func _load() -> void:
-	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302,SAVE303,SAVE304,SAVE305,SAVE306,SAVE3061]: checkpoint_path=SAVE3061 if strategy_choice.button_pressed else (SAVE306 if control_choice.button_pressed else (SAVE305 if racecraft_choice.button_pressed else (SAVE304 if tyre_choice.button_pressed else (SAVE303 if wet_choice.button_pressed else (SAVE302 if geometry_choice.button_pressed else (SAVE301 if energy_choice.button_pressed else (SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE)))))))))
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302,SAVE303,SAVE304,SAVE305,SAVE306,SAVE3061,SAVE3062]: checkpoint_path=SAVE3062 if sector_choice.button_pressed else (SAVE3061 if strategy_choice.button_pressed else (SAVE306 if control_choice.button_pressed else (SAVE305 if racecraft_choice.button_pressed else (SAVE304 if tyre_choice.button_pressed else (SAVE303 if wet_choice.button_pressed else (SAVE302 if geometry_choice.button_pressed else (SAVE301 if energy_choice.button_pressed else (SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE))))))))))
 	var candidate = _read_checkpoint(checkpoint_path)
 	var from_backup: bool = false
 	if candidate == null:
 		candidate = _read_checkpoint(checkpoint_path+".bak"); from_backup = candidate != null
 	if candidate == null: status.text = "Checkpoint ausente, inválido ou incompatível."; return
 	if checkpoint_path==SAVE30 and candidate.state.has("hyper_career_token"):status.text="Este é um checkpoint de carreira. Abra Living Factory 3.0.";return
-	k = candidate; physics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV); dynamics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV); mega_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV); energy_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.ENERGY_REV); geometry_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.GEOMETRY_REV); wet_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.WET_REV); tyre_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.TYRE_REV); racecraft_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.RACECRAFT_REV); control_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.CONTROL_REV); strategy_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.STRATEGY_REV); running = false; _bind_session(); pause_button.text = "RETOMAR"; status.text = "Checkpoint restaurado do backup." if from_backup else "Checkpoint restaurado."
+	k = candidate; physics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV); dynamics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV); mega_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV); energy_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.ENERGY_REV); geometry_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.GEOMETRY_REV); wet_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.WET_REV); tyre_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.TYRE_REV); racecraft_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.RACECRAFT_REV); control_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.CONTROL_REV); strategy_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.STRATEGY_REV); sector_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.SECTOR_REV); running = false; _bind_session(); pause_button.text = "RETOMAR"; status.text = "Checkpoint restaurado do backup." if from_backup else "Checkpoint restaurado."
 func _close() -> void:
 	if get_parent() is Window and get_parent() != get_tree().root: get_parent().queue_free()
 	else: get_tree().change_scene_to_file("res://scenes/main.tscn")
@@ -363,6 +372,7 @@ func _close() -> void:
 func _pit_label(value: String) -> String:
 	return str({"TRACK":"PISTA","ENTRY_OBSERVED":"ENTRADA","PIT_IN":"ENTRADA","PIT_WAIT":"FILA","PIT_SERVICE":"SERVIÇO","PIT_OUT":"SAÍDA"}.get(value,value))
 func _radio_text(ev: Dictionary) -> String:
+	if str(ev.type)=="race_control_sector_warning":return "Direção de prova: delta negativo no trecho de VSC; em análise."
 	if str(ev.type)=="race_control_speed_warning":return "Direção de prova: excesso de distância durante VSC, em análise."
 	if str(ev.type)=="race_control_order_warning":return "Direção de prova: mudança de posição durante VSC, em análise."
 	if str(ev.type)=="mega_radio":return str({"DAMAGE":"Piloto: sinto dano aerodinâmico.","RELIABILITY":"Engenheiro: condição mecânica crítica.","FUEL":"Engenheiro: atenção ao combustível.","TYRES":"Piloto: pneus perderam rendimento.","TRAFFIC":"Piloto: preso no tráfego."}.get(str(ev.get("kind","")),"Atenção."))
@@ -482,7 +492,8 @@ func _career_gp() -> void:
 	racecraft_choice.set_pressed_no_signal(false)
 	control_choice.set_pressed_no_signal(false)
 	strategy_choice.set_pressed_no_signal(false)
-	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302,SAVE303,SAVE304,SAVE305,SAVE306,SAVE3061]: checkpoint_path=CAREER_SAVE30 if career.mega_mode else SAVE
+	sector_choice.set_pressed_no_signal(false)
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30,SAVE301,SAVE302,SAVE303,SAVE304,SAVE305,SAVE306,SAVE3061,SAVE3062]: checkpoint_path=CAREER_SAVE30 if career.mega_mode else SAVE
 	if career.mega_mode and not s.is_empty():
 		var resumed=_reserved_mega_checkpoint(s)
 		if resumed!=null:
