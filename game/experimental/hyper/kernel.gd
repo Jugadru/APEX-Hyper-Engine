@@ -60,6 +60,8 @@ func step_tick() -> bool:
 	_wake_grid(action.wake_gaps)
 	for car in state.cars:
 		Env.drs_update(car,state.hyper_drs_zones,int(action.physical_front_gaps.get(int(car.id),state.lap_length_mm)),int(state.water_microns))
+		if bool(car.get("mega_30",{}).get("neutral",false)):
+			car.hyper.drs_active=false;car.hyper.drs_armed=[]
 	var advanced: bool = super.step_tick()
 	if not advanced:
 		return false
@@ -215,6 +217,7 @@ func _advance_reference_car(car: Dictionary, previous: int) -> void:
 	var drag: int = int(d.drag_milli)
 	var downforce: int = int(d.downforce_milli)
 	var boost: int = mini(12000, int(h.kers_j)) if str(car.pace) == "Atacar" and int(d.speed_mm_s) > 25000 and int(d.fuel_g) > 0 else 0
+	if bool(car.get("mega_30",{}).get("neutral",false)) or bool(car.get("mega_30",{}).get("failure",false)):boost=0
 	car["hyper_kers_power_w"] = int(boost * 1000 / STEP_MS)
 	d.wheel_power_w = power + int(car.hyper_kers_power_w)
 	# DRS zones come from the original project's approximations; no official geometry claimed.
