@@ -1,0 +1,37 @@
+name: Race audit laboratory
+on:
+  pull_request:
+    branches: [main, hyper/3.0.6.1-strategy]
+    paths:
+      - 'lab/race-control-audit/**'
+      - 'tools/wet_matrix_audit.py'
+      - '.github/workflows/race-audit-lab.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Exact candidate and Python syntax
+        env:
+          EXPECTED: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          python3 -m py_compile tools/wet_matrix_audit.py
+      - uses: chickensoft-games/setup-godot@ac93246ea68518a384c1c280a496e5989341f2f6
+        with:
+          version: '4.7.2'
+          use-dotnet: false
+      - name: Isolated audit fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          timeout 60s godot --headless --path lab/race-control-audit --script res://test.gd 2>&1 | tee /tmp/race-audit.log
+          grep -q '"status":"PASS"' /tmp/race-audit.log
+          if grep -E '^FAIL |SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/race-audit.log; then exit 1; fi
