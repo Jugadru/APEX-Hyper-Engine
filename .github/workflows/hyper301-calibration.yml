@@ -62,3 +62,13 @@ jobs:
             if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' "/tmp/$mode.log"; then exit 1; fi
           done
           python3 tools/compare_hyper_gp.py /tmp/hyper30.log /tmp/hyper301.log "$TRACK" "$WEATHER"
+          PYTHONPATH=tools python3 - <<'PY'
+          import os
+          from compare_hyper_gp import load
+          expected = {
+              "ITA": "5b0f962e954f89d350caea919700105c9b986c9cff4a3e5850baf9d16ad4a018",
+              "GBR": "0ac3020fce448df37a4778404bda7a3ae6e448c75b1498fb56c512b832a36857",
+          }
+          assert load("/tmp/hyper30.log")["hash"] == expected[os.environ["TRACK"]], "approved rev5 sporting hash changed"
+          print("HYPER301_LEGACY_HASH_PASS")
+          PY

@@ -237,14 +237,14 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 			p.erase("energy_share");p.erase("energy_v8_budget");p.erase("energy_kers_budget")
 			if not braking:
 				var upper_speed:int=mini(cap,clampi(old_velocity+int((engine_n-drag_n-rolling_n)*step_ms/mass_kg),0,MAX_V_MM_S))
-				var upper_distance:int=int((old_velocity+upper_speed)*step_ms/2+int(dyn.distance_remainder))/1000
+				var upper_distance:int=int((old_velocity+upper_speed)*step_ms/2+int(dyn.distance_remainder))/1000+1 # conservative integer rounding bound
 				engine_n=Energy301.limit(proposal_n,share,v8_budget,kers_budget,upper_distance)
 		available_drive_n=engine_n-drag_n-rolling_n
 	var force_n: int = -brake_force if braking else available_drive_n
 	if advanced and braking: force_n-=drag_n+rolling_n
 	var acceleration_mm_s2: int = int(force_n * 1000 / mass_kg)
-	var next_speed: int = clampi(old_velocity + int(acceleration_mm_s2 * step_ms / 1000), 0, MAX_V_MM_S)
-	var unclamped_speed:int=next_speed
+	var unclamped_speed:int=old_velocity + int(acceleration_mm_s2 * step_ms / 1000)
+	var next_speed: int = clampi(unclamped_speed, 0, MAX_V_MM_S)
 	if not braking:
 		next_speed = mini(next_speed, cap if combined else cap + maxi(1500, int(brake_decel * step_ms / 1000)))
 	var distance_numerator: int = int((old_velocity + next_speed) * step_ms / 2) + int(dyn.distance_remainder)
