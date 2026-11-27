@@ -179,12 +179,16 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 				var defensive_lane: String = "LEFT" if target_id % 2 == 0 else "RIGHT"
 				if styled:defensive_lane=Style305.preferred_lane(defender[Style305.KEY],Geometry302.curvature_at(profile,lap_mm,int(defender.dynamics.distance_mm)))
 				var incoming_state: Dictionary = proposed.get(target_id, defender.racecraft).duplicate(true)
-				if not bool(r.get("lapping",false)) and (Style305.defense_allowed(defender,target_gap,speed-int(defender.dynamics.speed_mm_s)) and not bool(incoming_state.defense_used) if styled else str(defender.driver.intent)=="COVER_THREAT") and str(incoming_state.phase) in ["CRUISE", "APPROACH", "RECOVER"] and _lane_allowed(defensive_lane, target_id, int(defender.dynamics.distance_mm), proposed, roster, lap_mm):
+				var pre_defense:Dictionary=incoming_state.duplicate(true) if styled else {}
+				var defense_event_index:int=transitions.size()
+				var staged_defense:bool=false
+				if not bool(r.get("lapping",false)) and (Style305.defense_allowed(defender,target_gap,speed-int(defender.dynamics.speed_mm_s)) and not bool(incoming_state.defense_used) if styled else str(defender.driver.intent)=="COVER_THREAT") and str(incoming_state.phase) in ["CRUISE", "APPROACH", "RECOVER"] and _lane_allowed(defensive_lane, target_id, int(defender.dynamics.distance_mm), proposed, roster, lap_mm) and (not styled or _future_clear(defensive_lane,defender,proposed,roster,lap_mm)):
 					incoming_state.target_id = id
 					incoming_state.lane = defensive_lane
 					incoming_state.defense_used = true
 					_phase(incoming_state, "DEFEND", tick, transitions, target_id, "single_defensive_move")
 					proposed[target_id] = incoming_state
+					staged_defense=styled
 				var first_lane: String = "RIGHT" if str(incoming_state.lane) == "LEFT" else "LEFT"
 				if styled and str(incoming_state.lane)=="CENTER":first_lane=Style305.preferred_lane(car[Style305.KEY],Geometry302.curvature_at(profile,lap_mm,distance))
 				var second_lane: String = "LEFT" if first_lane == "RIGHT" else "RIGHT"
@@ -199,7 +203,12 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 					claims[target_id] = id
 					_phase(r, "ATTACK", tick, transitions, id, "clear_alternative_corridor")
 					if wet_mode:wet_reasons.committed=int(wet_reasons.committed)+1
-				elif wet_mode:wet_reasons.lane=int(wet_reasons.lane)+1
+				else:
+					if staged_defense:
+						# A defense is committed only with a real attack corridor.
+						proposed[target_id]=pre_defense
+						transitions.resize(defense_event_index)
+					if wet_mode:wet_reasons.lane=int(wet_reasons.lane)+1
 			if str(r.phase) == "PREPARE" and tick - int(r.phase_tick) >= 150:
 				_phase(r, "ABORT", tick, transitions, id, "no_safe_corridor")
 				r.aborts = int(r.aborts) + 1

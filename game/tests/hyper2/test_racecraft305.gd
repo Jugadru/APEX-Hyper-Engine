@@ -51,6 +51,18 @@ func run()->void:
 	roster.reverse();ck(T.plan(roster,profile,lap,10,5000)==plan,"roster permutation")
 	car.dynamics.tyres_304.rear_reserve_n=100
 	ck(T.plan(roster,profile,lap,10,5000).states[int(car.id)].phase!="ATTACK","resolver respects axle reserve")
+	car.dynamics.tyres_304.rear_reserve_n=3000
+	defender.pace="Normal";defender.driver.fatigue=0;defender.driver.intent="COVER_THREAT";defender.evolution.error_left=0
+	# Both alternatives occupied at the attacker, but clear at the defender:
+	# no ghost defensive move or event without a committed attack.
+	var left:Dictionary=k.state.cars[2].duplicate(true);var right:Dictionary=k.state.cars[3].duplicate(true)
+	for blocker in [left,right]:
+		blocker.finished=false;blocker.pit_stage="TRACK";blocker.pace="Conservar"
+		blocker.dynamics.distance_mm=100000;blocker.dynamics.speed_mm_s=40000;blocker.racecraft=T.initial_state()
+	left.racecraft.lane="LEFT";right.racecraft.lane="RIGHT"
+	var blocked:Dictionary=T.plan([car,defender,left,right],profile,lap,10,5000)
+	ck(blocked.states[int(car.id)].phase!="ATTACK" and blocked.states[int(defender.id)].phase!="DEFEND","no orphan defense when both lanes blocked")
+	ck(not blocked.transitions.any(func(e:Dictionary)->bool:return str(e.phase)=="DEFEND"),"no phantom defense event")
 	var replay=R.new();replay.attach(k)
 	for i in range(900):k.step_tick();replay.observed(k)
 	var copy=K.new();ck(copy.restore(k.checkpoint()),"restore")
