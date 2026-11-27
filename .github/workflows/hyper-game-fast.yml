@@ -1,0 +1,47 @@
+name: Hyper Game FAST
+on:
+  push:
+    branches: ['migration/alpha2-full-baseline', 'hyper/**', main]
+  pull_request:
+    branches: [main, 'migration/alpha2-full-baseline']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  game-fast:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Verify candidate and baseline archive inventory
+        env:
+          EXPECTED: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          python3 tools/verify_game_inventory.py
+      - uses: chickensoft-games/setup-godot@ac93246ea68518a384c1c280a496e5989341f2f6
+        with:
+          version: '4.7.2'
+          use-dotnet: false
+      - name: Import actual Godot game
+        shell: bash
+        run: |
+          set -euo pipefail
+          godot --version
+          timeout 300s godot --headless --path game --rendering-method gl_compatibility --editor --import > /tmp/hyper-import.log 2>&1 || { tail -150 /tmp/hyper-import.log; exit 1; }
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper-import.log; then exit 1; fi
+          tail -15 /tmp/hyper-import.log
+      - name: Run game directional regression fixtures
+        shell: bash
+        run: |
+          set -euo pipefail
+          for item in test_evolution test_calendar test_replay_quality test_manual_wet test_workshop test_menu test_ui; do
+            echo "HYPER_FIXTURE $item"
+            timeout 240s godot --headless --path game --rendering-method gl_compatibility --script "res://tests/hyper2/$item.gd" > "/tmp/$item.log" 2>&1 || { cat "/tmp/$item.log"; exit 1; }
+            cat "/tmp/$item.log"
+            if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:|^FAIL ' "/tmp/$item.log"; then exit 1; fi
+          done
+          echo HYPER_GAME_FAST_PASS
