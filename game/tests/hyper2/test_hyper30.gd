@@ -15,7 +15,7 @@ func run()->void:
 	var m:Dictionary=M.initial()
 	M.lane(m,"RIGHT",10000,5000,10000)
 	ck(m.lateral_mm==280 and m.pitch_millirad==-10 and m.roll_load_permille==500,"bounded lane and load proxies")
-	M.condition_tick(m,1000000,true);ck(m.health==998,"wear by distance")
+	M.condition_tick(m,5000000,true);ck(m.health==998,"stress-weighted wear by distance")
 	ck(M.incident(m,"SPIN")==85 and m.damage==85,"incident damage")
 	var k=K.new();var s:Dictionary=S.create("ITA","Seco",2026);s.hyper30_physics=true;s.hyper_errors_enabled=false
 	ck(k.initialize(s) and k.state.hyper_evolution_revision==5,"revision 5")
@@ -32,10 +32,25 @@ func run()->void:
 	ck(k.sporting_hash()==copy.sporting_hash() and k.state.mega_control.remaining==0,"control expiry and continuation")
 	var bad:Dictionary=k.checkpoint();bad.state.cars[0].mega_30.health=-1
 	ck(not copy.restore(bad),"invalid health rejected")
+	first.mega_30.health=0;first.mega_30.failure=true
+	for i in range(100):
+		if first.finished:break
+		k.step_tick()
+	ck(first.finished and first.hyper.retired and k.state.events.any(func(e:Dictionary)->bool:return e.type=="mega_mechanical_retirement" and int(e.car_id)==id),"mechanical retirement from actual motion")
 	var probe=K.new();ck(probe.initialize(s),"replay init");var replay=R.new();replay.attach(probe)
 	for i in range(350):probe.step_tick();replay.observed(probe)
 	var seek=replay.seek(350);ck(seek!=null and seek.sporting_hash()==probe.sporting_hash(),"replay")
 	ck(probe.state.cars.all(func(car:Dictionary)->bool:return M.valid(car.mega_30)),"24 valid states")
+	var repair:Dictionary=probe.state.cars[0];repair.mega_30.damage=85
+	var repair_id:int=int(repair.id)
+	var order:Dictionary={"type":"schedule_pit","source":"Manual","car_id":repair_id,"requested_lap":int(repair.laps_done)+2,"compound":"Médio","allow_double_stack":true}
+	ck(bool(probe.submit(order).accepted),"repair pit accepted")
+	var stops:int=int(repair.hyper.pit_count);var extended:bool=false
+	for i in range(3500):
+		probe.step_tick()
+		if repair.pit_stage=="PIT_SERVICE" and int(repair.hyper.pit_remaining)==int(repair.hyper.get("service_ticks",15))+4:extended=true
+		if int(repair.hyper.pit_count)>stops:break
+	ck(extended and int(repair.hyper.pit_count)==stops+1 and int(repair.mega_30.damage)==45,"actual pit repair and extra service time")
 	var path:String="user://hyper30_qa_career.bin"
 	for ext in ["",".tmp",".bak"]:DirAccess.remove_absolute(ProjectSettings.globalize_path(path+ext))
 	var career=C.new(path,true);var data:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://data/season_2012.json"))

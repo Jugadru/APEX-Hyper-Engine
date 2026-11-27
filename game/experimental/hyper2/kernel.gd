@@ -31,9 +31,6 @@ func step_tick() -> bool:
 	var old_distances:Dictionary={}
 	if mega:
 		var control:Dictionary=state.mega_control
-		if int(control.remaining)>0:
-			control.remaining=int(control.remaining)-1
-			if int(control.remaining)==0:_event("mega_green",-1)
 		for car in state.cars:
 			car[Mega.KEY].neutral=int(control.remaining)>0
 			old_distances[int(car.id)]=int(car.dynamics.distance_mm)
@@ -82,6 +79,9 @@ func step_tick() -> bool:
 				if int(e.error_left)==0:
 					e.recovery_ticks=25; _event("hyper_error_recovered",int(car.id),{"kind":str(e.error_kind)})
 	if mega:
+		if int(state.mega_control.remaining)>0:
+			state.mega_control.remaining=int(state.mega_control.remaining)-1
+			if int(state.mega_control.remaining)==0:_event("mega_green",-1)
 		for car in state.cars:
 			var x:Dictionary=car[Mega.KEY]
 			var evo:Dictionary=car.evolution

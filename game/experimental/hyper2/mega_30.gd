@@ -5,13 +5,14 @@ const KEY := "mega_30"
 const CONTROL_TICKS := 100
 const CONTROL_CAP := 50000
 const RADIO_COOLDOWN := 150
+const WEAR_INTERVAL_MM := 5000000 # one permille per 5 stress-weighted km
 static func initial(condition:int=100)->Dictionary:
-	return {"lateral_mm":0,"lateral_velocity_mm_s":0,"pitch_millirad":0,"roll_load_permille":0,"damage":0,"health":clampi(condition*10,0,1000),"wear_mm":0,"seen_errors":0,"seen_stops":0,"failure":false,"neutral":false,"radio_tick":-1000,"radio_kind":""}
+	return {"lateral_mm":0,"lateral_velocity_mm_s":0,"pitch_millirad":0,"roll_load_permille":0,"damage":0,"health":clampi(condition*10,0,1000),"wear_mm":0,"seen_errors":0,"seen_stops":0,"failure":condition<=0,"neutral":false,"radio_tick":-1000,"radio_kind":""}
 static func valid(x:Variant)->bool:
 	if not x is Dictionary or not x.has_all(initial().keys()):return false
 	for key in initial():
 		if typeof(x[key])!=typeof(initial()[key]):return false
-	return absi(int(x.lateral_mm))<=2200 and absi(int(x.lateral_velocity_mm_s))<=1400 and absi(int(x.pitch_millirad))<=60 and int(x.roll_load_permille)>=0 and int(x.roll_load_permille)<=1000 and int(x.damage)>=0 and int(x.damage)<=1000 and int(x.health)>=0 and int(x.health)<=1000 and int(x.wear_mm)>=0 and int(x.wear_mm)<1000000 and int(x.seen_errors)>=0 and int(x.seen_stops)>=0 and int(x.radio_tick)>=-1000 and x.radio_kind in ["","DAMAGE","RELIABILITY","TRAFFIC","TYRES","FUEL"]
+	return absi(int(x.lateral_mm))<=2200 and absi(int(x.lateral_velocity_mm_s))<=1400 and absi(int(x.pitch_millirad))<=60 and int(x.roll_load_permille)>=0 and int(x.roll_load_permille)<=1000 and int(x.damage)>=0 and int(x.damage)<=1000 and int(x.health)>=0 and int(x.health)<=1000 and int(x.wear_mm)>=0 and int(x.wear_mm)<WEAR_INTERVAL_MM and int(x.seen_errors)>=0 and int(x.seen_stops)>=0 and int(x.radio_tick)>=-1000 and x.radio_kind in ["","DAMAGE","RELIABILITY","TRAFFIC","TYRES","FUEL"]
 static func control()->Dictionary:
 	return {"remaining":0,"incidents":0,"deployments":0}
 static func valid_control(x:Variant)->bool:
@@ -26,10 +27,10 @@ static func lane(x:Dictionary,desired:String,accel:int,lateral:int,grip:int)->vo
 	x.pitch_millirad=clampi(-accel/1000,-60,60)
 	x.roll_load_permille=clampi(lateral*1000/maxi(1,grip),0,1000)
 static func condition_tick(x:Dictionary,distance:int,attacking:bool)->void:
-	var total:int=int(x.wear_mm)+maxi(0,distance)
-	var km:int=total/1000000
-	x.wear_mm=total%1000000
-	x.health=maxi(0,int(x.health)-km*(2 if attacking else 1))
+	var total:int=int(x.wear_mm)+maxi(0,distance)*(2 if attacking else 1)
+	var units:int=total/WEAR_INTERVAL_MM
+	x.wear_mm=total%WEAR_INTERVAL_MM
+	x.health=maxi(0,int(x.health)-units)
 	if int(x.health)==0:x.failure=true
 static func incident(x:Dictionary,kind:String)->int:
 	var severity:int=int({"SPIN":85,"RUNNING_WIDE":25,"OVERSTEER":10}.get(kind,0))

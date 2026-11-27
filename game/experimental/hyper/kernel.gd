@@ -182,6 +182,8 @@ func _pit_service() -> void:
 		busy[str(car.team)] = true
 		car.pit_stage = "PIT_SERVICE"
 		car.hyper.pit_remaining = int(car.hyper.get("service_ticks",SERVICE_TICKS))
+		if int(car.get("mega_30",{}).get("damage",0))>0:
+			car.hyper.pit_remaining+=4 # 0.8s for partial repair, existing garage occupied
 		_event("hyper_pit_service_start", int(car.id))
 
 func _clear_duel(old: Dictionary) -> Dictionary:

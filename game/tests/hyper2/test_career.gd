@@ -11,11 +11,12 @@ func check(ok: bool,label: String) -> void:
 	if not ok: failures.append(label); printerr("FAIL ",label)
 func _initialize() -> void: call_deferred("run")
 func run() -> void:
-	var path: String = "user://hyper2_qa_career.bin"
+	var mega:bool="hyper30" in OS.get_cmdline_user_args()
+	var path: String = "user://hyper30_qa_full_career.bin" if mega else "user://hyper2_qa_career.bin"
 	for name in [path,path+".bak",path+".tmp"]:
 		if FileAccess.file_exists(name): DirAccess.remove_absolute(ProjectSettings.globalize_path(name))
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/season_2012.json"))
-	var c = C.new(path)
+	var c = C.new(path,mega)
 	check(c.create("Ferrari",2026,data),"new 2012 career")
 	check(c.state.slots.size()==6 and c.state.parts.size()==9,"unique initial physical components")
 	check(not c.create("Ferrari",2027,data),"active career protected")
@@ -32,9 +33,10 @@ func run() -> void:
 	var scenario: Dictionary = c.prepare("Seco",true,0)
 	check(not scenario.is_empty() and c.locked(),"round reservation persisted")
 	check(not c.advance_days(1),"factory locked during GP")
-	var saved = C.new(path)
+	var saved = C.new(path,mega)
 	check(saved.locked() and saved.state.active_scenario==scenario,"career load preserves frozen scenario")
 	var k = K.new(); check(k.initialize(scenario),"career kernel init")
+	if mega:check(int(k.state.hyper_evolution_revision)==5,"mega career sporting revision")
 	var player: Dictionary = {}
 	for car in k.state.cars:
 		if str(car.team)=="Ferrari": player = car; break
@@ -61,7 +63,12 @@ func run() -> void:
 	for row in c.standings(false): sum += int(row.points)
 	check(sum==101,"2012 points distribution")
 	for slot in c.state.slots: check(int(c.state.parts[c.state.slots[slot]].km)>0,"installed part mileage persisted")
-	var reloaded = C.new(path)
+	var reloaded = C.new(path,mega)
 	check(reloaded.state==c.state,"atomic career save reload")
+	if mega:
+		for car in k.state.cars:
+			if str(car.team)=="Ferrari":
+				var installed:Dictionary=c.state.parts[c.state.slots[str(car.name)+":Motor"]]
+				check(int(installed.condition)<=int(car.mega_30.health)/10,"race mechanical condition persisted")
 	print("HYPER_CAREER ",JSON.stringify({"checks":checks,"failures":failures,"ticks":k.state.tick,"elapsed_ms":Time.get_ticks_msec()-start,"round":c.state.round,"points":sum,"winner":k.classification()[0].name,"hash":k.sporting_hash()}))
 	quit(0 if failures.is_empty() else 1)
