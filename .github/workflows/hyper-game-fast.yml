@@ -38,7 +38,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for item in test_evolution test_calendar test_replay_quality test_manual_wet test_workshop test_menu test_ui test_hyper22; do
+          for item in test_evolution test_calendar test_replay_quality test_manual_wet test_workshop test_menu test_ui test_hyper22 test_hyper23; do
             echo "HYPER_FIXTURE $item"
             timeout 240s godot --headless --path game --rendering-method gl_compatibility --script "res://tests/hyper2/$item.gd" > "/tmp/$item.log" 2>&1 || { cat "/tmp/$item.log"; exit 1; }
             cat "/tmp/$item.log"
@@ -48,4 +48,8 @@ jobs:
           cat /tmp/hyper22-wet.log
           grep -q '"status":"PASS"' /tmp/hyper22-wet.log
           if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper22-wet.log; then exit 1; fi
+          timeout 240s godot --headless --path game --rendering-method gl_compatibility --script res://tests/hyper2/test_manual_wet.gd -- hyper23 > /tmp/hyper23-wet.log 2>&1 || { cat /tmp/hyper23-wet.log; exit 1; }
+          cat /tmp/hyper23-wet.log
+          grep -q '"status":"PASS"' /tmp/hyper23-wet.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper23-wet.log; then exit 1; fi
           echo HYPER_GAME_FAST_PASS

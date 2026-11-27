@@ -3,10 +3,12 @@ extends "res://experimental/hyper/kernel.gd"
 const Intelligence = preload("res://experimental/hyper2/race_intelligence.gd")
 const EVOLUTION_REV := 2
 const PHYSICS_REV := 3
+const DYNAMICS_REV := 4
+const Dynamics = preload("res://experimental/hyper2/dynamics_23.gd")
 const Powertrain = preload("res://experimental/hyper2/powertrain_22.gd")
 func initialize(scenario: Dictionary) -> bool:
 	if not super.initialize(scenario): return false
-	state["hyper_evolution_revision"]=PHYSICS_REV if bool(scenario.get("hyper22_physics",false)) else EVOLUTION_REV
+	state["hyper_evolution_revision"]=DYNAMICS_REV if bool(scenario.get("hyper23_physics",false)) else (PHYSICS_REV if bool(scenario.get("hyper22_physics",false)) else EVOLUTION_REV)
 	state["hyper_errors_enabled"]=bool(scenario.get("hyper_errors_enabled",true))
 	var skill_by_name: Dictionary={}
 	var historical: Variant=JSON.parse_string(FileAccess.get_file_as_string("res://data/season_2012.json"))
@@ -14,7 +16,8 @@ func initialize(scenario: Dictionary) -> bool:
 		for d in t.drivers: skill_by_name[str(d.name)]=int(d.skill)
 	for car in state.cars:
 		car["evolution"]=Intelligence.initial(int(state.seed),int(car.id),int(skill_by_name.get(str(car.name),80)))
-		if int(state.hyper_evolution_revision)==PHYSICS_REV: car.dynamics[Powertrain.KEY]=Powertrain.initial()
+		if int(state.hyper_evolution_revision)>=PHYSICS_REV: car.dynamics[Powertrain.KEY]=Powertrain.initial()
+		if int(state.hyper_evolution_revision)==DYNAMICS_REV: car.dynamics[Dynamics.KEY]=Dynamics.initial()
 	return true
 func step_tick() -> bool:
 	if not initialized or bool(state.finished) or int(state.tick)>=MAX_TICKS: return false
@@ -92,13 +95,16 @@ func strategy_report(id: int) -> Dictionary:
 	return {"diagnosis":Intelligence.diagnosis(car,int(state.water_microns)),"protected":int(car.pit_requested_lap)>0,"cases":Intelligence.rejoin(car,state.cars,int(car.reference_lap_ms)/STEP_MS,int(state.hyper_pit_transit)+SERVICE_TICKS,int(state.race_laps))}
 func restore(data: Dictionary) -> bool:
 	var candidate: Variant=data.get("state",null)
-	if not candidate is Dictionary or int(candidate.get("hyper_evolution_revision",0)) not in [EVOLUTION_REV,PHYSICS_REV] or typeof(candidate.get("hyper_errors_enabled"))!=TYPE_BOOL: return false
+	if not candidate is Dictionary or int(candidate.get("hyper_evolution_revision",0)) not in [EVOLUTION_REV,PHYSICS_REV,DYNAMICS_REV] or typeof(candidate.get("hyper_errors_enabled"))!=TYPE_BOOL: return false
 	for car in candidate.get("cars",[]):
 		if not car is Dictionary or not car.get("evolution") is Dictionary: return false
 		if not car.get("dynamics") is Dictionary: return false
-		if int(candidate.hyper_evolution_revision)==PHYSICS_REV:
+		if int(candidate.hyper_evolution_revision)>=PHYSICS_REV:
 			if not Powertrain.valid(car.dynamics.get(Powertrain.KEY)): return false
 		elif car.dynamics.has(Powertrain.KEY): return false
+		if int(candidate.hyper_evolution_revision)==DYNAMICS_REV:
+			if not Dynamics.valid(car.dynamics.get(Dynamics.KEY)): return false
+		elif car.dynamics.has(Dynamics.KEY): return false
 		var e: Dictionary=car.evolution
 		if not e.has_all(["skill","reaction_ticks","error_kind","error_left","error_total","error_ref_speed","error_count","recovery_ticks","cooldown","last_cross_tick","last_lap_ticks","best_lap_ticks","lap_times","traffic_ticks","blue_ticks","last_radio_tick"]): return false
 		for key in ["skill","reaction_ticks","error_left","error_total","error_ref_speed","error_count","recovery_ticks","cooldown","last_cross_tick","last_lap_ticks","best_lap_ticks","traffic_ticks","blue_ticks"]:

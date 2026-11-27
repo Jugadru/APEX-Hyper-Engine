@@ -4,6 +4,7 @@ extends RefCounted
 ## Output: desired lanes, finite-speed following constraints and ordered transitions.
 ## No direct progress/position edits; overtakes require actual longitudinal crossing.
 ## Lane/corner capacity is a synthetic corridor abstraction, NOT surveyed geometry.
+const Dynamics23 = preload("res://experimental/hyper2/dynamics_23.gd")
 const SCHEMA: int = 13
 const PHASES: Array[String] = ["CRUISE", "APPROACH", "PREPARE", "ATTACK", "SIDE_BY_SIDE", "DEFEND", "ABORT", "RECOVER"]
 const LANES: Array[String] = ["CENTER", "LEFT", "RIGHT"]
@@ -240,4 +241,5 @@ static func _evolution_commit(car: Dictionary, profile: Array, lap_mm: int, dist
 		else: break
 	var radius: int=int(profile[idx].radius_mm)
 	# Late lateral commitment is not allowed in a corner. Existing occupied lanes remain held.
+	if car.dynamics.has(Dynamics23.KEY) and not Dynamics23.attack_allowed(car,radius,gap,water): return false
 	return radius>=350000 or gap>=14000+int(water/2)

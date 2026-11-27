@@ -66,6 +66,6 @@ func restore(data: Dictionary) -> bool:
 			# Initial grid converts progress to integer millimetres once. Before
 			# movement, inverse rounding can differ by one progress unit.
 			var projected_grid: int = int(int(car.progress_units) * int(candidate.lap_length_mm) / LAP_UNITS)
-			if int(candidate.get("hyper_evolution_revision",0)) not in [2,3] or int(candidate.tick)>3 or int(car.progress_units)>0 or int(dyn.speed_mm_s)!=0 or int(dyn.distance_mm)!=projected_grid:
+			if int(candidate.get("hyper_evolution_revision",0)) not in [2,3,4] or int(candidate.tick)>3 or int(car.progress_units)>0 or int(dyn.speed_mm_s)!=0 or int(dyn.distance_mm)!=projected_grid:
 				return false
 	return super.restore(data)
