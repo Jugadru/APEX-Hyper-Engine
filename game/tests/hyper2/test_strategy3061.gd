@@ -16,7 +16,8 @@ func run()->void:
 	var k=K.new();ck(k.initialize(scenario) and int(k.state.hyper_evolution_revision)==12,"init")
 	var car:Dictionary=k.state.cars[0].duplicate(true)
 	var compounds:Array=k.state.compounds
-	car.tire="Médio"
+	ck("Duro" in compounds and "Médio" not in compounds,"2012 GBR nominated compounds")
+	car.tire="Duro"
 	var emergency:Dictionary=P.evaluate(car,compounds,4400,20,50,100)
 	ck(emergency.stop and emergency.compound=="Chuva","urgent heavy rain")
 	P.accepted(car[P.KEY]);ck(P.valid(car[P.KEY]),"accepted ledger")
@@ -27,13 +28,16 @@ func run()->void:
 	car.tire="Chuva";car.dynamics.tire_temp_centi=6800
 	ck(not P.evaluate(car,compounds,0,20,200,100).stop,"drying persistence")
 	var drying:Dictionary=P.evaluate(car,compounds,0,20,250,100)
-	ck(drying.stop and drying.compound=="Médio","persistent dry crossover")
+	ck(drying.stop and drying.compound=="Duro" and drying.compound in compounds,"persistent dry crossover")
+	ck(P.wet_target("Chuva",0,["Médio","Duro","Chuva"])=="Médio","medium when nominated")
+	ck(P.wet_target("Intermediário",0,["Macio","Intermediário"])=="Macio","soft when sole nominated slick")
+	ck(P.wet_target("Chuva",0,["Chuva"])=="Chuva","no invented dry compound")
 	car[P.KEY]=P.initial()
 	ck(not P.evaluate(car,compounds,0,2,50,5000).stop,"wait first sample")
 	var expensive:Dictionary=P.evaluate(car,compounds,0,2,100,5000)
 	ck(not expensive.stop and expensive.reason=="no_payback","pit cost prevents unprofitable stop")
-	car[P.KEY]=P.initial();car.tire="Médio";car.dynamics.tire_temp_centi=9000
-	ck(not P.evaluate(car,["Médio"],4400,10,50,100).stop,"unavailable tyre protected")
+	car[P.KEY]=P.initial();car.tire="Duro";car.dynamics.tire_temp_centi=8500
+	ck(not P.evaluate(car,["Duro"],4400,10,50,100).stop,"unavailable tyre protected")
 	var replay=R.new();replay.attach(k)
 	for i in range(2000):k.step_tick();replay.observed(k)
 	ck(k.state.cars.all(func(row:Dictionary)->bool:return P.valid(row[P.KEY])),"all strategy ledgers valid")

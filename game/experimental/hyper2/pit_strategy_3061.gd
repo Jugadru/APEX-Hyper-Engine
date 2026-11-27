@@ -13,17 +13,20 @@ static func valid(x:Variant)->bool:
 		if typeof(x[key])!=typeof(initial()[key]):return false
 	if x.candidate!="" and not x.candidate in Vehicle.TYRES:return false
 	return int(x.streak)>=0 and int(x.streak)<=3 and int(x.last_tick)>=-1 and int(x.evaluations)>=0 and int(x.evaluations)<=400000 and int(x.orders)>=0 and int(x.holds)>=0 and int(x.orders)+int(x.holds)<=int(x.evaluations) and x.reason in REASONS and absi(int(x.gain_ms))<=1000000 and int(x.cost_ms)>=0 and int(x.cost_ms)<=1000000
-static func wet_target(current:String,water:int)->String:
+static func wet_target(current:String,water:int,available:Array)->String:
 	# Hysteresis: existing wet compound can remain in crossover band.
 	if water>=3900:return "Chuva"
 	if current=="Chuva" and water>3000:return "Chuva"
 	if water>=1900:return "Intermediário"
 	if current in ["Chuva","Intermediário"] and water>700:return "Intermediário" if current=="Intermediário" else "Chuva"
-	return "Médio" if current in ["Chuva","Intermediário"] else current
+	if current in ["Chuva","Intermediário"]:
+		for dry in ["Médio","Duro","Macio"]:
+			if dry in available:return dry
+	return current
 static func evaluate(car:Dictionary,available:Array,water:int,remaining:int,tick:int,pit_ticks:int)->Dictionary:
 	var x:Dictionary=car[KEY]
 	var current:String=str(car.tire)
-	var target:String=wet_target(current,water)
+	var target:String=wet_target(current,water,available)
 	var wear:int=int(car.dynamics.wear_micro)
 	var reason:String="stay_out"
 	var urgent:bool=false
