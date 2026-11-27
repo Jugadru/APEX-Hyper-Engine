@@ -10,6 +10,9 @@ const SAVE22: String = "user://hyper_engine_22_checkpoint.bin"
 const SAVE23: String = "user://hyper_engine_23_checkpoint.bin"
 var physics_choice: CheckBox
 var dynamics_choice: CheckBox
+var mega_choice: CheckBox
+const SAVE30: String = "user://hyper_engine_30_checkpoint.bin"
+const CAREER_SAVE30: String = "user://hyper_career_30_race_checkpoint.bin"
 const Quality = preload("res://experimental/hyper2/quality.gd")
 const View3D = preload("res://experimental/hyper2/view_3d.gd")
 var quality = Quality.new()
@@ -68,8 +71,8 @@ func _ready() -> void:
 	add_child(margin)
 	var outer := VBoxContainer.new(); outer.add_theme_constant_override("separation",10); margin.add_child(outer)
 	var header := HBoxContainer.new(); outer.add_child(header)
-	var heading := _label(header,"APEX  /  NEXT ENGINE 2.3",30); heading.modulate = Color("ff8126"); heading.size_flags_horizontal = SIZE_EXPAND_FILL
-	_label(header,"HYPER EVOLUTION  •  2.3 EXPERIMENTAL",18)
+	var heading := _label(header,"APEX  /  NEXT ENGINE 3.0",30); heading.modulate = Color("ff8126"); heading.size_flags_horizontal = SIZE_EXPAND_FILL
+	_label(header,"HYPER-MEGA  •  3.0 EXPERIMENTAL",18)
 	_label(outer,"LABORATÓRIO JOGÁVEL  |  GP independente • física longitudinal experimental • sem alterar a carreira oficial",16)
 	var config := HFlowContainer.new(); outer.add_child(config)
 	circuit = _option(config,"Circuito")
@@ -89,13 +92,19 @@ func _ready() -> void:
 	_label(config,"Seed"); seed_field = SpinBox.new(); seed_field.max_value = 2147483647; seed_field.value = 2026; seed_field.custom_minimum_size.x = 110; config.add_child(seed_field)
 	physics_choice=CheckBox.new(); physics_choice.text="Física 2.2 (GP livre)"; config.add_child(physics_choice)
 	dynamics_choice=CheckBox.new(); dynamics_choice.text="Física 2.3 (GP livre)"; config.add_child(dynamics_choice)
-	physics_choice.toggled.connect(func(on:bool): if on: dynamics_choice.set_pressed_no_signal(false))
-	dynamics_choice.toggled.connect(func(on:bool): if on: physics_choice.set_pressed_no_signal(false))
+	mega_choice=CheckBox.new();mega_choice.text="HYPER-MEGA 3.0";config.add_child(mega_choice)
+	physics_choice.toggled.connect(func(on:bool):
+		if on:dynamics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false))
+	dynamics_choice.toggled.connect(func(on:bool):
+		if on:physics_choice.set_pressed_no_signal(false);mega_choice.set_pressed_no_signal(false))
+	mega_choice.toggled.connect(func(on:bool):
+		if on:physics_choice.set_pressed_no_signal(false);dynamics_choice.set_pressed_no_signal(false))
 	start_button = _button(config,"INICIAR",_start)
 	var controls := HFlowContainer.new(); outer.add_child(controls)
 	pause_button = _button(controls,"PAUSAR",_pause)
 	for mult in [1,5,16,32,64]: _button(controls,str(mult)+"×",_speed.bind(float(mult)))
 	_button(controls,"TEMPORADA / P&D / STAFF",_open_career)
+	_button(controls,"LIVING FACTORY 3.0",_open_mega_career)
 	_button(controls,"SALVAR CHECKPOINT",_save)
 	_button(controls,"CARREGAR",_load)
 	_button(controls,"VOLTAR AO MENU",_close)
@@ -148,7 +157,8 @@ func _start() -> void:
 	var s: Dictionary = Scenario.create(code,w,int(seed_field.value),team.get_item_text(team.selected),auto_pit.button_pressed,setup_choice.selected*500)
 	s.hyper22_physics=physics_choice.button_pressed
 	s.hyper23_physics=dynamics_choice.button_pressed
-	if checkpoint_path in [SAVE,SAVE22,SAVE23]: checkpoint_path=SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE)
+	s.hyper30_physics=mega_choice.button_pressed
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30]: checkpoint_path=SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE))
 	var selected_count:int=0
 	for car in s.get("cars",[]):
 		if str(car.team)==team.get_item_text(team.selected):
@@ -207,16 +217,19 @@ func _redraw() -> void:
 		if selected.dynamics.has("dynamics_23") and selected.pit_stage=="TRACK":
 			var grip:Dictionary=selected.dynamics.dynamics_23
 			telemetry.text += " • %s / reserva %d%% / carga F %d N" % [grip.phase,int(grip.reserve_permille)/10,int(grip.front_n)]
+		if selected.has("mega_30"):
+			var m:Dictionary=selected.mega_30
+			telemetry.text += " • condição %d%% / dano %d%% / %s" % [int(m.health)/10,int(m.damage)/10,"SC VIRTUAL" if int(k.state.mega_control.remaining)>0 else "VERDE"]
 		telemetry.text += " • última %.1fs / melhor %.1fs • %d erros" % [float(selected.evolution.last_lap_ticks)*0.2,float(selected.evolution.best_lap_ticks)*0.2,int(selected.evolution.error_count)]
 	var events: Array = k.state.events
 	while event_cursor < events.size():
 		var ev: Dictionary = events[event_cursor]; event_cursor += 1
-		if not str(ev.type) in ["hyper_pit_serviced","hyper_pit_exit","hyper_weather_change","hyper_strategy_order","hyper_retired","racecraft_overtake_confirmed","driver_intent_changed","command_rejected","race_finished","hyper_driver_error","hyper_error_recovered","hyper_error_interrupted"]: continue
-		if str(ev.type) == "driver_intent_changed" and int(ev.car_id) != selected_id: continue
+		if not str(ev.type) in ["hyper_pit_serviced","hyper_pit_exit","hyper_weather_change","hyper_strategy_order","hyper_retired","racecraft_overtake_confirmed","driver_intent_changed","command_rejected","race_finished","hyper_driver_error","hyper_error_recovered","hyper_error_interrupted","mega_damage","mega_repair","mega_virtual_sc","mega_green","mega_mechanical_retirement","mega_radio"]: continue
+		if str(ev.type) in ["driver_intent_changed","mega_radio"] and int(ev.car_id) != selected_id: continue
 		var c: Dictionary = k._lookup_car(int(ev.car_id)); var name_text: String = str(c.get("name","DIREÇÃO"))
 		var msg:String=_radio_text(ev)
 		radio_lines.append("%ds • %s • %s" % [int(ev.tick)*200/1000,name_text,msg])
-		if voice_enabled and not voice_id.is_empty() and int(ev.car_id)==selected_id and speed<=5.0 and int(ev.tick)-last_spoken_tick>=50 and not DisplayServer.tts_is_speaking() and str(ev.type) in ["hyper_driver_error","hyper_pit_serviced","hyper_strategy_order","driver_intent_changed"]:
+		if voice_enabled and not voice_id.is_empty() and int(ev.car_id)==selected_id and speed<=5.0 and int(ev.tick)-last_spoken_tick>=50 and not DisplayServer.tts_is_speaking() and str(ev.type) in ["hyper_driver_error","hyper_pit_serviced","hyper_strategy_order","driver_intent_changed","mega_radio"]:
 			DisplayServer.tts_speak(msg,voice_id,75,1.0,1.0);last_spoken_tick=int(ev.tick)
 		if radio_lines.size() > 30: radio_lines.pop_front()
 	radio.text = "\n".join(radio_lines)
@@ -240,7 +253,14 @@ func _pit() -> void:
 func _cancel() -> void: _command({"type":"cancel_pit"})
 func _save() -> void:
 	if not k.initialized: return
-	if checkpoint_path in [SAVE,SAVE22,SAVE23]: checkpoint_path=SAVE23 if int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV else (SAVE22 if int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV else SAVE)
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30]: checkpoint_path=SAVE30 if int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV else (SAVE23 if int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV else (SAVE22 if int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV else SAVE))
+	if checkpoint_path==SAVE30 and k.state.has("hyper_career_token"):checkpoint_path=CAREER_SAVE30
+	if checkpoint_path==SAVE30:
+		var prior=_read_checkpoint(SAVE30)
+		if prior!=null and prior.state.has("hyper_career_token"):
+			var moved=_read_checkpoint(CAREER_SAVE30)
+			if moved==null or str(moved.state.get("hyper_career_token",""))!=str(prior.state.hyper_career_token) or int(moved.state.tick)<int(prior.state.tick):
+				status.text="Checkpoint antigo de carreira protegido. Abra Living Factory e salve a etapa separadamente.";return
 	var f := FileAccess.open(checkpoint_path+".tmp",FileAccess.WRITE)
 	if f == null: status.text = "Falha ao abrir arquivo de checkpoint."; return
 	f.store_var(k.checkpoint(),false); f.flush(); var write_error: Error = f.get_error(); f.close()
@@ -260,17 +280,19 @@ func _read_checkpoint(path: String):
 	var saved: Variant = f.get_var(false); f.close()
 	var candidate = Kernel.new()
 	if not saved is Dictionary or not candidate.restore(saved): return null
-	var expected_rev:int=4 if path in [SAVE23,SAVE23+".bak"] else (3 if path in [SAVE22,SAVE22+".bak"] else (2 if path in [SAVE,SAVE+".bak"] else 0))
+	var expected_rev:int=5 if path in [SAVE30,SAVE30+".bak",CAREER_SAVE30,CAREER_SAVE30+".bak"] else (4 if path in [SAVE23,SAVE23+".bak"] else (3 if path in [SAVE22,SAVE22+".bak"] else (2 if path in [SAVE,SAVE+".bak"] else 0)))
 	if expected_rev!=0 and int(candidate.state.hyper_evolution_revision)!=expected_rev: return null
+	if path in [CAREER_SAVE30,CAREER_SAVE30+".bak"] and not candidate.state.has("hyper_career_token"):return null
 	return candidate
 func _load() -> void:
-	if checkpoint_path in [SAVE,SAVE22,SAVE23]: checkpoint_path=SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE)
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30]: checkpoint_path=SAVE30 if mega_choice.button_pressed else (SAVE23 if dynamics_choice.button_pressed else (SAVE22 if physics_choice.button_pressed else SAVE))
 	var candidate = _read_checkpoint(checkpoint_path)
 	var from_backup: bool = false
 	if candidate == null:
 		candidate = _read_checkpoint(checkpoint_path+".bak"); from_backup = candidate != null
 	if candidate == null: status.text = "Checkpoint ausente, inválido ou incompatível."; return
-	k = candidate; physics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV); dynamics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV); running = false; _bind_session(); pause_button.text = "RETOMAR"; status.text = "Checkpoint restaurado do backup." if from_backup else "Checkpoint restaurado."
+	if checkpoint_path==SAVE30 and candidate.state.has("hyper_career_token"):status.text="Este é um checkpoint de carreira. Abra Living Factory 3.0.";return
+	k = candidate; physics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.PHYSICS_REV); dynamics_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.DYNAMICS_REV); mega_choice.set_pressed_no_signal(int(k.state.hyper_evolution_revision)==Kernel.MEGA_REV); running = false; _bind_session(); pause_button.text = "RETOMAR"; status.text = "Checkpoint restaurado do backup." if from_backup else "Checkpoint restaurado."
 func _close() -> void:
 	if get_parent() is Window and get_parent() != get_tree().root: get_parent().queue_free()
 	else: get_tree().change_scene_to_file("res://scenes/main.tscn")
@@ -278,14 +300,21 @@ func _close() -> void:
 func _pit_label(value: String) -> String:
 	return str({"TRACK":"PISTA","ENTRY_OBSERVED":"ENTRADA","PIT_IN":"ENTRADA","PIT_WAIT":"FILA","PIT_SERVICE":"SERVIÇO","PIT_OUT":"SAÍDA"}.get(value,value))
 func _radio_text(ev: Dictionary) -> String:
+	if str(ev.type)=="mega_radio":return str({"DAMAGE":"Piloto: sinto dano aerodinâmico.","RELIABILITY":"Engenheiro: condição mecânica crítica.","FUEL":"Engenheiro: atenção ao combustível.","TYRES":"Piloto: pneus perderam rendimento.","TRAFFIC":"Piloto: preso no tráfego."}.get(str(ev.get("kind","")),"Atenção."))
+	if str(ev.type) in ["mega_damage","mega_repair","mega_virtual_sc","mega_green","mega_mechanical_retirement"]:return str({"mega_damage":"Dano identificado.","mega_repair":"Reparo parcial no box.","mega_virtual_sc":"Neutralização virtual; sem novo ataque.","mega_green":"Bandeira verde.","mega_mechanical_retirement":"Abandono mecânico."}[str(ev.type)])
 	var messages: Dictionary = {"hyper_pit_serviced":"Pneus trocados: "+str(ev.get("compound","")),"hyper_pit_exit":"Retorno à pista.","hyper_weather_change":"Mudança de água na pista: "+str(ev.get("water_microns",0))+" μm.","hyper_strategy_order":"Estratégia solicita box: "+str(ev.get("compound","")),"hyper_retired":"Abandono: falta de combustível.","racecraft_overtake_confirmed":"Ultrapassagem confirmada.","command_rejected":"Ordem rejeitada: "+str(ev.get("reason","")),"race_finished":"Bandeirada final."}
 	if str(ev.type) in ["hyper_driver_error","hyper_error_recovered","hyper_error_interrupted"]:
 		return str({"hyper_driver_error":"Piloto com erro: ","hyper_error_recovered":"Recuperação concluída: ","hyper_error_interrupted":"Recuperação interrompida: "}[str(ev.type)])+str(Kernel.Intelligence.LABELS.get(str(ev.get("kind","")),"Erro"))
 	if str(ev.type) == "driver_intent_changed":
 		return str({"stable_running":"Piloto: ritmo estável.","slower_car_ahead":"Piloto: tenho ritmo para atacar o carro da frente.","faster_car_behind":"Piloto: carro mais rápido atrás; vou defender.","tire_worn":"Piloto: estou sentindo o desgaste dos pneus.","tire_overheated":"Piloto: pneus quentes, vou conservar.","fuel_low":"Engenheiro: combustível baixo, conserve.","driver_fatigue":"Piloto: preciso reduzir o esforço."}.get(str(ev.get("reason","")),"Piloto: intenção atualizada."))
 	return str(messages.get(str(ev.type),str(ev.type)))
+func _open_mega_career()->void:
+	if is_instance_valid(career_window):return
+	career=Career.new("user://hyper_career_30.bin",true);_career_window()
 func _open_career() -> void:
 	if is_instance_valid(career_window): return
+	career=Career.new();_career_window()
+func _career_window()->void:
 	career_window = Window.new(); career_window.title = "APEX Hyper • Central de Temporada"; career_window.size = Vector2i(1000,750); career_window.min_size = Vector2i(850,600)
 	career_window.transient = true
 	add_child(career_window)
@@ -311,6 +340,9 @@ func _career_refresh() -> void:
 	_button(actions,"AVANÇAR 1 DIA",func(): _career_action("Dia avançado." if career.advance_days(1) else "Sem dias disponíveis ou GP ativo."))
 	_button(actions,"AVANÇAR ATÉ O GP",func(): _career_action("Calendário avançado." if career.advance_days(int(career.state.days_left)) else "Sem dias disponíveis ou GP ativo."))
 	if career.locked(): _label(career_body,"GP reservado: engenharia e contratos bloqueados até registro da bandeirada.")
+	if career.mega_mode:
+		var factory:Dictionary=career.factory_report()
+		_label(career_body,"LIVING FACTORY 3.0 • %d instaladas / %d reservas / %d manutenção / %d ordens / %d projetos" % [factory.installed,factory.spares,factory.maintenance,factory.work_pending,factory.projects_active],16)
 	_label(career_body,"ENGENHARIA • projetos, protótipos, testes, fabricação e instalação",20)
 	var p_row := HFlowContainer.new(); career_body.add_child(p_row)
 	var family := _option(p_row,"Família")
@@ -377,10 +409,28 @@ func _career_gp() -> void:
 	var s: Dictionary = career.prepare(w,auto_pit.button_pressed,setup_choice.selected*500,setup_second.selected*500)
 	physics_choice.set_pressed_no_signal(false)
 	dynamics_choice.set_pressed_no_signal(false)
-	if checkpoint_path in [SAVE,SAVE22,SAVE23]: checkpoint_path=SAVE
+	mega_choice.set_pressed_no_signal(career.mega_mode)
+	if checkpoint_path in [SAVE,SAVE22,SAVE23,SAVE30,CAREER_SAVE30]: checkpoint_path=CAREER_SAVE30 if career.mega_mode else SAVE
+	if career.mega_mode and not s.is_empty():
+		var resumed=_reserved_mega_checkpoint(s)
+		if resumed!=null:
+			k=resumed;running=false;_bind_session();pause_button.text="RETOMAR";status.text="Etapa reservada restaurada.";career_window.queue_free();return
 	var candidate = Kernel.new()
 	if s.is_empty() or not candidate.initialize(s): _career_action("Falha ao preparar etapa."); return
 	k = candidate; _bind_session(); running = true; pause_button.text = "PAUSAR"; status.text = "Etapa oficial da carreira Hyper em andamento."; career_window.queue_free()
+func _reserved_mega_checkpoint(s:Dictionary):
+	# Prefer the newest matching reserved-race checkpoint; legacy candidate
+	# files can be read but never mistaken for a different reservation.
+	var best=null
+	for path in [CAREER_SAVE30,CAREER_SAVE30+".bak",SAVE30,SAVE30+".bak"]:
+		var candidate=_read_checkpoint(path)
+		if candidate==null:continue
+		var st:Dictionary=candidate.state
+		if str(st.get("hyper_career_token",""))!=str(s.get("hyper_career_token","")) or not st.has("hyper_career_token"):continue
+		if int(st.hyper_evolution_revision)!=Kernel.MEGA_REV or int(st.seed)!=int(s.seed) or str(st.track_code)!=str(s.track_code) or str(st.hyper_player_team)!=str(s.hyper_player_team):continue
+		if int(st.race_laps)!=int(s.race_laps) or int(st.lap_length_mm)!=int(s.lap_length_mm):continue
+		if best==null or int(st.tick)>int(best.state.tick):best=candidate
+	return best
 func _career_record() -> void:
 	_career_action("Resultado registrado e folha/orçamento atualizados." if career.commit(k) else "Somente uma bandeirada válida da etapa reservada pode ser registrada.")
 
@@ -389,6 +439,9 @@ func _engineer_report()->void:
 	var report: Dictionary=k.strategy_report(selected_id)
 	var lines: Array[String]=[str(report.diagnosis),"Projeção aproximada; não altera ordens."]
 	for item in report.cases: lines.append("V%d: P%d • %d carros próximos • %s" % [item.lap,item.position,item.nearby,item.confidence])
+	if not report.get("ranked",[]).is_empty():
+		var best:Dictionary=report.ranked[0]
+		lines.append("VSE: V%d • score %d (estimativa; não envia ordem)" % [best.lap,best.score])
 	_show_info("Race Engineer / Pit Wall", "\n".join(lines))
 func _quality_report()->void:
 	var r: Dictionary=quality.report()

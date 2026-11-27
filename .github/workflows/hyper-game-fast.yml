@@ -12,6 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      - name: Isolate test user data
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/hyper-game-data"
+          echo "XDG_DATA_HOME=$RUNNER_TEMP/hyper-game-data" >> "$GITHUB_ENV"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -34,11 +39,19 @@ jobs:
           timeout 300s godot --headless --path game --rendering-method gl_compatibility --editor --import > /tmp/hyper-import.log 2>&1 || { tail -150 /tmp/hyper-import.log; exit 1; }
           if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper-import.log; then exit 1; fi
           tail -15 /tmp/hyper-import.log
+      - name: Parse all Hyper test entry points
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in game/tests/hyper2/*.gd; do
+            godot --headless --path game --rendering-method gl_compatibility --check-only --script "res://${file#game/}" > /tmp/hyper-parse.log 2>&1 || { cat /tmp/hyper-parse.log; exit 1; }
+            if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper-parse.log; then exit 1; fi
+          done
       - name: Run game directional regression fixtures
         shell: bash
         run: |
           set -euo pipefail
-          for item in test_evolution test_calendar test_replay_quality test_manual_wet test_workshop test_menu test_ui test_hyper22 test_hyper23; do
+          for item in test_evolution test_calendar test_replay_quality test_manual_wet test_workshop test_menu test_ui test_hyper22 test_hyper23 test_hyper30; do
             echo "HYPER_FIXTURE $item"
             timeout 240s godot --headless --path game --rendering-method gl_compatibility --script "res://tests/hyper2/$item.gd" > "/tmp/$item.log" 2>&1 || { cat "/tmp/$item.log"; exit 1; }
             cat "/tmp/$item.log"
@@ -52,4 +65,8 @@ jobs:
           cat /tmp/hyper23-wet.log
           grep -q '"status":"PASS"' /tmp/hyper23-wet.log
           if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper23-wet.log; then exit 1; fi
+          timeout 240s godot --headless --path game --rendering-method gl_compatibility --script res://tests/hyper2/test_manual_wet.gd -- hyper30 > /tmp/hyper30-wet.log 2>&1 || { cat /tmp/hyper30-wet.log; exit 1; }
+          cat /tmp/hyper30-wet.log
+          grep -q '"status":"PASS"' /tmp/hyper30-wet.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper30-wet.log; then exit 1; fi
           echo HYPER_GAME_FAST_PASS

@@ -10,6 +10,7 @@ func run() -> void:
 	var scenario: Dictionary = S.create(code, weather, 2026)
 	if "hyper22" in args: scenario.hyper22_physics=true
 	if "hyper23" in args: scenario.hyper23_physics=true
+	if "hyper30" in args: scenario.hyper30_physics=true
 	if not k.initialize(scenario): quit(1); return
 	var begin: int = Time.get_ticks_msec()
 	var resume_checked: bool = false

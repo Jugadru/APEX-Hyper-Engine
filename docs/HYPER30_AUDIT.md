@@ -1,0 +1,25 @@
+# Hyper 3.0 — technical audit and correction
+Reviewed original candidate 6095b8fba37915da8c6cd4e628e5ede5fdb4c89e and exact-head run 46051494559. Main 2.3 remains approved. Free GP calibration: Monza 29882/29883 ticks, 81/82 passes, 52/52 stops; Silverstone heavy rain 40728/40752 ticks, 60/57 passes, 63/65 stops. 24 finishers each, checkpoint parity PASS. Career test FAIL before execution due duplicate local variable car. Game FAST 46051494474 24 new checks PASS; insufficient because career entry point was not parsed. No complete audit of all 3134 asset/source files or native GPU. Scope: Hyper kernel chain, dynamics, control, career, UI, replay, traffic, workflows and specific fixtures.
+## Corrections in this candidate
+- Fix duplicate variable; parse every Hyper test script in FAST; isolated test user directory.
+- Separate 3.0 free GP and reserved career race checkpoint. Resume matching reservation by token, track, team, seed, dimensions, revision, newest tick; reject unrelated snapshots. Guard legacy candidate shared-file overwrite. Existing 2.1 save behavior unchanged.
+- Rev5 retirement closes DRS; finish field on final retirement without extra tick. Filter lapping, finished target and neutral state out of confirmed sporting pass counts in revision 5 only.
+- Validate revision 5 geometry, incident/service counts, health/failure and radio timestamp on restore. Add tests for malformed geometry, ledger, checkpoint separation and wrong reservation.
+- Filter new driver radio by selection, enable existing optional system TTS for that event. No new audio.
+- Calibration CI triggers on source changes, not just documentation. Same predeclared bounds unchanged.
+## Findings requiring further design, not fixed here
+P0: full career runtime not yet evidenced; release blocked until exact-head tests.
+P1: VSC is a speed target and attack restriction, not a no-overtake/delta system; lapping, adjacent corridors and pit exits can change rank. Need spatial ordering and delta monitoring. No physical safety car.
+P1: friction circle only allocates estimated forces; unmet lateral demand still follows centreline. No steering, load transfer per tyre, actual suspension or collision response. Synthetic radii and visual Chaikin route differ. Need surveyed/licensed geometry, curvature and path authority before claiming realism.
+P1: delivered energy is estimated from start-of-tick speed before target cap; clamp can dissipate work without ledger. Need proposal/settlement audit, actual displacement and braking work, coast/idle/launch cases; preserve rev2–4 hashes.
+P1: race ends when all cars finish full race distance, not winner-triggered chequered flag/lapped classification. Existing career floor(90%) and retired-last sorting approximate regulations. Need independent rules revision.
+P1: health/failure deterministic distance threshold; no component-specific fault modes, temperature fatigue or probabilistic hazard calibration. Initial condition only motor; damage is one scalar. Existing factory may over-penalize component condition; test multi-GP maintenance budget and spare availability.
+P1: compare gate requires zero retirements and only rejects total pass collapse. Appropriate for nominal regression only; reliability stress needs separate expected-DNF fixtures, multiple seeds, yellow passing, actual fuel use and per-lap distribution. Current pass count not comprehensive positional change count.
+P2: advisor score not race-time optimization; no weather forecast, tyre stint model, double-stack timing or uncertainty propagation. Existing AI pit threshold remains unchanged. Radio uses rules, not true engineer dialogue.
+P2: replay holds full event/command history and synchronously seeks; memory and seek time grow; profile with full season-sized traces. Visual adapter is read-only but may retain stale cars after all finish; no GPU testing.
+P2: part/project state validation and source inventory allowlists need stronger cross-field invariants and independent manifest hashes. Architect bridge, packaging and release quality remain pending.
+## Acceptance
+No merge until exact-head isolated/game FAST and paired complete GPs + actual career GP pass. No FULL season or GPU claims. Audit is based on inspected source and logs; suspected balance/performance risks are hypotheses, not measured failures.
+
+## Additional confirmed regression
+The inherited command queue authorizes set_auto only for revision 2, while the Hyper kernel implements it for every revision. Fix acceptance for revisions 2–5, Manual only, with actual Manual → AUTO tests on all four and negative AI tests. Autonomous full-race behavior is unchanged by this acceptance change; verify exact baseline hashes. Also note MAX_COMMANDS=4096 caps the entire historical ledger, not pending commands; long races/high command counts may exhaust it. Pending lookup is indexed, but validation still scans historical records. Benchmark and redesign with bounded history plus a replay journal; do not silently drop commands.

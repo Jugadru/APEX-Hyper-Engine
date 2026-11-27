@@ -1,0 +1,98 @@
+extends SceneTree
+const K=preload("res://experimental/hyper2/kernel.gd")
+const S=preload("res://experimental/hyper/scenario.gd")
+const M=preload("res://experimental/hyper2/mega_30.gd")
+const C=preload("res://experimental/hyper2/career.gd")
+const R=preload("res://experimental/hyper2/replay.gd")
+const UI=preload("res://experimental/hyper2/console.tscn")
+var checks:int=0
+var errors:Array[String]=[]
+func ck(ok:bool,label:String)->void:
+	checks+=1
+	if not ok:errors.append(label);printerr("FAIL ",label)
+func _initialize()->void:call_deferred("run")
+func run()->void:
+	var m:Dictionary=M.initial()
+	M.lane(m,"RIGHT",10000,5000,10000)
+	ck(m.lateral_mm==280 and m.pitch_millirad==-10 and m.roll_load_permille==500,"bounded lane and load proxies")
+	M.condition_tick(m,5000000,true);ck(m.health==998,"stress-weighted wear by distance")
+	ck(M.incident(m,"SPIN")==85 and m.damage==85,"incident damage")
+	for revision in [2,3,4,5]:
+		var control_kernel=K.new()
+		var control_scenario:Dictionary=S.create("ITA","Seco",2026)
+		control_scenario.hyper22_physics=revision==3;control_scenario.hyper23_physics=revision==4;control_scenario.hyper30_physics=revision==5
+		ck(control_kernel.initialize(control_scenario),"control init "+str(revision))
+		var control_id:int=int(control_kernel.state.cars[0].id)
+		ck(bool(control_kernel.submit({"type":"set_pace","source":"Manual","car_id":control_id,"pace":"Atacar"}).accepted),"manual pace accepted "+str(revision))
+		control_kernel.step_ticks(4)
+		ck(str(control_kernel.state.cars[0].driver.control_mode)=="MANUAL","manual mode "+str(revision))
+		ck(bool(control_kernel.submit({"type":"set_auto","source":"Manual","car_id":control_id}).accepted),"auto accepted "+str(revision))
+		control_kernel.step_ticks(4)
+		ck(str(control_kernel.state.cars[0].driver.control_mode)=="AUTO","auto restored "+str(revision))
+		ck(not bool(control_kernel.submit({"type":"set_auto","source":"AI","car_id":control_id}).accepted),"AI cannot release manual "+str(revision))
+	var k=K.new();var s:Dictionary=S.create("ITA","Seco",2026);s.hyper30_physics=true;s.hyper_errors_enabled=false
+	ck(k.initialize(s) and k.state.hyper_evolution_revision==5,"revision 5")
+	var r=R.new();r.attach(k);k.step_ticks(300);r.observed(k)
+	var first:Dictionary=k.state.cars[0];var id:int=int(first.id)
+	first.evolution.error_count=1;first.evolution.error_kind="SPIN"
+	k.step_tick();ck(first.mega_30.damage==85 and k.state.mega_control.remaining==100,"spin triggers virtual control")
+	k.step_tick();ck(k.state.cars.all(func(car:Dictionary)->bool:return not car.hyper.drs_active),"DRS disabled during control")
+	ck(first.mega_30.neutral,"neutral state")
+	var before:String=k.sporting_hash();var report:Dictionary=k.strategy_report(id)
+	ck(report.has("ranked") and not report.ranked.is_empty() and k.sporting_hash()==before,"VSE read only")
+	var copy=K.new();ck(copy.restore(k.checkpoint()),"restore rev5")
+	k.step_ticks(110);copy.step_ticks(110)
+	ck(k.sporting_hash()==copy.sporting_hash() and k.state.mega_control.remaining==0,"control expiry and continuation")
+	var bad:Dictionary=k.checkpoint();bad.state.cars[0].mega_30.health=-1
+	ck(not copy.restore(bad),"invalid health rejected")
+	var malformed:Dictionary=k.checkpoint();malformed.state.track_profile[0].radius_mm=0
+	ck(not copy.restore(malformed),"invalid geometry rejected")
+	var inconsistent:Dictionary=k.checkpoint();inconsistent.state.cars[0].mega_30.seen_errors+=1
+	ck(not copy.restore(inconsistent),"inconsistent incident ledger rejected")
+	first.mega_30.health=0;first.mega_30.failure=true
+	for i in range(100):
+		if first.finished:break
+		k.step_tick()
+	ck(first.finished and first.hyper.retired and k.state.events.any(func(e:Dictionary)->bool:return e.type=="mega_mechanical_retirement" and int(e.car_id)==id),"mechanical retirement from actual motion")
+	var probe=K.new();ck(probe.initialize(s),"replay init");var replay=R.new();replay.attach(probe)
+	for i in range(350):probe.step_tick();replay.observed(probe)
+	var seek=replay.seek(350);ck(seek!=null and seek.sporting_hash()==probe.sporting_hash(),"replay")
+	ck(probe.state.cars.all(func(car:Dictionary)->bool:return M.valid(car.mega_30)),"24 valid states")
+	var repair:Dictionary=probe.state.cars[0];repair.mega_30.damage=85
+	var repair_id:int=int(repair.id)
+	var order:Dictionary={"type":"schedule_pit","source":"Manual","car_id":repair_id,"requested_lap":int(repair.laps_done)+2,"compound":"Médio","allow_double_stack":true}
+	ck(bool(probe.submit(order).accepted),"repair pit accepted")
+	var stops:int=int(repair.hyper.pit_count);var extended:bool=false
+	for i in range(3500):
+		probe.step_tick()
+		if repair.pit_stage=="PIT_SERVICE" and int(repair.hyper.pit_remaining)==int(repair.hyper.get("service_ticks",15))+4:extended=true
+		if int(repair.hyper.pit_count)>stops:break
+	ck(extended and int(repair.hyper.pit_count)==stops+1 and int(repair.mega_30.damage)==45,"actual pit repair and extra service time")
+	var path:String="user://hyper30_qa_career.bin"
+	for ext in ["",".tmp",".bak"]:DirAccess.remove_absolute(ProjectSettings.globalize_path(path+ext))
+	var career=C.new(path,true);var data:Dictionary=JSON.parse_string(FileAccess.get_file_as_string("res://data/season_2012.json"))
+	ck(career.create("Ferrari",2026,data),"factory season")
+	ck(career.factory_report().installed==6 and career.factory_report().spares==3,"inventory")
+	var scenario:Dictionary=career.prepare("Seco",true,0)
+	ck(scenario.get("hyper30_physics",false) and str(scenario.hyper_career_token).begins_with("H30:"),"career selects rev5")
+	var saved=C.new(path,true);ck(saved.locked() and saved.state.active_scenario==scenario,"career save isolation")
+	ck(C.new(path).state.is_empty(),"legacy rejects 3.0 career")
+	var ui=UI.instantiate();root.add_child(ui);await process_frame
+	ui.mega_choice.button_pressed=true;ui._start();ui.running=false;ui.k.step_ticks(100);ui._redraw()
+	ck(ui.k.state.hyper_evolution_revision==5 and ui.checkpoint_path==ui.SAVE30,"UI and save path")
+	ck(ui.telemetry.text.contains("condição"),"condition telemetry")
+	# Never delete player checkpoint files: fixture needs a fresh isolated user dir.
+	if FileAccess.file_exists(ui.SAVE30) or FileAccess.file_exists(ui.CAREER_SAVE30):
+		printerr("FAIL checkpoint fixture requires a fresh isolated user directory");quit(1);return
+	ui._save();var free_hash:String=ui.k.sporting_hash()
+	var career_kernel=K.new();ck(career_kernel.initialize(scenario),"career race for checkpoint fixture")
+	career_kernel.step_ticks(200);ui.k=career_kernel;ui.checkpoint_path=ui.SAVE30;ui._save()
+	ck(ui.checkpoint_path==ui.CAREER_SAVE30,"career checkpoint path separated")
+	var free_copy=ui._read_checkpoint(ui.SAVE30);var career_copy=ui._reserved_mega_checkpoint(scenario)
+	ck(free_copy!=null and free_copy.sporting_hash()==free_hash,"free checkpoint preserved")
+	ck(career_copy!=null and career_copy.sporting_hash()==career_kernel.sporting_hash(),"reserved career checkpoint recovered")
+	var other:Dictionary=scenario.duplicate(true);other.hyper_career_token="other"
+	ck(ui._reserved_mega_checkpoint(other)==null,"wrong reservation rejected")
+	ui.queue_free();await process_frame
+	print("HYPER30_GAME ",JSON.stringify({"checks":checks,"failures":errors,"status":"PASS" if errors.is_empty() else "FAIL"}))
+	quit(0 if errors.is_empty() else 1)

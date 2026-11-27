@@ -14,9 +14,11 @@ const STAGES: Array[String] = ["PROJETO","PROTÓTIPO","TESTE","FABRICAÇÃO","PR
 var state: Dictionary = {}
 var save_path: String
 var recovered_backup: bool = false
+var mega_mode: bool = false
 const WORK_COST: int=90000
 const WORK_DAYS: int=2
-func _init(path: String = "user://hyper_career_21.bin") -> void:
+func _init(path: String = "user://hyper_career_21.bin", mega:bool=false) -> void:
+	mega_mode=mega
 	save_path = path
 	load_save()
 func _hash(value: Dictionary) -> String:
@@ -55,6 +57,7 @@ func _valid(s: Dictionary) -> bool:
 	if int(s.get("schema",0)) != 2 or not s.has_all(["team","seed","serial","round","calendar","drivers","constructors","results","budget","staff_roster","staff_payroll_keys","staff_log","staff_soul","rivals","parts","slots","projects","days_left","next_id","active_scenario"]): return false
 	if not s.calendar is Array or not s.results is Array or not s.parts is Dictionary or not s.slots is Dictionary or not s.projects is Dictionary or not s.drivers is Dictionary or not s.constructors is Dictionary or not s.active_scenario is Dictionary: return false
 	if s.calendar.size() != 20 or s.drivers.size() != 24 or s.constructors.size() != 12 or int(s.round) != s.results.size() or int(s.round) > 20 or int(s.days_left) < 0 or int(s.days_left) > 14: return false
+	if bool(s.get("mega_mode",false))!=mega_mode:return false
 	var occupied: Dictionary = {}
 	for slot in s.slots:
 		var id: String = str(s.slots[slot])
@@ -87,6 +90,7 @@ func create(team: String, seed_value: int, data: Dictionary) -> bool:
 		archive.append({"serial":int(state.serial),"team":str(state.team),"drivers":state.drivers.duplicate(true),"constructors":state.constructors.duplicate(true),"results":state.results.duplicate(true)})
 		if archive.size()>20: archive.pop_front()
 	var s: Dictionary = {"archive":archive,"schema":2,"work_orders":{},"serial":int(state.get("serial",0))+1,"team":team,"seed":seed_value,"round":0,"calendar":[],"drivers":{},"constructors":{},"results":[],"budget":12000000,"staff_roster":{},"staff_payroll_keys":{},"staff_log":[],"staff_soul":{},"rivals":Rivals.create(data.teams,team),"parts":{},"slots":{},"projects":{},"days_left":14,"next_id":1,"active_scenario":{}}
+	if mega_mode:s["mega_mode"]=true
 	for track in data.tracks: s.calendar.append(str(track.code))
 	for t in data.teams:
 		s.constructors[str(t.name)] = 0
@@ -202,9 +206,12 @@ func prepare(weather: String, auto_pit: bool, setup_wet: int, second_setup: int=
 				if index==1:scenario.hyper_specs[str(car.id)].wet_setup=clampi(second_setup,0,1000)
 				index+=1
 	scenario.hyper_career_token = "%d:%d:%d" % [state.serial,state.round,seed_value]
+	if mega_mode:
+		scenario.hyper30_physics=true;scenario.hyper_career_token="H30:"+str(scenario.hyper_career_token)
 	for car in scenario.cars:
 		var level: Dictionary = _levels_for(str(car.name),str(car.team))
 		var spec: Dictionary = scenario.hyper_specs[str(car.id)]
+		if mega_mode:spec.condition=int(level.get("Motor_condition",100))
 		var motor: int = int(level.get("Motor",0)); var wing: int = int(level.get("Asa",0)); var chassis: int = int(level.get("Chassi",0))
 		var motor_focus: String = str(level.get("Motor_focus","equilibrado")); var wing_focus: String = str(level.get("Asa_focus","equilibrado"))
 		var chassis_focus: String = str(level.get("Chassi_focus","equilibrado"))
@@ -227,6 +234,7 @@ func commit(kernel) -> bool:
 	if not active() or not locked() or not kernel.initialized or not bool(kernel.state.finished): return false
 	var scenario: Dictionary = state.active_scenario
 	if str(kernel.state.get("hyper_career_token","")) != str(scenario.hyper_career_token) or str(kernel.state.track_code) != str(scenario.track_code) or int(kernel.state.seed) != int(scenario.seed) or int(kernel.state.race_laps) != int(scenario.race_laps) or int(kernel.state.lap_length_mm) != int(scenario.lap_length_mm) or str(kernel.state.hyper_player_team) != str(state.team): return false
+	if int(kernel.state.hyper_evolution_revision)!=(Kernel.MEGA_REV if mega_mode else Kernel.EVOLUTION_REV):return false
 	var rows: Array = kernel.classification()
 	if rows.size() != 24: return false
 	var s: Dictionary = state.duplicate(true); var seen: Dictionary = {}; var result_rows: Array = []; var team_points: int = 0; var best: int = 24
@@ -246,6 +254,10 @@ func commit(kernel) -> bool:
 			for family in FAMILIES:
 				var part: Dictionary = s.parts[s.slots[name+":"+family]]; part.km = int(part.km)+distance_km
 				part.condition=maxi(0,int(part.condition)-int(distance_km/(70 if part.focus=="durabilidade" else 45)))
+				if mega_mode:
+					var condition:Dictionary=kernel._lookup_car(int(row.id)).mega_30
+					if family=="Motor":part.condition=mini(int(part.condition),int(condition.health)/10)
+					elif family=="Asa":part.condition=maxi(0,int(part.condition)-int(condition.damage)/10)
 	var round_number: int = int(s.round)+1
 	var revenue: int = 850000 + team_points*25000
 	s.budget = int(s.budget)+revenue
@@ -255,6 +267,16 @@ func commit(kernel) -> bool:
 	s.results.append({"round":round_number,"track":str(scenario.track_code),"hash":kernel.sporting_hash(),"rows":result_rows,"revenue":revenue,"payroll":int(payroll.paid)})
 	s.round = round_number; s.days_left = 14; s.active_scenario = {}
 	return _write(s)
+func factory_report()->Dictionary:
+	var report:Dictionary={"installed":state.get("slots",{}).size(),"spares":0,"maintenance":0,"work_pending":0,"projects_active":0}
+	for part in state.get("parts",{}).values():
+		if str(part.slot).is_empty():report.spares=int(report.spares)+1
+		elif int(part.condition)<75:report.maintenance=int(report.maintenance)+1
+	for work in state.get("work_orders",{}).values():
+		if work.status=="PENDING":report.work_pending=int(report.work_pending)+1
+	for project in state.get("projects",{}).values():
+		if int(project.stage)<4:report.projects_active=int(report.projects_active)+1
+	return report
 func standings(constructors: bool) -> Array:
 	var rows: Array = []
 	if state.is_empty(): return rows

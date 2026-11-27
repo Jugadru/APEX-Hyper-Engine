@@ -47,6 +47,7 @@ func feed(cars: Array,id: int,interval: float=0.25)->void:
 	for car in cars:
 		if car.finished or car.pit_stage!="TRACK": continue
 		var lane: float=float({"LEFT":-2.2,"RIGHT":2.2,"CENTER":0.0}.get(str(car.racecraft.lane),0.0))
+		if car.has("mega_30"):lane=float(car.mega_30.lateral_mm)/1000.0
 		targets[int(car.id)]={"id":int(car.id),"team":str(car.team),"color":str(team_colors.get(str(car.team),"#bbbbbb")),"progress":float(car.progress_units)/1000000.0,"race_lane":lane,"grid":int(car.grid),"tire":str(car.tire),"drs_active":bool(car.hyper.drs_active),"combat_target_id":int(car.racecraft.target_id),"combat_state":str({"ATTACK":"attacking","SIDE_BY_SIDE":"duel","PREPARE":"preparing"}.get(str(car.racecraft.phase),"clear")),"finished":false}
 func _process(delta:float)->void:
 	if not is_visible_in_tree() or total<=0 or targets.is_empty(): return

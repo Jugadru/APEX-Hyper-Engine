@@ -116,6 +116,9 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 			if int(near[1])>0 and int(near[1])<gap and distance-int(near[2])>lap_mm/2:
 				front_id=int(near[0]);gap=int(near[1]);is_lapping=true
 		var phase: String = str(r.phase)
+		if bool(car.get("mega_30",{}).get("neutral",false)) and phase in ["APPROACH","PREPARE","ATTACK","SIDE_BY_SIDE"]:
+			_phase(r,"ABORT",tick,transitions,id,"virtual_neutralization")
+			phase="ABORT";r.aborts=int(r.aborts)+1
 		var target_id: int = int(r.target_id)
 		var target_gap: int = -1
 		if by_id.has(target_id):
@@ -138,7 +141,7 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 				r.defense_used = false
 				r.lane = "CENTER"
 		elif phase == "CRUISE":
-			if tick >= int(r.cooldown_until) and front_id >= 0 and gap < SEARCH_MM and speed - int(by_id[front_id].dynamics.speed_mm_s) >= 1700:
+			if not bool(car.get("mega_30",{}).get("neutral",false)) and tick >= int(r.cooldown_until) and front_id >= 0 and gap < SEARCH_MM and speed - int(by_id[front_id].dynamics.speed_mm_s) >= 1700:
 				r.target_id = front_id
 				if car.has("evolution"):r["lapping"]=is_lapping
 				_phase(r, "APPROACH", tick, transitions, id, "lapping_traffic" if is_lapping else "closing_on_slower_car")
@@ -232,6 +235,7 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 	return {"states": proposed, "speed_caps": caps, "transitions": transitions, "wake_gaps": wakes, "physical_front_gaps": front_gaps}
 
 static func _evolution_commit(car: Dictionary, profile: Array, lap_mm: int, distance: int, gap: int,water:int=0) -> bool:
+	if bool(car.get("mega_30",{}).get("neutral",false)):return false
 	if not car.has("evolution"): return true
 	if int(car.evolution.error_left)>0: return false
 	var location: int=posmod(distance,lap_mm)

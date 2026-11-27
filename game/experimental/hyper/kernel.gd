@@ -60,6 +60,8 @@ func step_tick() -> bool:
 	_wake_grid(action.wake_gaps)
 	for car in state.cars:
 		Env.drs_update(car,state.hyper_drs_zones,int(action.physical_front_gaps.get(int(car.id),state.lap_length_mm)),int(state.water_microns))
+		if bool(car.get("mega_30",{}).get("neutral",false)):
+			car.hyper.drs_active=false;car.hyper.drs_armed=[]
 	var advanced: bool = super.step_tick()
 	if not advanced:
 		return false
@@ -82,6 +84,7 @@ func step_tick() -> bool:
 		if bool(car.hyper.retired) or str(car.pit_stage) != "TRACK" or str(r.phase) not in ["ATTACK", "SIDE_BY_SIDE"]:
 			continue
 		var target: Dictionary = _lookup_car(int(r.target_id))
+		if car.has("mega_30") and (bool(r.get("lapping",false)) or target.get("finished",false) or bool(car.mega_30.neutral)):continue
 		if target.is_empty() or bool(target.hyper.retired) or str(target.pit_stage) != "TRACK":
 			continue
 		var id: int = int(car.id)
@@ -180,6 +183,8 @@ func _pit_service() -> void:
 		busy[str(car.team)] = true
 		car.pit_stage = "PIT_SERVICE"
 		car.hyper.pit_remaining = int(car.hyper.get("service_ticks",SERVICE_TICKS))
+		if int(car.get("mega_30",{}).get("damage",0))>0:
+			car.hyper.pit_remaining+=4 # 0.8s for partial repair, existing garage occupied
 		_event("hyper_pit_service_start", int(car.id))
 
 func _clear_duel(old: Dictionary) -> Dictionary:
@@ -215,6 +220,7 @@ func _advance_reference_car(car: Dictionary, previous: int) -> void:
 	var drag: int = int(d.drag_milli)
 	var downforce: int = int(d.downforce_milli)
 	var boost: int = mini(12000, int(h.kers_j)) if str(car.pace) == "Atacar" and int(d.speed_mm_s) > 25000 and int(d.fuel_g) > 0 else 0
+	if bool(car.get("mega_30",{}).get("neutral",false)) or bool(car.get("mega_30",{}).get("failure",false)):boost=0
 	car["hyper_kers_power_w"] = int(boost * 1000 / STEP_MS)
 	d.wheel_power_w = power + int(car.hyper_kers_power_w)
 	# DRS zones come from the original project's approximations; no official geometry claimed.
