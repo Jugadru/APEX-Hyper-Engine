@@ -7,6 +7,7 @@ extends RefCounted
 const Dynamics23 = preload("res://experimental/hyper2/dynamics_23.gd")
 const Geometry302 = preload("res://experimental/hyper2/geometry_302.gd")
 const Wet303 = preload("res://experimental/hyper2/wet_303.gd")
+const Style305 = preload("res://experimental/hyper2/racecraft_305.gd")
 const SCHEMA: int = 13
 const PHASES: Array[String] = ["CRUISE", "APPROACH", "PREPARE", "ATTACK", "SIDE_BY_SIDE", "DEFEND", "ABORT", "RECOVER"]
 const LANES: Array[String] = ["CENTER", "LEFT", "RIGHT"]
@@ -48,6 +49,15 @@ static func _lane_allowed(lane: String, car_id: int, distance_mm: int, proposed:
 			return false
 	return true
 
+static func _future_clear(lane:String,car:Dictionary,proposed:Dictionary,roster:Array,lap:int)->bool:
+	# Half-second constant-velocity projection; not a collision solver.
+	var own:int=int(car.dynamics.distance_mm)+int(car.dynamics.speed_mm_s)/2
+	for other in roster:
+		if int(other.id)==int(car.id) or other.finished or str(other.pit_stage)!="TRACK":continue
+		if str(proposed.get(int(other.id),other.racecraft).lane)!=lane:continue
+		var projected:int=int(other.dynamics.distance_mm)+int(other.dynamics.speed_mm_s)/2
+		if absi(wrapped_delta(projected,own,lap))<=LANE_CLEAR_MM:return false
+	return true
 static func _can_pass(profile: Array, lap_mm: int, distance_mm: int) -> bool:
 	if profile.is_empty() or lap_mm <= 0:
 		return false
@@ -114,6 +124,7 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 			var near:Array=physical_next[id]
 			if int(near[1])>0 and int(near[1])<gap and distance-int(near[2])>lap_mm/2:
 				front_id=int(near[0]);gap=int(near[1]);is_lapping=true
+		var styled:bool=car.has(Style305.KEY)
 		var phase: String = str(r.phase)
 		if bool(car.get("mega_30",{}).get("neutral",false)) and phase in ["APPROACH","PREPARE","ATTACK","SIDE_BY_SIDE"]:
 			_phase(r,"ABORT",tick,transitions,id,"virtual_neutralization")
@@ -140,7 +151,7 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 				r.defense_used = false
 				r.lane = "CENTER"
 		elif phase == "CRUISE":
-			if not bool(car.get("mega_30",{}).get("neutral",false)) and tick >= int(r.cooldown_until) and front_id >= 0 and gap < SEARCH_MM and speed - int(by_id[front_id].dynamics.speed_mm_s) >= 1700:
+			if not bool(car.get("mega_30",{}).get("neutral",false)) and tick >= int(r.cooldown_until) and front_id >= 0 and gap < SEARCH_MM and (Style305.approach(car,gap,speed-int(by_id[front_id].dynamics.speed_mm_s),water) if styled else speed-int(by_id[front_id].dynamics.speed_mm_s)>=1700):
 				r.target_id = front_id
 				if car.has("evolution"):r["lapping"]=is_lapping
 				_phase(r, "APPROACH", tick, transitions, id, "lapping_traffic" if is_lapping else "closing_on_slower_car")
@@ -148,7 +159,7 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 			if front_id != target_id or target_gap < 0 or target_gap > SEARCH_MM:
 				_phase(r, "ABORT", tick, transitions, id, "opportunity_lost")
 				r.aborts = int(r.aborts) + 1
-			elif (str(car.driver.intent) == "PREPARE_ATTACK" or bool(r.get("lapping",false))) and target_gap <= PREPARE_MM:
+			elif (bool(r.get("lapping",false)) or (Style305.prepare(car,target_gap,speed-int(by_id[target_id].dynamics.speed_mm_s),water) if styled else str(car.driver.intent)=="PREPARE_ATTACK")) and target_gap <= PREPARE_MM:
 				_phase(r, "PREPARE", tick, transitions, id, "driver_attack_intent")
 			elif tick - int(r.phase_tick) > 180:
 				_phase(r, "ABORT", tick, transitions, id, "approach_timeout")
@@ -156,28 +167,34 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 		elif phase == "PREPARE":
 			var wet_mode:bool=car.has(Wet303.KEY) and water>700
 			var wet_reason:String=""
-			if wet_mode and by_id.has(target_id) and target_gap<=INITIATE_MM:
-				wet_reason=Wet303.attack_reason(car,Geometry302.radius_at(profile,lap_mm,distance),target_gap,speed-int(by_id[target_id].dynamics.speed_mm_s),water)
+			if (wet_mode or styled) and by_id.has(target_id) and target_gap<=INITIATE_MM:
+				wet_reason=Style305.reason(car,profile,lap_mm,distance,target_gap,speed-int(by_id[target_id].dynamics.speed_mm_s),water) if styled else Wet303.attack_reason(car,Geometry302.radius_at(profile,lap_mm,distance),target_gap,speed-int(by_id[target_id].dynamics.speed_mm_s),water)
 				if wet_reason=="eligible" and claims.has(target_id):wet_reason="claim"
-				wet_reasons[wet_reason]=int(wet_reasons[wet_reason])+1
+				if wet_mode:wet_reasons[wet_reason]=int(wet_reasons[wet_reason])+1
 			if not by_id.has(target_id) or bool(by_id[target_id].finished) or str(by_id[target_id].pit_stage) != "TRACK" or target_gap < -5000 or target_gap > SEARCH_MM:
 				_phase(r, "ABORT", tick, transitions, id, "gap_changed")
 				r.aborts = int(r.aborts) + 1
-			elif target_gap <= INITIATE_MM and not claims.has(target_id) and (wet_reason=="eligible" if wet_mode else (_can_pass(profile, lap_mm, distance) and _evolution_commit(car, profile, lap_mm, distance, target_gap,water))):
+			elif target_gap <= INITIATE_MM and not claims.has(target_id) and (wet_reason=="eligible" if wet_mode or styled else (_can_pass(profile, lap_mm, distance) and _evolution_commit(car, profile, lap_mm, distance, target_gap,water))):
 				var defender: Dictionary = by_id[target_id]
 				var defensive_lane: String = "LEFT" if target_id % 2 == 0 else "RIGHT"
+				if styled:defensive_lane=Style305.preferred_lane(defender[Style305.KEY],Geometry302.curvature_at(profile,lap_mm,int(defender.dynamics.distance_mm)))
 				var incoming_state: Dictionary = proposed.get(target_id, defender.racecraft).duplicate(true)
-				if not bool(r.get("lapping",false)) and str(defender.driver.intent) == "COVER_THREAT" and str(incoming_state.phase) in ["CRUISE", "APPROACH", "RECOVER"] and _lane_allowed(defensive_lane, target_id, int(defender.dynamics.distance_mm), proposed, roster, lap_mm):
+				var pre_defense:Dictionary=incoming_state.duplicate(true) if styled else {}
+				var defense_event_index:int=transitions.size()
+				var staged_defense:bool=false
+				if not bool(r.get("lapping",false)) and (Style305.defense_allowed(defender,target_gap,speed-int(defender.dynamics.speed_mm_s)) and not bool(incoming_state.defense_used) if styled else str(defender.driver.intent)=="COVER_THREAT") and str(incoming_state.phase) in ["CRUISE", "APPROACH", "RECOVER"] and _lane_allowed(defensive_lane, target_id, int(defender.dynamics.distance_mm), proposed, roster, lap_mm) and (not styled or _future_clear(defensive_lane,defender,proposed,roster,lap_mm)):
 					incoming_state.target_id = id
 					incoming_state.lane = defensive_lane
 					incoming_state.defense_used = true
 					_phase(incoming_state, "DEFEND", tick, transitions, target_id, "single_defensive_move")
 					proposed[target_id] = incoming_state
+					staged_defense=styled
 				var first_lane: String = "RIGHT" if str(incoming_state.lane) == "LEFT" else "LEFT"
+				if styled and str(incoming_state.lane)=="CENTER":first_lane=Style305.preferred_lane(car[Style305.KEY],Geometry302.curvature_at(profile,lap_mm,distance))
 				var second_lane: String = "LEFT" if first_lane == "RIGHT" else "RIGHT"
 				var selected: String = ""
 				for lane in [first_lane, second_lane]:
-					if lane != str(incoming_state.lane) and _lane_allowed(lane, id, distance, proposed, roster, lap_mm):
+					if lane != str(incoming_state.lane) and _lane_allowed(lane, id, distance, proposed, roster, lap_mm) and (not styled or _future_clear(lane,car,proposed,roster,lap_mm)):
 						selected = lane
 						break
 				if not selected.is_empty():
@@ -186,7 +203,12 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 					claims[target_id] = id
 					_phase(r, "ATTACK", tick, transitions, id, "clear_alternative_corridor")
 					if wet_mode:wet_reasons.committed=int(wet_reasons.committed)+1
-				elif wet_mode:wet_reasons.lane=int(wet_reasons.lane)+1
+				else:
+					if staged_defense:
+						# A defense is committed only with a real attack corridor.
+						proposed[target_id]=pre_defense
+						transitions.resize(defense_event_index)
+					if wet_mode:wet_reasons.lane=int(wet_reasons.lane)+1
 			if str(r.phase) == "PREPARE" and tick - int(r.phase_tick) >= 150:
 				_phase(r, "ABORT", tick, transitions, id, "no_safe_corridor")
 				r.aborts = int(r.aborts) + 1
@@ -200,6 +222,7 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 				r.cooldown_until=tick+35
 			elif phase == "ATTACK" and absi(target_gap) <= SIDE_BY_SIDE_MM:
 				_phase(r, "SIDE_BY_SIDE", tick, transitions, id, "longitudinal_overlap")
+		if styled and str(r.phase)=="ABORT" and phase!="ABORT":r.cooldown_until=tick+Style305.cooldown(car[Style305.KEY])
 		r.last_gap_mm = target_gap if int(r.target_id) >= 0 else -1
 	# Index the physical field by lane, including wrapped distances for lapped traffic.
 	var lane_groups: Dictionary = {"CENTER": [], "LEFT": [], "RIGHT": []}
