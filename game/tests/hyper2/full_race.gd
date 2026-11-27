@@ -17,6 +17,7 @@ func run() -> void:
 	if "hyper303" in args: scenario.hyper303_physics=true
 	if "hyper304" in args: scenario.hyper304_physics=true
 	if "hyper305" in args: scenario.hyper305_physics=true
+	if "hyper306" in args: scenario.hyper306_physics=true
 	if not k.initialize(scenario): quit(1); return
 	var begin: int = Time.get_ticks_msec()
 	var resume_checked: bool = false
@@ -43,4 +44,5 @@ func run() -> void:
 	var ok: bool = bool(k.state.finished) and complete > 0 and complete + retired == 24 and resume_checked and stops > 0
 	print("HYPER_FULL ", JSON.stringify({"status":"PASS" if ok else "FAIL","track":code,"weather":weather,"ticks":k.state.tick,"clock_s":float(k.state.clock_ms)/1000.0,"elapsed_ms":Time.get_ticks_msec()-begin,"complete":complete,"retired":retired,"stops":stops,"passes":k.state.racecraft_passes,"attempts":k.state.racecraft_attempts,"hash":k.sporting_hash(),"checkpoint_parity":resume_checked,"winner":k.classification()[0].name}))
 	if k.state.has("wet_attack_reasons"):print("WET_ATTACK_REASONS ",JSON.stringify(k.state.wet_attack_reasons))
+	if k.state.has("race_control_306"):print("RACE_CONTROL_SUMMARY ",JSON.stringify(k.state.race_control_306))
 	quit(0 if ok else 1)
