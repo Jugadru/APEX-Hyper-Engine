@@ -34,3 +34,18 @@ jobs:
           timeout 90s godot --headless --path lab/longitudinal --script res://tests/hyper22_longitudinal_adapter_test.gd 2>&1 | tee /tmp/hyper-fast.log
           grep -q 'HYPER22_LONGITUDINAL_PASS checks=' /tmp/hyper-fast.log
           if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper-fast.log; then exit 1; fi
+
+      - name: Export and compare native longitudinal metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p ci-results
+          python3 tools/apex_hyper_metadata.py --native-log /tmp/hyper-fast.log > ci-results/hyper-metadata.json
+          cp /tmp/hyper-fast.log ci-results/hyper-fast.log
+      - name: Retain scoped Hyper metadata evidence
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: hyper-foundation-metadata
+          path: ci-results/
+          if-no-files-found: error
+          retention-days: 7

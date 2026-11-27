@@ -60,6 +60,13 @@ func _initialize() -> void:
 	verify(trial_a.size() == 24, "24 actors, not a full GP")
 	if failures == 0:
 		print("HYPER22_LONGITUDINAL_PASS checks=%d" % checks)
+		print("HYPER_METADATA_NATIVE " + JSON.stringify({
+			"adapter_revision": Adapter.REVISION,
+			"step_us": int(round(Adapter.STEP_S * 1000000.0)),
+			"max_previews": Adapter.MAX_PREVIEWS,
+			"rounding_tolerance_um": int(round(Adapter.ROUNDING_TOLERANCE_M * 1000000.0)),
+			"max_speed_mps": int(Adapter.Longitudinal.MAX_MPS)
+		}))
 	quit(0 if failures == 0 else 1)
 
 func run_fixture() -> Array:
