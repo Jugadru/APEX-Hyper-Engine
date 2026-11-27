@@ -42,6 +42,14 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if int(candidate.get("lap_length_mm", 0)) < 1000000 or int(candidate.get("lap_length_mm", 0)) > 30000000:
 		return false
+	if int(candidate.get("hyper_evolution_revision",0))==5:
+		if candidate.track_profile.size()>1000:return false
+		var last_start:int=-1
+		for segment in candidate.track_profile:
+			if not segment is Dictionary or typeof(segment.get("start_mm"))!=TYPE_INT or typeof(segment.get("radius_mm"))!=TYPE_INT:return false
+			if int(segment.start_mm)<=last_start or int(segment.start_mm)>=int(candidate.lap_length_mm) or int(segment.radius_mm)<Vehicle.MIN_RADIUS_MM or int(segment.radius_mm)>Vehicle.MAX_RADIUS_MM:return false
+			if last_start==-1 and int(segment.start_mm)!=0:return false
+			last_start=int(segment.start_mm)
 	if int(candidate.get("water_microns", -1)) < 0 or int(candidate.get("water_microns", -1)) > 6000:
 		return false
 	for car in candidate.get("cars", []):

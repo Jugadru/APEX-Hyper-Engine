@@ -106,12 +106,16 @@ func step_tick() -> bool:
 				Mega.lane(x,str(car.racecraft.lane),int(grip.accel_mm_s2),int(grip.lateral_demand_n),int(grip.grip_n))
 				if bool(x.failure) and int(d.speed_mm_s)<=1000:
 					car.finished=true;car.hyper.retired=true;car.hyper.finish_tick=int(state.tick)
+					car.hyper.drs_active=false;car.hyper.drs_armed=[]
 					_event("mega_mechanical_retirement",int(car.id))
+					continue
 				var radio:String=Mega.radio_kind(car)
 				if not radio.is_empty() and radio!=str(x.radio_kind) and int(state.tick)-int(x.radio_tick)>=Mega.RADIO_COOLDOWN:
 					x.radio_kind=radio;x.radio_tick=int(state.tick)
 					_event("mega_radio",int(car.id),{"kind":radio})
 				elif radio.is_empty():x.radio_kind=""
+		if not bool(state.finished) and state.cars.all(func(actor:Dictionary)->bool:return bool(actor.finished)):
+			state.finished=true;_event("race_finished",-1)
 	return true
 func _advance_reference_car(car: Dictionary,previous: int) -> void:
 	var e: Dictionary=car.evolution
@@ -169,6 +173,10 @@ func restore(data: Dictionary) -> bool:
 		elif car.dynamics.has(Dynamics.KEY): return false
 		if int(candidate.hyper_evolution_revision)==MEGA_REV:
 			if not Mega.valid(car.get(Mega.KEY)):return false
+			var condition:Dictionary=car[Mega.KEY]
+			if not car.get("hyper") is Dictionary:return false
+			if int(condition.seen_errors)!=int(car.evolution.get("error_count",-1)) or int(condition.seen_stops)!=int(car.hyper.get("pit_count",-1)) or int(condition.radio_tick)>int(candidate.get("tick",-1)):return false
+			if bool(condition.failure)!=(int(condition.health)==0):return false
 		elif car.has(Mega.KEY):return false
 		var e: Dictionary=car.evolution
 		if not e.has_all(["skill","reaction_ticks","error_kind","error_left","error_total","error_ref_speed","error_count","recovery_ticks","cooldown","last_cross_tick","last_lap_ticks","best_lap_ticks","lap_times","traffic_ticks","blue_ticks","last_radio_tick"]): return false

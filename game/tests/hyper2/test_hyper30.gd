@@ -32,6 +32,10 @@ func run()->void:
 	ck(k.sporting_hash()==copy.sporting_hash() and k.state.mega_control.remaining==0,"control expiry and continuation")
 	var bad:Dictionary=k.checkpoint();bad.state.cars[0].mega_30.health=-1
 	ck(not copy.restore(bad),"invalid health rejected")
+	var malformed:Dictionary=k.checkpoint();malformed.state.track_profile[0].radius_mm=0
+	ck(not copy.restore(malformed),"invalid geometry rejected")
+	var inconsistent:Dictionary=k.checkpoint();inconsistent.state.cars[0].mega_30.seen_errors+=1
+	ck(not copy.restore(inconsistent),"inconsistent incident ledger rejected")
 	first.mega_30.health=0;first.mega_30.failure=true
 	for i in range(100):
 		if first.finished:break
@@ -64,6 +68,18 @@ func run()->void:
 	ui.mega_choice.button_pressed=true;ui._start();ui.running=false;ui.k.step_ticks(100);ui._redraw()
 	ck(ui.k.state.hyper_evolution_revision==5 and ui.checkpoint_path==ui.SAVE30,"UI and save path")
 	ck(ui.telemetry.text.contains("condição"),"condition telemetry")
+	# Never delete player checkpoint files: fixture needs a fresh isolated user dir.
+	if FileAccess.file_exists(ui.SAVE30) or FileAccess.file_exists(ui.CAREER_SAVE30):
+		printerr("FAIL checkpoint fixture requires a fresh isolated user directory");quit(1);return
+	ui._save();var free_hash:String=ui.k.sporting_hash()
+	var career_kernel=K.new();ck(career_kernel.initialize(scenario),"career race for checkpoint fixture")
+	career_kernel.step_ticks(200);ui.k=career_kernel;ui.checkpoint_path=ui.SAVE30;ui._save()
+	ck(ui.checkpoint_path==ui.CAREER_SAVE30,"career checkpoint path separated")
+	var free_copy=ui._read_checkpoint(ui.SAVE30);var career_copy=ui._reserved_mega_checkpoint(scenario)
+	ck(free_copy!=null and free_copy.sporting_hash()==free_hash,"free checkpoint preserved")
+	ck(career_copy!=null and career_copy.sporting_hash()==career_kernel.sporting_hash(),"reserved career checkpoint recovered")
+	var other:Dictionary=scenario.duplicate(true);other.hyper_career_token="other"
+	ck(ui._reserved_mega_checkpoint(other)==null,"wrong reservation rejected")
 	ui.queue_free();await process_frame
 	print("HYPER30_GAME ",JSON.stringify({"checks":checks,"failures":errors,"status":"PASS" if errors.is_empty() else "FAIL"}))
 	quit(0 if errors.is_empty() else 1)

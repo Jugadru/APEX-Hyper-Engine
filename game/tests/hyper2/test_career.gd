@@ -66,9 +66,9 @@ func run() -> void:
 	var reloaded = C.new(path,mega)
 	check(reloaded.state==c.state,"atomic career save reload")
 	if mega:
-		for car in k.state.cars:
-			if str(car.team)=="Ferrari":
-				var installed:Dictionary=c.state.parts[c.state.slots[str(car.name)+":Motor"]]
-				check(int(installed.condition)<=int(car.mega_30.health)/10,"race mechanical condition persisted")
+		for finisher in k.state.cars:
+			if str(finisher.team)=="Ferrari":
+				var installed:Dictionary=c.state.parts[c.state.slots[str(finisher.name)+":Motor"]]
+				check(int(installed.condition)<=int(finisher.mega_30.health)/10,"race mechanical condition persisted")
 	print("HYPER_CAREER ",JSON.stringify({"checks":checks,"failures":failures,"ticks":k.state.tick,"elapsed_ms":Time.get_ticks_msec()-start,"round":c.state.round,"points":sum,"winner":k.classification()[0].name,"hash":k.sporting_hash()}))
 	quit(0 if failures.is_empty() else 1)

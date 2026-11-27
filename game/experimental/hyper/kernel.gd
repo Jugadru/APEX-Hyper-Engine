@@ -84,6 +84,7 @@ func step_tick() -> bool:
 		if bool(car.hyper.retired) or str(car.pit_stage) != "TRACK" or str(r.phase) not in ["ATTACK", "SIDE_BY_SIDE"]:
 			continue
 		var target: Dictionary = _lookup_car(int(r.target_id))
+		if car.has("mega_30") and (bool(r.get("lapping",false)) or target.get("finished",false) or bool(car.mega_30.neutral)):continue
 		if target.is_empty() or bool(target.hyper.retired) or str(target.pit_stage) != "TRACK":
 			continue
 		var id: int = int(car.id)

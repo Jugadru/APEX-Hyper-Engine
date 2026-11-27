@@ -3,6 +3,8 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - 'game/**'
+      - 'tools/**'
       - '.github/workflows/hyper30-calibration.yml'
       - 'docs/HYPER30_MEGA.md'
   workflow_dispatch:
@@ -20,6 +22,8 @@ jobs:
             weather: Chuva intensa
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      XDG_DATA_HOME: ${{ runner.temp }}/hyper-calibration-data
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:

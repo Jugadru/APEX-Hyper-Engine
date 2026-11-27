@@ -11,6 +11,8 @@ jobs:
   game-fast:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      XDG_DATA_HOME: ${{ runner.temp }}/hyper-game-data
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -34,6 +36,14 @@ jobs:
           timeout 300s godot --headless --path game --rendering-method gl_compatibility --editor --import > /tmp/hyper-import.log 2>&1 || { tail -150 /tmp/hyper-import.log; exit 1; }
           if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper-import.log; then exit 1; fi
           tail -15 /tmp/hyper-import.log
+      - name: Parse all Hyper test entry points
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in game/tests/hyper2/*.gd; do
+            godot --headless --path game --rendering-method gl_compatibility --check-only --script "res://${file#game/}" > /tmp/hyper-parse.log 2>&1 || { cat /tmp/hyper-parse.log; exit 1; }
+            if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper-parse.log; then exit 1; fi
+          done
       - name: Run game directional regression fixtures
         shell: bash
         run: |
