@@ -42,7 +42,7 @@ func restore(data: Dictionary) -> bool:
 		return false
 	if int(candidate.get("lap_length_mm", 0)) < 1000000 or int(candidate.get("lap_length_mm", 0)) > 30000000:
 		return false
-	if int(candidate.get("hyper_evolution_revision",0)) in [5,6,7,8,9]:
+	if int(candidate.get("hyper_evolution_revision",0)) in [5,6,7,8,9,10]:
 		if candidate.track_profile.size()>1000:return false
 		var last_start:int=-1
 		for segment in candidate.track_profile:
@@ -74,6 +74,6 @@ func restore(data: Dictionary) -> bool:
 			# Initial grid converts progress to integer millimetres once. Before
 			# movement, inverse rounding can differ by one progress unit.
 			var projected_grid: int = int(int(car.progress_units) * int(candidate.lap_length_mm) / LAP_UNITS)
-			if int(candidate.get("hyper_evolution_revision",0)) not in [2,3,4,5,6,7,8,9] or int(candidate.tick)>3 or int(car.progress_units)>0 or int(dyn.speed_mm_s)!=0 or int(dyn.distance_mm)!=projected_grid:
+			if int(candidate.get("hyper_evolution_revision",0)) not in [2,3,4,5,6,7,8,9,10] or int(candidate.tick)>3 or int(car.progress_units)>0 or int(dyn.speed_mm_s)!=0 or int(dyn.distance_mm)!=projected_grid:
 				return false
 	return super.restore(data)
