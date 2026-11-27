@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - 'game/tests/lab_bridge_probe.gd'
+      - 'tools/lab_bridge_*'
       - '.github/workflows/lab-pinned-native-probe.yml'
 permissions:
   contents: read
@@ -22,8 +22,9 @@ jobs:
           EXPECTED: ${{ github.event.pull_request.head.sha }}
         run: |
           test "$(git rev-parse HEAD)" = "$EXPECTED"
+          python3 tools/verify_evolution_inventory.py
           git merge-base --is-ancestor 4e4e75f96f94ce4487e7a3c37862aabcbba649ef HEAD
-          test -z "$(git diff --name-only 4e4e75f96f94ce4487e7a3c37862aabcbba649ef HEAD -- . ':!game/tests/lab_bridge_probe.gd' ':!.github/workflows/lab-pinned-native-probe.yml')"
+          test -z "$(git diff --name-only 4e4e75f96f94ce4487e7a3c37862aabcbba649ef HEAD -- . ':!tools/lab_bridge_probe.gd' ':!tools/lab_bridge_grid.json' ':!.github/workflows/lab-pinned-native-probe.yml')"
       - uses: chickensoft-games/setup-godot@ac93246ea68518a384c1c280a496e5989341f2f6
         with:
           version: '4.7.2'
@@ -34,6 +35,8 @@ jobs:
           set -euo pipefail
           export XDG_DATA_HOME="$RUNNER_TEMP/hyper-probe-user"
           mkdir -p "$XDG_DATA_HOME"
+          cp tools/lab_bridge_probe.gd game/tests/lab_bridge_probe.gd
+          cp tools/lab_bridge_grid.json game/tests/lab_bridge_grid.json
           timeout 300s godot --headless --path game --rendering-method gl_compatibility --editor --import > "$RUNNER_TEMP/import.log" 2>&1
           if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' "$RUNNER_TEMP/import.log"; then exit 1; fi
           timeout 180s godot --headless --path game --rendering-method gl_compatibility --script res://tests/lab_bridge_probe.gd 2>&1 | tee "$RUNNER_TEMP/hyper.log"
