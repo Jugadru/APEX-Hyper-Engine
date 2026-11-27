@@ -13,6 +13,7 @@ const RACECRAFT_REV := 10
 const CONTROL_REV := 11
 const STRATEGY_REV := 12
 const SECTOR_REV := 13
+const STEWARDS_REV := 14
 const SectorControl = preload("res://experimental/hyper2/sector_control_3062.gd")
 const PitStrategy = preload("res://experimental/hyper2/pit_strategy_3061.gd")
 const RaceControl = preload("res://experimental/hyper2/race_control_306.gd")
@@ -26,16 +27,17 @@ const Dynamics = preload("res://experimental/hyper2/dynamics_23.gd")
 const Powertrain = preload("res://experimental/hyper2/powertrain_22.gd")
 func initialize(scenario: Dictionary) -> bool:
 	var route:Array=[]
-	if bool(scenario.get("hyper302_physics",false)) or bool(scenario.get("hyper303_physics",false)) or bool(scenario.get("hyper304_physics",false)) or bool(scenario.get("hyper305_physics",false)) or bool(scenario.get("hyper306_physics",false)) or bool(scenario.get("hyper3061_physics",false)) or bool(scenario.get("hyper3062_physics",false)):
+	if bool(scenario.get("hyper302_physics",false)) or bool(scenario.get("hyper303_physics",false)) or bool(scenario.get("hyper304_physics",false)) or bool(scenario.get("hyper305_physics",false)) or bool(scenario.get("hyper306_physics",false)) or bool(scenario.get("hyper3061_physics",false)) or bool(scenario.get("hyper3062_physics",false)) or bool(scenario.get("hyper3063_physics",false)):
 		route=Geometry.build(scenario.get("geometry_points",[]),int(scenario.get("lap_length_mm",0)))
 		if route.is_empty():return false
 	if not super.initialize(scenario): return false
 	state["hyper_evolution_revision"]=ENERGY_REV if bool(scenario.get("hyper301_physics",false)) else (MEGA_REV if bool(scenario.get("hyper30_physics",false)) else (DYNAMICS_REV if bool(scenario.get("hyper23_physics",false)) else (PHYSICS_REV if bool(scenario.get("hyper22_physics",false)) else EVOLUTION_REV)))
 	if not route.is_empty():
-		state.hyper_evolution_revision=SECTOR_REV if bool(scenario.get("hyper3062_physics",false)) else (STRATEGY_REV if bool(scenario.get("hyper3061_physics",false)) else (CONTROL_REV if bool(scenario.get("hyper306_physics",false)) else (RACECRAFT_REV if bool(scenario.get("hyper305_physics",false)) else (TYRE_REV if bool(scenario.get("hyper304_physics",false)) else (WET_REV if bool(scenario.get("hyper303_physics",false)) else GEOMETRY_REV)))));state.track_profile=route
+		state.hyper_evolution_revision=STEWARDS_REV if bool(scenario.get("hyper3063_physics",false)) else (SECTOR_REV if bool(scenario.get("hyper3062_physics",false)) else (STRATEGY_REV if bool(scenario.get("hyper3061_physics",false)) else (CONTROL_REV if bool(scenario.get("hyper306_physics",false)) else (RACECRAFT_REV if bool(scenario.get("hyper305_physics",false)) else (TYRE_REV if bool(scenario.get("hyper304_physics",false)) else (WET_REV if bool(scenario.get("hyper303_physics",false)) else GEOMETRY_REV))))));state.track_profile=route
 	if int(state.hyper_evolution_revision)>=WET_REV:state["wet_attack_reasons"]=Wet.counters()
 	if int(state.hyper_evolution_revision)>=MEGA_REV:state["mega_control"]=Mega.control()
 	if int(state.hyper_evolution_revision)>=CONTROL_REV:state[RaceControl.KEY]=RaceControl.initial()
+	if int(state.hyper_evolution_revision)==STEWARDS_REV:state[Stewards3063.KEY]=Stewards3063.initial()
 	state["hyper_errors_enabled"]=bool(scenario.get("hyper_errors_enabled",true))
 	var skill_by_name: Dictionary={}
 	var historical: Variant=JSON.parse_string(FileAccess.get_file_as_string("res://data/season_2012.json"))
@@ -55,7 +57,7 @@ func initialize(scenario: Dictionary) -> bool:
 		if int(state.hyper_evolution_revision)>=TYRE_REV:car.dynamics[Tyres.KEY]=Tyres.initial(scenario.get("hyper_specs",{}).get(str(car.id),{}))
 		if int(state.hyper_evolution_revision)>=RACECRAFT_REV:car[Style.KEY]=Style.initial(str(car.name),int(car.evolution.skill))
 		if int(state.hyper_evolution_revision)>=STRATEGY_REV:car[PitStrategy.KEY]=PitStrategy.initial()
-		if int(state.hyper_evolution_revision)==SECTOR_REV:car[SectorControl.KEY]=SectorControl.initial()
+		if int(state.hyper_evolution_revision)>=SECTOR_REV:car[SectorControl.KEY]=SectorControl.initial()
 	return true
 func step_tick() -> bool:
 	if not initialized or bool(state.finished) or int(state.tick)>=MAX_TICKS: return false
@@ -197,7 +199,7 @@ func strategy_report(id: int) -> Dictionary:
 	return report
 func restore(data: Dictionary) -> bool:
 	var candidate: Variant=data.get("state",null)
-	if not candidate is Dictionary or int(candidate.get("hyper_evolution_revision",0)) not in [EVOLUTION_REV,PHYSICS_REV,DYNAMICS_REV,MEGA_REV,ENERGY_REV,GEOMETRY_REV,WET_REV,TYRE_REV,RACECRAFT_REV,CONTROL_REV,STRATEGY_REV,SECTOR_REV] or typeof(candidate.get("hyper_errors_enabled"))!=TYPE_BOOL: return false
+	if not candidate is Dictionary or int(candidate.get("hyper_evolution_revision",0)) not in [EVOLUTION_REV,PHYSICS_REV,DYNAMICS_REV,MEGA_REV,ENERGY_REV,GEOMETRY_REV,WET_REV,TYRE_REV,RACECRAFT_REV,CONTROL_REV,STRATEGY_REV,SECTOR_REV,STEWARDS_REV] or typeof(candidate.get("hyper_errors_enabled"))!=TYPE_BOOL: return false
 	if int(candidate.hyper_evolution_revision)>=GEOMETRY_REV:
 		if not Geometry.valid(candidate.get("track_profile"),int(candidate.get("lap_length_mm",0))):return false
 	elif candidate.get("track_profile") is Array:
@@ -251,7 +253,7 @@ func restore(data: Dictionary) -> bool:
 		if int(candidate.hyper_evolution_revision)>=STRATEGY_REV:
 			if not PitStrategy.valid(car.get(PitStrategy.KEY)) or int(car[PitStrategy.KEY].last_tick)>int(candidate.tick):return false
 		elif car.has(PitStrategy.KEY):return false
-		if int(candidate.hyper_evolution_revision)==SECTOR_REV:
+		if int(candidate.hyper_evolution_revision)>=SECTOR_REV:
 			if not SectorControl.valid(car.get(SectorControl.KEY),int(candidate.lap_length_mm),int(candidate.tick),int(candidate.mega_control.deployments)):return false
 		elif car.has(SectorControl.KEY):return false
 		var e: Dictionary=car.evolution
@@ -263,4 +265,7 @@ func restore(data: Dictionary) -> bool:
 		if int(e.error_left)>0 and str(e.error_kind)=="": return false
 		for time in e.lap_times:
 			if typeof(time)!=TYPE_INT or int(time)<=0: return false
+	if int(candidate.hyper_evolution_revision)==STEWARDS_REV:
+		if not Stewards3063.valid(candidate.get(Stewards3063.KEY),candidate.cars,int(candidate.tick),int(candidate.mega_control.deployments)):return false
+	elif candidate.has(Stewards3063.KEY):return false
 	return super.restore(data)
