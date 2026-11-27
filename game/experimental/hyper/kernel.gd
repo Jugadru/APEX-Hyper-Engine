@@ -2,6 +2,7 @@ extends "res://experimental/apex2/driver_kernel_12.gd"
 ## Hyper Evolution: isolated playable successor to Racecraft 1.3.
 const Resolver = preload("res://experimental/hyper/traffic.gd")
 const Control306 = preload("res://experimental/hyper2/race_control_306.gd")
+const Pit3061 = preload("res://experimental/hyper2/pit_strategy_3061.gd")
 const RACECRAFT_TAG: String = "APEX2_HYPER_2.0_ALPHA1"
 
 const IndexedQueue = preload("res://experimental/hyper/indexed_queue.gd")
@@ -135,11 +136,13 @@ func _strategy_cycle() -> void:
 		if lap >= int(state.race_laps) - 1 or lap - int(car.hyper.last_pit_lap) < 2:
 			continue
 		var advice: Dictionary = Env.pit_advice(car, state.compounds, int(state.water_microns), int(state.race_laps) - lap)
+		if car.has(Pit3061.KEY):advice=Pit3061.evaluate(car,state.compounds,int(state.water_microns),int(state.race_laps)-lap,int(state.tick),int(state.hyper_pit_transit)+int(car.hyper.get("service_ticks",SERVICE_TICKS)))
 		car.hyper.strategy_reason = str(advice.reason)
 		if not bool(advice.stop):
 			continue
 		var result: Dictionary = submit({"type": "order_pit", "source": "AI", "car_id": int(car.id), "compound": str(advice.compound), "allow_double_stack": true})
 		if bool(result.accepted):
+			if car.has(Pit3061.KEY):Pit3061.accepted(car[Pit3061.KEY])
 			_event("hyper_strategy_order", int(car.id), {"reason": str(advice.reason), "compound": str(advice.compound)})
 
 func _pit_service() -> void:

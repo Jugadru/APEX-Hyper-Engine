@@ -13,6 +13,7 @@ func run() -> void:
 	if "hyper304" in OS.get_cmdline_user_args(): scenario.hyper304_physics=true
 	if "hyper305" in OS.get_cmdline_user_args(): scenario.hyper305_physics=true
 	if "hyper306" in OS.get_cmdline_user_args(): scenario.hyper306_physics=true
+	if "hyper3061" in OS.get_cmdline_user_args(): scenario.hyper3061_physics=true
 	scenario.hyper_weather = [{"tick":1500,"water":5000}]
 	var k = K.new()
 	if not k.initialize(scenario): quit(1); return
