@@ -70,11 +70,9 @@ jobs:
           expected = {
               ("ITA", "Seco"): "973293717ae3aa966d014217ff7ef7ab77abcab158a01235967c3335be96ba58",
               ("GBR", "Chuva intensa"): "7a39702f2f29e47fc7b23481aa70a82ff47bbe8a43608a581c3afb81d65ce569",
+              ("GBR", "Variável"): "c16296870a27f30fc6e20035e87811d500911c79a6e91ea81586d9c4de383ede",
           }
           key = (os.environ["TRACK"], os.environ["WEATHER"])
-          if key in expected:
-              assert load("/tmp/hyper305.log")["hash"] == expected[key], "rev10 sporting hash changed"
-              print("HYPER306_LEGACY_HASH_PASS")
-          else:
-              print("HYPER306_MIXED_HASH_NOT_PINNED: original comparison still running at implementation")
+          assert load("/tmp/hyper305.log")["hash"] == expected[key], "rev10 sporting hash changed"
+          print("HYPER306_LEGACY_HASH_PASS")
           PY

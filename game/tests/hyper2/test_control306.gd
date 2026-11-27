@@ -38,12 +38,14 @@ func run()->void:
 	var replay=R.new();replay.attach(k)
 	var attempts:int=int(k.state.racecraft_attempts)
 	var bad_drs:int=0
+	var bad_kers:int=0
 	for i in range(50):
 		k.step_tick();replay.observed(k)
 		for car in k.state.cars:
 			if car.hyper.drs_active:bad_drs+=1
+			if car.pit_stage=="TRACK" and not car.finished and int(car.dynamics.powertrain_22.kers_used_j)>0:bad_kers+=1
 	ck(k.state.race_control_306.phase=="VSC" and k.state.race_control_306.total_ticks==50,"actual neutralization")
-	ck(bad_drs==0 and int(k.state.racecraft_attempts)==attempts,"no DRS or new attacks")
+	ck(bad_drs==0 and bad_kers==0 and int(k.state.racecraft_attempts)==attempts,"no DRS, KERS or new attacks")
 	var copy=K.new();ck(copy.restore(k.checkpoint()),"restore mid VSC")
 	for i in range(50):k.step_tick();copy.step_tick();replay.observed(k)
 	ck(k.sporting_hash()==copy.sporting_hash(),"continuation through green")

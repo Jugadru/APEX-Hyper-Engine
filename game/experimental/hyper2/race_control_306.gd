@@ -2,7 +2,8 @@ extends RefCounted
 ## Revision 11: monitored virtual neutralization. The existing mega timer
 ## remains the sole authority. Warnings are observations, not penalties.
 const KEY:="race_control_306"
-const CAP_MM_S:=50000
+const Mega=preload("res://experimental/hyper2/mega_30.gd")
+const CAP_MM_S:=Mega.CONTROL_CAP
 const STEP_MS:=200
 const GRACE_TICKS:=10
 const TOLERANCE_MM:=2000
@@ -23,7 +24,7 @@ static func valid(x:Variant,roster:Array)->bool:
 		if not id is String or not ids.has(id):return false
 		var row:Variant=x.cars[id]
 		if not row is Dictionary or not row.has_all(["samples","delta_mm","warned"]):return false
-		if typeof(row.samples)!=TYPE_INT or int(row.samples)<0 or int(row.samples)>100:return false
+		if typeof(row.samples)!=TYPE_INT or int(row.samples)<0 or int(row.samples)>Mega.CONTROL_TICKS:return false
 		if typeof(row.delta_mm)!=TYPE_INT or absi(int(row.delta_mm))>2000000 or typeof(row.warned)!=TYPE_BOOL:return false
 	for pair in x.reported_pairs:
 		if not pair is String or x.reported_pairs[pair]!=true:return false
