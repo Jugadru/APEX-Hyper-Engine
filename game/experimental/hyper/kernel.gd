@@ -53,6 +53,8 @@ func step_tick() -> bool:
 	for car in state.cars:
 		prior_distances[int(car.id)] = int(car.dynamics.distance_mm)
 	var action: Dictionary = Resolver.plan(state.cars, state.track_profile, int(state.lap_length_mm), int(state.tick) + 1,int(state.water_microns))
+	if state.has("wet_attack_reasons"):
+		for reason in action.wet_reasons:state.wet_attack_reasons[reason]=int(state.wet_attack_reasons[reason])+int(action.wet_reasons[reason])
 	for car in state.cars:
 		var id: int = int(car.id)
 		car.racecraft = action.states[id]

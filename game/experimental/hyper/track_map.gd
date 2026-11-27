@@ -17,6 +17,11 @@ func configure(raw: Array, team_colors: Dictionary) -> void:
 		lengths.append(total)
 		total += points[i].distance_to(points[(i+1)%points.size()])
 	queue_redraw()
+func configure_profile(profile:Array,lap:int,team_colors:Dictionary)->void:
+	points.clear();lengths.clear();total=float(lap);colors=team_colors.duplicate()
+	for sample in profile:
+		points.append(Vector2(float(sample.x)/1000000.0,float(sample.y)/1000000.0));lengths.append(float(sample.start_mm))
+	queue_redraw()
 func update_rows(data: Array, id: int) -> void:
 	rows = data; selected_id = id; queue_redraw()
 func _draw() -> void:
@@ -39,7 +44,7 @@ func _draw() -> void:
 		var idx: int = 0
 		while idx+1 < lengths.size() and lengths[idx+1] <= target: idx += 1
 		var end: int = (idx+1)%points.size()
-		var segment: float = points[idx].distance_to(points[end])
+		var segment: float = (total if end==0 else float(lengths[end]))-float(lengths[idx])
 		var v: Vector2 = screen_points[idx].lerp(screen_points[end],clampf((target-lengths[idx])/maxf(0.00001,segment),0.0,1.0))
 		var color: Color = Color(str(colors.get(row.team,"#b1b8c2")))
 		if bool(row.retired): color = Color("686868")

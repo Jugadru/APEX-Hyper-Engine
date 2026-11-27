@@ -51,7 +51,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for item in test_evolution test_calendar test_replay_quality test_manual_wet test_workshop test_menu test_ui test_hyper22 test_hyper23 test_hyper30 test_energy301; do
+          for item in test_evolution test_calendar test_replay_quality test_manual_wet test_workshop test_menu test_ui test_hyper22 test_hyper23 test_hyper30 test_energy301 test_geometry302 test_wet303; do
             echo "HYPER_FIXTURE $item"
             timeout 240s godot --headless --path game --rendering-method gl_compatibility --script "res://tests/hyper2/$item.gd" > "/tmp/$item.log" 2>&1 || { cat "/tmp/$item.log"; exit 1; }
             cat "/tmp/$item.log"
@@ -73,4 +73,12 @@ jobs:
           cat /tmp/hyper301-wet.log
           grep -q '"status":"PASS"' /tmp/hyper301-wet.log
           if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper301-wet.log; then exit 1; fi
+          timeout 240s godot --headless --path game --rendering-method gl_compatibility --script res://tests/hyper2/test_manual_wet.gd -- hyper302 > /tmp/hyper302-wet.log 2>&1 || { cat /tmp/hyper302-wet.log; exit 1; }
+          cat /tmp/hyper302-wet.log
+          grep -q '"status":"PASS"' /tmp/hyper302-wet.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper302-wet.log; then exit 1; fi
+          timeout 240s godot --headless --path game --rendering-method gl_compatibility --script res://tests/hyper2/test_manual_wet.gd -- hyper303 > /tmp/hyper303-wet.log 2>&1 || { cat /tmp/hyper303-wet.log; exit 1; }
+          cat /tmp/hyper303-wet.log
+          grep -q '"status":"PASS"' /tmp/hyper303-wet.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper303-wet.log; then exit 1; fi
           echo HYPER_GAME_FAST_PASS

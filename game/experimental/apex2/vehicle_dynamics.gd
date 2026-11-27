@@ -8,6 +8,8 @@ extends RefCounted
 const Powertrain22 = preload("res://experimental/hyper2/powertrain_22.gd")
 const Dynamics23 = preload("res://experimental/hyper2/dynamics_23.gd")
 const Energy301 = preload("res://experimental/hyper2/energy_301.gd")
+const Geometry302 = preload("res://experimental/hyper2/geometry_302.gd")
+const Wet303 = preload("res://experimental/hyper2/wet_303.gd")
 const STEP_MS: int = 200
 const LAP_UNITS: int = 1000000
 const MAX_V_MM_S: int = 106000
@@ -34,6 +36,40 @@ static func integer_sqrt(value: int) -> int:
 		x = y
 		y = int((x + int(value / x)) / 2)
 	return x
+
+# The float root is only a seed: exact integer comparisons certify the
+# floor. Bound the fast domain so multiplication cannot overflow.
+static func exact_root_fast(value:int)->int:
+	if value<=0:return 0
+	if value>4503599627370496:return integer_sqrt(value)
+	var root:int=int(sqrt(float(value)))
+	while root*root>value:root-=1
+	while (root+1)*(root+1)<=value:root+=1
+	return root
+
+# Revision 7 only. Squaring is monotone for these nonnegative speed caps.
+# Keep the minimum squared cap and take one final root, rather than one
+# root per future sample. No changed lookahead distance or grip constants.
+static func canonical_preview(profile:Array,lap_mm:int,position_mm:int,index:int,current_radius:int,mass_kg:int,mu:int,downforce:int,old_velocity:int,corner_margin:int)->int:
+	var best:int=MAX_V_MM_S*MAX_V_MM_S
+	for ahead in range(mini(128,profile.size())):
+		var point:Dictionary=profile[(index+ahead)%profile.size()]
+		var distance:int=0 if ahead==0 else posmod(int(point.start_mm)-position_mm,lap_mm)
+		if distance>850000:break
+		var radius:int=current_radius if ahead==0 else int(point.radius_mm)
+		if radius>=MAX_RADIUS_MM:continue
+		var denominator:int=mass_kg*2000000000-mu*downforce*radius
+		var limit:int=MAX_V_MM_S
+		if denominator>0:
+			var numerator:int=mu*mass_kg*981*20*radius
+			limit=mini(MAX_V_MM_S,exact_root_fast(int(numerator/denominator)*1000000))
+		limit=int(limit*corner_margin/1000)
+		var squared:int=limit*limit
+		if squared>=best:continue
+		var decel:int=maxi(2500,int(_grip_force_n(mass_kg,mini(old_velocity,limit),mu,downforce)*1000/mass_kg))
+		decel=maxi(1500,int(decel*800/1000))
+		best=mini(best,squared+2*decel*distance)
+	return exact_root_fast(best)
 
 static func track_profile(points: Array, lap_mm: int) -> Array:
 	if lap_mm < 1000000 or lap_mm > 30000000 or points.size() < 8 or points.size() > 1000:
@@ -174,6 +210,8 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	var brake_decel: int = maxi(2500, int(grip_n * 1000 / mass_kg))
 	var position_mm: int = posmod(int(dyn.distance_mm), lap_mm)
 	var index: int = _profile_index(profile, position_mm)
+	var canonical:bool=profile[index].has("curvature")
+	var current_radius:int=Geometry302.radius_at(profile,lap_mm,position_mm) if canonical else int(profile[index].radius_mm)
 	var cap: int = MAX_V_MM_S
 	var load: Dictionary = {}
 	var corner_margin: int = 1000
@@ -184,39 +222,45 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 		load= Dynamics23.loads(mass_kg,_aero_force_n(int(dyn.downforce_milli),old_velocity),int(dyn[Dynamics23.KEY].accel_mm_s2))
 		grip_n=int(grip_n*int(load.scale)/1000)
 		corner_margin=Dynamics23.margin(car,water_microns)
-		var radius_now:int=int(profile[index].radius_mm)
+		if car.has(Wet303.KEY):corner_margin=Wet303.margin(corner_margin,car[Wet303.KEY],water_microns)
+		var radius_now:int=current_radius
 		# The sentinel describes a straight, not a physical 1000 m curve.
 		lateral_demand=0 if radius_now>=MAX_RADIUS_MM else int(mass_kg*old_velocity*old_velocity/maxi(1,radius_now*1000))
 		budget=Dynamics23.budget(grip_n,lateral_demand)
 		long_limit=int(budget.long_limit_n)
 		brake_decel=maxi(2500,int(long_limit*1000/mass_kg))
-	# Anticipate upcoming geometry by stopping-distance energy equation v²=v0²+2*a*s.
-	for ahead in range(mini(10, profile.size())):
-		var k: int = (index + ahead) % profile.size()
-		var point: Dictionary = profile[k]
-		var next_pos: int = int(point.start_mm)
-		var distance: int = posmod(next_pos - position_mm, lap_mm)
-		if ahead == 0:
-			distance = 0
-		if distance > 850000:
-			break
-		var corner_limit: int = _corner_cap_mm_s(int(point.radius_mm), mass_kg, mu, int(dyn.downforce_milli))
-		if combined and int(point.radius_mm)<MAX_RADIUS_MM:
-			corner_limit=int(corner_limit*corner_margin/1000)
-		var approach_decel: int = brake_decel
-		if advanced:
-			# Conservative endpoint grip instead of relying on high-speed downforce
-			# that disappears while slowing for the corner.
-			approach_decel = maxi(2500,int(_grip_force_n(mass_kg,mini(old_velocity,corner_limit),mu,int(dyn.downforce_milli))*1000/mass_kg))
-		if combined: approach_decel=maxi(1500,int(approach_decel*800/1000))
-		var stopping_cap: int = mini(MAX_V_MM_S, integer_sqrt(corner_limit * corner_limit + 2 * approach_decel * distance))
-		cap = mini(cap, stopping_cap)
+	if canonical:
+		cap=canonical_preview(profile,lap_mm,position_mm,index,current_radius,mass_kg,mu,int(dyn.downforce_milli),old_velocity,corner_margin)
+	else:
+		# Anticipate upcoming geometry by stopping-distance energy equation v²=v0²+2*a*s.
+		for ahead in range(mini(10, profile.size())):
+			var k: int = (index + ahead) % profile.size()
+			var point: Dictionary = profile[k]
+			var next_pos: int = int(point.start_mm)
+			var distance: int = posmod(next_pos - position_mm, lap_mm)
+			if ahead == 0:
+				distance = 0
+			if distance > 850000:
+				break
+			var sample_radius:int=current_radius if canonical and ahead==0 else int(point.radius_mm)
+			var corner_limit: int = _corner_cap_mm_s(sample_radius, mass_kg, mu, int(dyn.downforce_milli))
+			if combined and sample_radius<MAX_RADIUS_MM:
+				corner_limit=int(corner_limit*corner_margin/1000)
+			var approach_decel: int = brake_decel
+			if advanced:
+				# Conservative endpoint grip instead of relying on high-speed downforce
+				# that disappears while slowing for the corner.
+				approach_decel = maxi(2500,int(_grip_force_n(mass_kg,mini(old_velocity,corner_limit),mu,int(dyn.downforce_milli))*1000/mass_kg))
+			if combined: approach_decel=maxi(1500,int(approach_decel*800/1000))
+			var stopping_cap: int = mini(MAX_V_MM_S, integer_sqrt(corner_limit * corner_limit + 2 * approach_decel * distance))
+			cap = mini(cap, stopping_cap)
 	# 1.3 opt-in traffic braking envelope; absent for all legacy 1.1/1.2 runs.
 	# The cap limits target speed, never boosts acceleration or teleports the car.
 	if car.has("traffic_speed_cap_mm_s"):
 		cap = mini(cap, clampi(int(car.traffic_speed_cap_mm_s), 0, MAX_V_MM_S))
 	# Power-to-wheel tractive force P/v, limited by longitudinal tyre traction.
 	var throttle: int = _pace_throttle(str(car.pace))
+	if car.has(Wet303.KEY):throttle=Wet303.throttle(throttle,car[Wet303.KEY],water_microns)
 	var power_requested_w: int = int(int(dyn.wheel_power_w) * throttle / 1000) if int(dyn.fuel_g) > 0 else 0
 	var engine_n: int = mini(grip_n, int(power_requested_w * 1000 / maxi(14000, old_velocity)))
 	var drag_n: int = _aero_force_n(int(dyn.drag_milli), old_velocity)
@@ -272,7 +316,7 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 		info.long_limit_n=long_limit;info.long_used_n=brake_force if braking else engine_n
 		info.reserve_permille=int(budget.reserve_permille);info.saturated=bool(budget.saturated)
 		info.accel_mm_s2=int((next_speed-old_velocity)*1000/maxi(1,step_ms));info.margin_permille=corner_margin
-		info.phase=Dynamics23.phase(int(profile[index].radius_mm),int(profile[(index+1)%profile.size()].radius_mm),int(profile[posmod(index-1,profile.size())].radius_mm))
+		info.phase=Dynamics23.phase(current_radius,int(profile[(index+1)%profile.size()].radius_mm),int(profile[posmod(index-1,profile.size())].radius_mm))
 		info.target_mm_s=cap
 	# Energy at the wheels / assumed overall efficiency * petrol energy density.
 	var delivered_power_w: int = mini(power_requested_w, int(engine_n * old_velocity / 1000)) if not braking else 0
@@ -293,7 +337,7 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	var spec: Dictionary = TYRES.get(str(car.tire), TYRES["Médio"])
 	var temperature_excess: int = maxi(0, int(dyn.tire_temp_centi) - int(spec.optimal_centi) - 900)
 	var thermal_wear_permille: int = mini(1700, 1000 + int(temperature_excess / 20))
-	var radius: int = int(profile[index].radius_mm)
+	var radius: int = current_radius
 	var lateral_force: int = int(mass_kg * old_velocity * old_velocity / maxi(1, radius * 1000))
 	var lateral_use: int = mini(1000, int(lateral_force * 1000 / maxi(1, grip_n)))
 	var work_multiplier: int = 1000 + int(lateral_use / 3) + (220 if braking else 0)

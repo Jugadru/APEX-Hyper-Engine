@@ -7,11 +7,14 @@ func run() -> void:
 	var code: String = args[0] if args.size() > 0 else "ITA"
 	var weather: String = args[1] if args.size() > 1 else "Seco"
 	var k = K.new()
-	var scenario: Dictionary = S.create(code, weather, 2026)
+	var scenario: Dictionary = S.create(code, "Seco" if weather=="Variável" else weather, 2026)
+	if weather=="Variável":scenario.hyper_weather=[{"tick":600,"water":2200},{"tick":1800,"water":4400},{"tick":4500,"water":2600},{"tick":7000,"water":500},{"tick":12000,"water":4600},{"tick":15000,"water":2500},{"tick":19000,"water":0}]
 	if "hyper22" in args: scenario.hyper22_physics=true
 	if "hyper23" in args: scenario.hyper23_physics=true
 	if "hyper30" in args: scenario.hyper30_physics=true
 	if "hyper301" in args: scenario.hyper301_physics=true
+	if "hyper302" in args: scenario.hyper302_physics=true
+	if "hyper303" in args: scenario.hyper303_physics=true
 	if not k.initialize(scenario): quit(1); return
 	var begin: int = Time.get_ticks_msec()
 	var resume_checked: bool = false
@@ -37,4 +40,5 @@ func run() -> void:
 		stops += int(row.stops)
 	var ok: bool = bool(k.state.finished) and complete > 0 and complete + retired == 24 and resume_checked and stops > 0
 	print("HYPER_FULL ", JSON.stringify({"status":"PASS" if ok else "FAIL","track":code,"weather":weather,"ticks":k.state.tick,"clock_s":float(k.state.clock_ms)/1000.0,"elapsed_ms":Time.get_ticks_msec()-begin,"complete":complete,"retired":retired,"stops":stops,"passes":k.state.racecraft_passes,"attempts":k.state.racecraft_attempts,"hash":k.sporting_hash(),"checkpoint_parity":resume_checked,"winner":k.classification()[0].name}))
+	if k.state.has("wet_attack_reasons"):print("WET_ATTACK_REASONS ",JSON.stringify(k.state.wet_attack_reasons))
 	quit(0 if ok else 1)

@@ -18,8 +18,8 @@ for item in data["included"]:
         raise SystemExit("invalid inventory path")
     expected[str(p)] = (item["bytes"], item["sha256"])
 actual = {p.relative_to(root / "game").as_posix(): p for p in (root / "game").rglob("*") if p.is_file()}
-changed = ["experimental/apex2/vehicle_dynamics.gd","experimental/hyper/kernel.gd","experimental/apex2/vehicle_kernel_11.gd","experimental/hyper2/kernel.gd","experimental/hyper2/console.gd","tests/hyper2/test_manual_wet.gd","tests/hyper2/full_race.gd","experimental/hyper/traffic.gd","experimental/hyper2/career.gd","experimental/hyper2/view_3d.gd","tests/hyper2/test_career.gd","experimental/apex2/command_queue.gd"]
-added = ["experimental/hyper2/powertrain_22.gd","tests/hyper2/test_hyper22.gd","experimental/hyper2/dynamics_23.gd","tests/hyper2/test_hyper23.gd","experimental/hyper2/mega_30.gd","tests/hyper2/test_hyper30.gd","experimental/hyper2/energy_301.gd","tests/hyper2/test_energy301.gd"]
+changed = ["experimental/apex2/vehicle_dynamics.gd","experimental/hyper/kernel.gd","experimental/apex2/vehicle_kernel_11.gd","experimental/hyper2/kernel.gd","experimental/hyper2/console.gd","tests/hyper2/test_manual_wet.gd","tests/hyper2/full_race.gd","experimental/hyper/traffic.gd","experimental/hyper2/career.gd","experimental/hyper2/view_3d.gd","tests/hyper2/test_career.gd","experimental/apex2/command_queue.gd","experimental/hyper/track_map.gd"]
+added = ["experimental/hyper2/powertrain_22.gd","tests/hyper2/test_hyper22.gd","experimental/hyper2/dynamics_23.gd","tests/hyper2/test_hyper23.gd","experimental/hyper2/mega_30.gd","tests/hyper2/test_hyper30.gd","experimental/hyper2/energy_301.gd","tests/hyper2/test_energy301.gd","experimental/hyper2/geometry_302.gd","tests/hyper2/test_geometry302.gd","experimental/hyper2/wet_303.gd","tests/hyper2/test_wet303.gd"]
 if not set(changed) <= set(expected) or set(added) & set(expected):
     raise SystemExit("invalid evolution allowlist")
 if set(actual) != set(expected) | set(added):
