@@ -1,0 +1,3 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+HUD_REBROADCAST_SCENARIOS {"errors":[],"pass":true,"results":[{"cars":24,"pass":true,"scenario":"Silverstone dry","ticks":12},{"cars":24,"pass":true,"scenario":"Spa heavy rain","ticks":12},{"cars":24,"pass":true,"scenario":"Monza dry","ticks":12},{"cars":24,"pass":true,"scenario":"Singapore heavy rain","ticks":12}]}

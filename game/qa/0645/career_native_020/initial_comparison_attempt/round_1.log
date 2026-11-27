@@ -1,0 +1,14 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CAREER_START round=1 code=AUS laps=58 native_step=0.20
+CAREER_PROGRESS round=1 lap=7/58 simulated_s=600.0
+CAREER_PROGRESS round=1 lap=14/58 simulated_s=1200.0
+CAREER_PROGRESS round=1 lap=21/58 simulated_s=1800.0
+CAREER_PROGRESS round=1 lap=27/58 simulated_s=2400.0
+CAREER_PROGRESS round=1 lap=34/58 simulated_s=3000.0
+CAREER_PROGRESS round=1 lap=41/58 simulated_s=3600.0
+CAREER_PROGRESS round=1 lap=48/58 simulated_s=4200.0
+CAREER_PROGRESS round=1 lap=54/58 simulated_s=4800.0
+CAREER_FAIL round=1 championship disk roundtrip
+CAREER_FAIL round=1 garage disk roundtrip
+CAREER_FAIL round=1 code=AUS checks=182

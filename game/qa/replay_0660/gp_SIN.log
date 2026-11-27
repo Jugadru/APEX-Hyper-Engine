@@ -1,0 +1,3 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+REPLAY_GP_PASS { "track": "SIN", "weather": "Chuva intensa", "laps": 3, "ticks": 2050, "live_ms": 13579.349, "replay_ms": 13959.548, "bytes": 4082504, "pit_phases": ["approach", "dock", "service", "queue", "repair", "safety_hold", "exit"], "pit_checkpoint_count": 7, "hash": "11927a5f4796e4453c8a73112628067fc96fdd778624db7233e177b533df14e0", "pass": true }

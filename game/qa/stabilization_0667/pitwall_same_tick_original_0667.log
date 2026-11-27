@@ -1,0 +1,3 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+SAME_TICK_PITWALL_PROBE {"lap1_after_tick":1,"lap1_before_tick":0,"lap2_after_tick":1,"lap2_before_tick":0,"queued_after_first":1,"queued_after_second":2,"queued_before":0,"queued_commands":[{"actor":4,"target":1,"tick":1,"type":"schedule_pit"},{"actor":5,"target":1,"tick":1,"type":"schedule_pit"}],"step_ok":true}

@@ -1,0 +1,30 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+LRP_FULL_LIVE {"checkpoints":7,"leader_lap":5,"positions_sampled":960,"sim_seconds":399.999999999986,"ticks":2000,"wall_seconds":68.088685}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":10,"positions_sampled":1920,"sim_seconds":800.000000000045,"ticks":4000,"wall_seconds":141.538659}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":14,"positions_sampled":2880,"sim_seconds":1200.00000000014,"ticks":6000,"wall_seconds":206.560411}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":19,"positions_sampled":3840,"sim_seconds":1600.00000000023,"ticks":8000,"wall_seconds":273.07635}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":23,"positions_sampled":4800,"sim_seconds":2000.00000000032,"ticks":10000,"wall_seconds":333.679575}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":28,"positions_sampled":5760,"sim_seconds":2400.00000000001,"ticks":12000,"wall_seconds":389.470665}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":33,"positions_sampled":6720,"sim_seconds":2799.99999999964,"ticks":14000,"wall_seconds":435.466326}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":37,"positions_sampled":7680,"sim_seconds":3199.99999999928,"ticks":16000,"wall_seconds":481.611281}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":41,"positions_sampled":8640,"sim_seconds":3599.99999999892,"ticks":18000,"wall_seconds":526.495692}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":46,"positions_sampled":9600,"sim_seconds":3999.99999999855,"ticks":20000,"wall_seconds":560.3865}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":50,"positions_sampled":10560,"sim_seconds":4399.99999999819,"ticks":22000,"wall_seconds":590.464361}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":53,"positions_sampled":11520,"sim_seconds":4799.99999999783,"ticks":24000,"wall_seconds":619.661308}
+LRP_FULL_LIVE_END {"finished":true,"finished_cars":24,"hash":"2a7e27179177858b8754a0c65666b325499e4aa13d423de060181b11d9ae1c4b","seconds":624.32248,"ticks":24431,"unique_positions":24}
+LRP_FULL_REPLAY {"elapsed_seconds":58.968941,"target_ticks":24431,"ticks":2000}
+LRP_FULL_REPLAY {"elapsed_seconds":132.933014,"target_ticks":24431,"ticks":4000}
+LRP_FULL_REPLAY {"elapsed_seconds":198.274274,"target_ticks":24431,"ticks":6000}
+LRP_FULL_REPLAY {"elapsed_seconds":255.828835,"target_ticks":24431,"ticks":8000}
+LRP_FULL_REPLAY {"elapsed_seconds":305.264126,"target_ticks":24431,"ticks":10000}
+LRP_FULL_REPLAY {"elapsed_seconds":349.798136,"target_ticks":24431,"ticks":12000}
+LRP_FULL_REPLAY {"elapsed_seconds":388.790209,"target_ticks":24431,"ticks":14000}
+LRP_FULL_REPLAY {"elapsed_seconds":420.889113,"target_ticks":24431,"ticks":16000}
+LRP_FULL_REPLAY {"elapsed_seconds":450.521684,"target_ticks":24431,"ticks":18000}
+LRP_FULL_REPLAY {"elapsed_seconds":478.644122,"target_ticks":24431,"ticks":20000}
+LRP_FULL_REPLAY {"elapsed_seconds":507.345023,"target_ticks":24431,"ticks":22000}
+LRP_FULL_REPLAY {"elapsed_seconds":535.051687,"target_ticks":24431,"ticks":24000}
+LRP_FULL_REPLAY_END {"error":"","hash":"2a7e27179177858b8754a0c65666b325499e4aa13d423de060181b11d9ae1c4b","seconds":539.264212,"ticks":24431,"verified":true}
+
+RESULT {"test": "monza_full_53_laps_live_and_replay", "started": "2026-11-15 23:59:17", "project": "/mnt/data/APEX_STABILIZACAO_0667/project", "cmd": ["/mnt/data/apex_v0664_work/godot/Godot_v4.7.2-stable_linux.x86_64", "--headless", "--path", "/mnt/data/APEX_STABILIZACAO_0667/project", "-s", "res://tests/long_race_full_fork_0664.gd"], "status": "pass", "exit_code": 0, "elapsed_seconds": 1165.775, "ended": "2026-11-16 00:18:43"}

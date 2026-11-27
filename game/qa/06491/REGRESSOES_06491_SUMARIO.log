@@ -1,0 +1,15 @@
+PASS pitwall_06491_stint_reset_test
+PASS pitwall_0649_strategy_test
+PASS race_0645_intelligence_test
+PASS race_0646_engineer_3_test
+PASS race_0647_soul2_test
+PASS staff_0648_contracts_test
+PASS staff_0648_career_integration_test
+PASS core_0640_pitwall_intelligence_test
+PASS core_0635_soul_stint_smoke_test
+PASS core_0642_save_migration_test
+PASS core_0622_corner_hud_smoke_test
+PASS track_0644_hud_integration_test
+PASS pitwall_0649_ui_test
+PASS race_0647_soul2_ui_test
+PASS staff_0648_ui_test

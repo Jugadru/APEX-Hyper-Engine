@@ -1,0 +1,28 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+LRP_FULL_LIVE {"checkpoints":7,"leader_lap":5,"positions_sampled":960,"sim_seconds":399.999999999986,"ticks":2000,"wall_seconds":20.735975}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":10,"positions_sampled":1920,"sim_seconds":800.000000000045,"ticks":4000,"wall_seconds":44.292282}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":14,"positions_sampled":2880,"sim_seconds":1200.00000000014,"ticks":6000,"wall_seconds":67.806765}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":19,"positions_sampled":3840,"sim_seconds":1600.00000000023,"ticks":8000,"wall_seconds":92.659832}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":23,"positions_sampled":4800,"sim_seconds":2000.00000000032,"ticks":10000,"wall_seconds":136.391819}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":28,"positions_sampled":5760,"sim_seconds":2400.00000000001,"ticks":12000,"wall_seconds":169.961261}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":33,"positions_sampled":6720,"sim_seconds":2799.99999999964,"ticks":14000,"wall_seconds":200.807334}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":37,"positions_sampled":7680,"sim_seconds":3199.99999999928,"ticks":16000,"wall_seconds":233.462272}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":41,"positions_sampled":8640,"sim_seconds":3599.99999999892,"ticks":18000,"wall_seconds":277.341814}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":46,"positions_sampled":9600,"sim_seconds":3999.99999999855,"ticks":20000,"wall_seconds":319.851368}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":50,"positions_sampled":10560,"sim_seconds":4399.99999999819,"ticks":22000,"wall_seconds":375.808429}
+LRP_FULL_LIVE {"checkpoints":9,"leader_lap":53,"positions_sampled":11520,"sim_seconds":4799.99999999783,"ticks":24000,"wall_seconds":411.040981}
+LRP_FULL_LIVE_END {"finished":true,"finished_cars":24,"hash":"2a7e27179177858b8754a0c65666b325499e4aa13d423de060181b11d9ae1c4b","seconds":416.473241,"ticks":24431,"unique_positions":24}
+LRP_FULL_REPLAY {"elapsed_seconds":31.696975,"target_ticks":24431,"ticks":2000}
+LRP_FULL_REPLAY {"elapsed_seconds":62.777488,"target_ticks":24431,"ticks":4000}
+LRP_FULL_REPLAY {"elapsed_seconds":96.514123,"target_ticks":24431,"ticks":6000}
+LRP_FULL_REPLAY {"elapsed_seconds":134.850872,"target_ticks":24431,"ticks":8000}
+LRP_FULL_REPLAY {"elapsed_seconds":173.361749,"target_ticks":24431,"ticks":10000}
+LRP_FULL_REPLAY {"elapsed_seconds":212.737818,"target_ticks":24431,"ticks":12000}
+LRP_FULL_REPLAY {"elapsed_seconds":253.940428,"target_ticks":24431,"ticks":14000}
+LRP_FULL_REPLAY {"elapsed_seconds":293.26653,"target_ticks":24431,"ticks":16000}
+LRP_FULL_REPLAY {"elapsed_seconds":328.452229,"target_ticks":24431,"ticks":18000}
+LRP_FULL_REPLAY {"elapsed_seconds":363.843372,"target_ticks":24431,"ticks":20000}
+LRP_FULL_REPLAY {"elapsed_seconds":400.002806,"target_ticks":24431,"ticks":22000}
+LRP_FULL_REPLAY {"elapsed_seconds":433.325223,"target_ticks":24431,"ticks":24000}
+LRP_FULL_REPLAY_END {"error":"","hash":"2a7e27179177858b8754a0c65666b325499e4aa13d423de060181b11d9ae1c4b","seconds":437.999009,"ticks":24431,"verified":true}

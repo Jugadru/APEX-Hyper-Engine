@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+RACECRAFT_0667_GP_PASS { "track": "SIN", "laps": 3, "ticks": 2050, "hash": "48085a06fed3d7761a58206673c03685043645d813ea809e0b76c968e94439c9", "live_ms": 15237, "replay_ms": 15620, "counts": { "approaches": 35, "attack_signals": 6, "defense_signals": 1, "yield_signals": 0, "duel_entries": 5, "blocked_ticks": 6170, "confirmed_passes": 0, "position_gains_other": 40, "contacts": 0, "driving_errors": 0 } }

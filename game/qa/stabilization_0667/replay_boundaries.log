@@ -1,0 +1,6 @@
+CMD: /mnt/data/apex_v0664_work/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path /mnt/data/APEX_STABILIZACAO_0667/project -s res://tests/replay_0660_boundaries.gd
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+REPLAY_BOUNDARIES_PASS V21/rain V4, same-tick ordering, invalid data and checkpoint integrity
+
+RESULT: {"test": "replay_boundaries", "script": "replay_0660_boundaries.gd", "started": "2026-11-16 00:03:13", "status": "PASS", "exit_code": 0, "elapsed_seconds": 5.698}

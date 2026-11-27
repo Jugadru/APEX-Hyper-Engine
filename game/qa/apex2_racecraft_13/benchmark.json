@@ -1,0 +1,86 @@
+{
+  "description": "APEX 2 Driver 1.2 vs Racecraft 1.3; 24 cars, headless; different rules, not a superiority claim",
+  "scenarios": [
+    {
+      "circuit": "GBR",
+      "driver_12": {
+        "events": 86,
+        "hash": "9e473ac890d345944e62cb922f1a0f30f93b28e012ddbb65e6594c96285c42ef",
+        "ms_per_tick": 1.1629,
+        "status": "PASS",
+        "ticks": 160,
+        "total_ms": 186.064
+      },
+      "racecraft_13": {
+        "events": 140,
+        "hash": "6b530fdde3e3d116ed7c4ca9522f1ce8ab2cfa9a5af38f44a83c875c459907c3",
+        "ms_per_tick": 2.11976875,
+        "status": "PASS",
+        "ticks": 160,
+        "total_ms": 339.163
+      },
+      "weather": "Seco"
+    },
+    {
+      "circuit": "BEL",
+      "driver_12": {
+        "events": 84,
+        "hash": "7cf6946e0501fa5646dbeba7e947bdff99ea46fa6b555fd91f83c7a42454a96b",
+        "ms_per_tick": 1.0685,
+        "status": "PASS",
+        "ticks": 160,
+        "total_ms": 170.96
+      },
+      "racecraft_13": {
+        "events": 120,
+        "hash": "8d84e1a7f776b6b393108e0df3b74e3aa00ad37020ebdf38afcc26df967df94f",
+        "ms_per_tick": 2.2381875,
+        "status": "PASS",
+        "ticks": 160,
+        "total_ms": 358.11
+      },
+      "weather": "Chuva intensa"
+    },
+    {
+      "circuit": "ITA",
+      "driver_12": {
+        "events": 76,
+        "hash": "4f9a3d98a04fae2518455654af8dce5fbdc0d293159751b884f868df8969d25c",
+        "ms_per_tick": 1.17141875,
+        "status": "PASS",
+        "ticks": 160,
+        "total_ms": 187.427
+      },
+      "racecraft_13": {
+        "events": 131,
+        "hash": "eea480dbd218c7f7b73bbd2602d9796e52f45a9d4f75e9202a0f5b57957576fe",
+        "ms_per_tick": 2.69116875,
+        "status": "PASS",
+        "ticks": 160,
+        "total_ms": 430.587
+      },
+      "weather": "Seco"
+    },
+    {
+      "circuit": "SIN",
+      "driver_12": {
+        "events": 76,
+        "hash": "c0dbbc645b17cb01be03f2ea34a428d214f9f1cd95fcc61e80ce94b8a1dc40db",
+        "ms_per_tick": 1.48221875,
+        "status": "PASS",
+        "ticks": 160,
+        "total_ms": 237.155
+      },
+      "racecraft_13": {
+        "events": 119,
+        "hash": "ffa868e4d29995c3851790113f3a07866be690f62397ed9baddb45220837146c",
+        "ms_per_tick": 3.0012,
+        "status": "PASS",
+        "ticks": 160,
+        "total_ms": 480.192
+      },
+      "weather": "Chuva intensa"
+    }
+  ],
+  "status": "PASS"
+}

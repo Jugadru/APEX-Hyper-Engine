@@ -1,0 +1,13 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+AUDIT_START code=ITA laps=53 seed=6503 weather=Seco step=0.20 plan=[{"name":"Fernando Alonso","stints":[{"compound":"Médio","from":1,"laps":27,"to":27,"wear_end":66.004848},{"compound":"Duro","from":28,"laps":26,"to":53,"wear_end":49.28361984}],"valid":true},{"name":"Felipe Massa","stints":[{"compound":"Médio","from":1,"laps":26,"to":26,"wear_end":64.928448},{"compound":"Duro","from":27,"laps":27,"to":53,"wear_end":52.28084736}],"valid":true}]true
+AUDIT_PROGRESS code=ITA lap=6/53 ticks=2500 wall_s=20.0true
+AUDIT_PROGRESS code=ITA lap=12/53 ticks=5000 wall_s=40.6true
+AUDIT_PROGRESS code=ITA lap=18/53 ticks=7500 wall_s=74.8true
+AUDIT_PROGRESS code=ITA lap=23/53 ticks=10000 wall_s=88.3true
+AUDIT_PROGRESS code=ITA lap=29/53 ticks=12500 wall_s=103.6true
+AUDIT_PROGRESS code=ITA lap=35/53 ticks=15000 wall_s=123.7true
+AUDIT_PROGRESS code=ITA lap=40/53 ticks=17500 wall_s=130.7true
+AUDIT_PROGRESS code=ITA lap=46/53 ticks=20000 wall_s=136.9true
+AUDIT_PROGRESS code=ITA lap=52/53 ticks=22500 wall_s=142.9true
+AUDIT_PASS code=ITA laps=53/ 53 drivers=24 stops=24 winner=Sebastian Vettel errors=0 tick=23547 reviews=1224true

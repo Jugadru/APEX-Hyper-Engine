@@ -1,0 +1,23 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+GP_START code=BRA seed=6407 step=0.20 engine=4.7.2-stable (official)
+GP_PROGRESS code=BRA lap=4/71 sim_s=300.0 wall_s=10.4
+GP_PROGRESS code=BRA lap=8/71 sim_s=600.0 wall_s=23.3
+GP_PROGRESS code=BRA lap=12/71 sim_s=900.0 wall_s=34.9
+GP_PROGRESS code=BRA lap=16/71 sim_s=1200.0 wall_s=44.8
+GP_PROGRESS code=BRA lap=20/71 sim_s=1500.0 wall_s=53.2
+GP_PROGRESS code=BRA lap=24/71 sim_s=1800.0 wall_s=61.3
+GP_PROGRESS code=BRA lap=27/71 sim_s=2100.0 wall_s=68.7
+GP_PROGRESS code=BRA lap=31/71 sim_s=2400.0 wall_s=75.3
+GP_PROGRESS code=BRA lap=35/71 sim_s=2700.0 wall_s=81.3
+GP_PROGRESS code=BRA lap=39/71 sim_s=3000.0 wall_s=86.9
+GP_PROGRESS code=BRA lap=43/71 sim_s=3300.0 wall_s=92.1
+GP_PROGRESS code=BRA lap=47/71 sim_s=3600.0 wall_s=96.9
+GP_PROGRESS code=BRA lap=50/71 sim_s=3900.0 wall_s=101.5
+GP_PROGRESS code=BRA lap=54/71 sim_s=4200.0 wall_s=105.8
+GP_PROGRESS code=BRA lap=58/71 sim_s=4500.0 wall_s=109.9
+GP_PROGRESS code=BRA lap=62/71 sim_s=4800.0 wall_s=113.9
+GP_PROGRESS code=BRA lap=66/71 sim_s=5100.0 wall_s=117.7
+GP_PROGRESS code=BRA lap=70/71 sim_s=5400.0 wall_s=121.8
+GP_PASS code=BRA laps=71 time=5623 temp_min=35.6 temp_max=40.2 grip_min=1.060 grip_max=1.115 rubber_start=8 rubber_max=55 wet=false stops=42 winner=Fernando Alonso
+APEX_0645_TEST_OK complete_grands_prix=1

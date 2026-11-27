@@ -1,0 +1,140 @@
+{
+  "release": "APEX2 Next Engine 1.2 Experimental",
+  "categories": {
+    "unit": "headless GDScript",
+    "game": "headless scene",
+    "graphics": "not tested on user GPU"
+  },
+  "cases": [
+    {
+      "id": "APEX2_12_BRAIN_CAUSAL",
+      "status": "PASS",
+      "evidence": "43 verificações iniciais ampliadas para 51 após casos de simultaneidade, prioridades, efeitos causais e manual."
+    },
+    {
+      "id": "APEX2_12_DETERMINISM",
+      "status": "PASS",
+      "evidence": "53 verificações: 4 pistas, 440 ticks por pista, ticks em lote/individuais, hashes e replay independente."
+    },
+    {
+      "id": "APEX2_12_STRESS",
+      "status": "PASS",
+      "evidence": "10.000 ticks Monza 24 carros, 285 eventos, 26 comandos, checkpoint e continuação +80 ticks."
+    },
+    {
+      "id": "APEX2_11_KERNEL_REGRESSION",
+      "status": "PASS",
+      "evidence": "525 verificações legadas do kernel 1.0."
+    },
+    {
+      "id": "APEX2_11_QUEUE_REGRESSION",
+      "status": "PASS",
+      "evidence": "97 verificações legadas da fila."
+    },
+    {
+      "id": "APEX2_11_REPLAY_REGRESSION",
+      "status": "PASS",
+      "evidence": "1.622 verificações legadas de replay."
+    },
+    {
+      "id": "APEX2_11_PHYSICS_REGRESSION",
+      "status": "PASS",
+      "evidence": "31 verificações de Vehicle Dynamics 1.1."
+    },
+    {
+      "id": "APEX2_11_PHYSICS_DET_REGRESSION",
+      "status": "PASS",
+      "evidence": "45 verificações de determinismo Vehicle 1.1."
+    },
+    {
+      "id": "APEX2_11_PIT_ENTRY_V21",
+      "status": "PASS",
+      "evidence": "Spa chuva, entrada manual V21 observada em tick 38.931 na Vehicle 1.1; não há serviço de pit experimental."
+    },
+    {
+      "id": "CORE2_PRIMARY_CONTRACT",
+      "status": "PASS",
+      "evidence": "86 verificações, quatro pistas, hash de referência do controlador de produção."
+    },
+    {
+      "id": "CORE2_PRIMARY_SCENE",
+      "status": "PASS",
+      "evidence": "17 verificações no fluxo de cena real do jogo."
+    },
+    {
+      "id": "HUD_REBROADCAST_UNIT",
+      "status": "PASS",
+      "evidence": "Teste unitário herdado da HUD."
+    },
+    {
+      "id": "HUD_REBROADCAST_INTEGRATION",
+      "status": "PASS",
+      "evidence": "34 verificações, cena real."
+    },
+    {
+      "id": "HUD_PENDING_ORDERS",
+      "status": "PASS",
+      "evidence": "30 verificações de ordens pendentes."
+    },
+    {
+      "id": "GODOT_EDITOR_IMPORT",
+      "status": "PASS",
+      "evidence": "Importação Godot 4.7.2 headless com --single-threaded-scene, inclusive extração inteiramente nova."
+    },
+    {
+      "id": "DRIVER_BENCHMARK_EXECUTION",
+      "status": "PASS",
+      "evidence": "4 cenários; três amostras por motor com 180 ticks medidos cada."
+    },
+    {
+      "id": "CPU_PERFORMANCE_CONCLUSION",
+      "status": "INCONCLUSIVE",
+      "evidence": "Alta variabilidade entre amostras do host; não se afirma ganho ou regressão percentuais estáveis."
+    },
+    {
+      "id": "CORE2_FULL_MONZA_53_LAPS_THIS_RELEASE",
+      "status": "NOT_RUN",
+      "evidence": "Não repetido nesta versão; nenhuma regra do motor oficial foi modificada."
+    },
+    {
+      "id": "GPU_REAL_FPS",
+      "status": "NOT_RUN",
+      "evidence": "Não há medições no PC do usuário."
+    },
+    {
+      "id": "RACECRAFT_LATERAL_OVERTAKE",
+      "status": "BLOCKED",
+      "evidence": "Resolver de disputas 1.3 não existe na Next Engine experimental."
+    },
+    {
+      "id": "CALIBRATED_DRIVER_TRAITS_2012",
+      "status": "NOT_RUN",
+      "evidence": "Perfis sintéticos, sem calibração histórica."
+    },
+    {
+      "id": "FULL_CAREER_AND_SAVE_MIGRATION",
+      "status": "NOT_RUN",
+      "evidence": "Nenhum save oficial modificado; carreira multi temporada não executada."
+    },
+    {
+      "id": "LONG_FORM_RACECRAFT_A_B",
+      "status": "NOT_RUN",
+      "evidence": "Paridade de regras com Core 2 ainda não foi alcançada."
+    },
+    {
+      "id": "GODOT_DEFAULT_CLEAN_IMPORT",
+      "status": "FAIL",
+      "evidence": "Importação headless padrão na primeira extração retornou exit=139 durante reimport, propagate_notification() em thread indevida."
+    },
+    {
+      "id": "GODOT_CLEAN_IMPORT_SINGLE_THREADED_RETRY",
+      "status": "PASS",
+      "evidence": "Modo --single-threaded-scene concluiu importação na primeira extração."
+    },
+    {
+      "id": "GODOT_FRESH_IMPORT_SINGLE_THREADED",
+      "status": "PASS",
+      "evidence": "Segunda extração limpa, primeira importação com single-threaded-scene concluiu sem erros."
+    }
+  ]
+}

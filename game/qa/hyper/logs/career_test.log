@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+HYPER_CAREER {"checks":34,"elapsed_ms":61083,"failures":[],"hash":"79d7babe23aeb10da69b42302e0e448c520c637f53530fe2a1267882386015d0","points":101,"round":1,"ticks":31665,"winner":"Lewis Hamilton"}

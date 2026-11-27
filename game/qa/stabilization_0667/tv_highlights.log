@@ -1,0 +1,6 @@
+CMD: /mnt/data/apex_v0664_work/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path /mnt/data/APEX_STABILIZACAO_0667/project -s res://tests/tv_director_highlights_0667_test.gd
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+TV_DIRECTOR_HIGHLIGHTS_0667_PASS {"deduplication":true,"deferred_pit":true,"incident_preempts_pit":true,"new_session_reset":true,"pass_preempts_battle":true,"rewind_clears_highlights":true,"time_bounded":true}
+
+RESULT: {"test": "tv_highlights", "script": "tv_director_highlights_0667_test.gd", "started": "2026-11-16 00:03:19", "status": "PASS", "exit_code": 0, "elapsed_seconds": 0.315}

@@ -1,0 +1,7 @@
+team_pit_06497_unit_test EXIT=0: TEAM_06497_PASS 16 safety/strategy assertions, early, late, priority, manual, V21 
+pitwall_0649_strategy_test EXIT=0: PITWALL_0649_STRATEGY_PASS pure scenarios, under/overcut, safe stagger, rain, V21 native 
+lap_strategy_06496_auto_gate_test EXIT=0: AUTO_GATE_06496_PASS real strategy window V18 -> V17, AI only, Manual and V21 guarded 
+race_0646_engineer_3_test EXIT=0: RE3_0646_PASS: pure planning, staff horizon, rain 83, V21, double stack, 4 radios, UI, manual pit, 0.20 native 
+pre_race_06495_planner_test EXIT=0: PRE_RACE_06495_PASS Silverstone dry 52 laps, two drivers, safe stints, read-only, wet restriction 
+dynamic_strategy_06498_data_test EXIT=0: APEX_06498_DATA_PASS pure read-only snapshots, missing laps, actual engine rate, initial plan and garage conflicts 
+dynamic_strategy_06498_parity_test EXIT=0: APEX_06498_PARITY_PASS Silverstone live charts have zero influence over race RNG, physics, AI or pits; 360 native 4s ticks 

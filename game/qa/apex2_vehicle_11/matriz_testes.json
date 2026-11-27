@@ -1,0 +1,121 @@
+{
+  "release": "APEX 2 Next Engine 1.1 Vehicle Dynamics",
+  "engine": "Godot 4.7.2",
+  "tests": [
+    {
+      "name": "ZIP-base v0.6.6.8.2 CRC e SHA-256",
+      "status": "PASS",
+      "evidence": "CRC integral e SHA-256 9dbf92ac... na auditoria"
+    },
+    {
+      "name": "Importação Godot 4.7.2 headless",
+      "status": "PASS",
+      "evidence": "apex2_vehicle11_final_import.log"
+    },
+    {
+      "name": "Dinâmica causal (grip, chuva, temperatura, potência, arrasto, consumo e desgaste)",
+      "status": "PASS",
+      "evidence": "31 verificações / test_vehicle_11.gd"
+    },
+    {
+      "name": "Determinismo em 4 circuitos (escalar/bloco/comandos)",
+      "status": "PASS",
+      "evidence": "45 verificações / test_vehicle_determinism_11.gd"
+    },
+    {
+      "name": "Checkpoints/restauração transacional",
+      "status": "PASS",
+      "evidence": "test_vehicle_11.gd; test_vehicle_determinism_11.gd"
+    },
+    {
+      "name": "Ordens manuais V21 sob chuva, sem antecipação pela IA",
+      "status": "PASS",
+      "evidence": "Spa cenário experimental de 1 carro; tick 38.931; test_vehicle_pit_11.gd"
+    },
+    {
+      "name": "Microbenchmark 120 ticks, 4 circuitos",
+      "status": "PASS",
+      "evidence": "qa/apex2_vehicle_11/benchmark.json; não é paridade física"
+    },
+    {
+      "name": "A/B CPU Core 2 versus Vehicle 1.1 (regras diferentes)",
+      "status": "PASS",
+      "evidence": "qa/apex2_vehicle_11/core_ab.json; não é ranking de superioridade"
+    },
+    {
+      "name": "Kernel 1.0 / 525 verificações",
+      "status": "PASS",
+      "evidence": "hash b8d5193a91af703f2c4f7e3925151807d67dbd5da510cf65544d96cbd527a0e6"
+    },
+    {
+      "name": "Fila de comandos legado / 97 verificações",
+      "status": "PASS",
+      "evidence": "test_pit_queue.gd"
+    },
+    {
+      "name": "Replay legado / 1622 verificações",
+      "status": "PASS",
+      "evidence": "test_replay.gd"
+    },
+    {
+      "name": "Controlador principal v0.6.6.8.2 / 86 verificações",
+      "status": "PASS",
+      "evidence": "primary_06682_contract.gd; 4 circuitos com hash idêntico"
+    },
+    {
+      "name": "HUD ReBroadcast unitário",
+      "status": "PASS",
+      "evidence": "hud_rebroadcast_0668_unit.gd"
+    },
+    {
+      "name": "HUD integração / 34 verificações",
+      "status": "PASS",
+      "evidence": "hud_rebroadcast_0668_integration.gd"
+    },
+    {
+      "name": "HUD ordens pendentes / 30 verificações",
+      "status": "PASS",
+      "evidence": "hud_rebroadcast_06681_pending_orders.gd"
+    },
+    {
+      "name": "Comparação de modelo cinemático e dinâmica avançada",
+      "status": "INCONCLUSIVE",
+      "evidence": "modelos não equivalentes; números não comparáveis como superioridade"
+    },
+    {
+      "name": "Realismo de tempo de volta e desgaste em corrida completa",
+      "status": "INCONCLUSIVE",
+      "evidence": "geometria 2D normalizada é aproximação; não há calibragem com dados reais"
+    },
+    {
+      "name": "Substituir física oficial Core2 pela Next1.1",
+      "status": "BLOCKED",
+      "evidence": "faltam racecraft, pit completo, IA, incidentes, calibração e validação de paridade"
+    },
+    {
+      "name": "FPS em 3D numa GPU física",
+      "status": "NOT_RUN",
+      "evidence": "nenhuma medição de frame rate no computador do usuário"
+    },
+    {
+      "name": "20 corridas completas com física Next 1.1",
+      "status": "NOT_RUN",
+      "evidence": "fora do escopo desta fase"
+    },
+    {
+      "name": "Validação de saves legados com Next 1.1 como motor oficial",
+      "status": "NOT_RUN",
+      "evidence": "nenhuma integração com saves oficiais; modelo isolado"
+    },
+    {
+      "name": "Segurança de manutenção prolongada 20 temporadas",
+      "status": "NOT_RUN",
+      "evidence": "fora do escopo"
+    },
+    {
+      "name": "Reextração limpa e importação do ZIP final",
+      "status": "PASS",
+      "evidence": "extração e importação CRC na cópia de validação preliminar; scripts estáveis"
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "base_zip": "APEX_MOTORSPORT_MANAGER_v0.6.6.8.2_APEX2_PRIMARY_COMPAT_COMPLETO.zip",
+  "base_sha256": "9dbf92ac79017aec4f222fc7e7a484bea088ca448648c5a61011240ba49848bc",
+  "modified_existing": [
+    {
+      "path": "experimental/apex2/simulation_kernel.gd",
+      "old_sha256": "2117b5e5b2550cf649766b5e9dc9edc24ad93caa970a31372878bcd809ce46e8",
+      "new_sha256": "7369dda55b93fce900396adddea43af4370d735e7377f540ae6afbd3199f68cd"
+    },
+    {
+      "path": "experimental/apex2/scenario_adapter.gd",
+      "old_sha256": "5b2342b7c12b6f05da8ec04795a9169e62d4cda7414bc084362d4f4384762740",
+      "new_sha256": "b59144ea8e3a4bd0da4bdfdb6f41e7558d383acf3a4e3e7df3c91e87e0ce544c"
+    }
+  ],
+  "new_files": [
+    {
+      "path": "experimental/apex2/vehicle_dynamics.gd",
+      "sha256": "a5245293e19bfd6626c7d50610e469781364186deb62da74dd9008fff847cf72"
+    },
+    {
+      "path": "experimental/apex2/vehicle_kernel_11.gd",
+      "sha256": "35cf0b63ebd90bf458b4d717a95c4defdf58003cefdb460ed7b26868543cc25f"
+    },
+    {
+      "path": "tests/apex2/test_vehicle_11.gd",
+      "sha256": "d43b3c4153fedea900eb611335fa651a62b73816bb7561ce7b8cdc91c4ab83c5"
+    },
+    {
+      "path": "tests/apex2/test_vehicle_determinism_11.gd",
+      "sha256": "41bf222bc105e3051ee54924cfaa6681a8e167ffe1648c359d278e9af40f1f6d"
+    },
+    {
+      "path": "tests/apex2/test_vehicle_pit_11.gd",
+      "sha256": "02bca9ecea8833d2f1da2989a7d75253042299a017172f38c76e27e006e0cef5"
+    },
+    {
+      "path": "tests/apex2/benchmark_vehicle_11.gd",
+      "sha256": "07bf869fdf102c882ebab9a1b27169f2b5b882a291e857c06d42b4f6c791c1cc"
+    },
+    {
+      "path": "tests/apex2/benchmark_core_vehicle_11.gd",
+      "sha256": "b63e84ceecc3b96036542aa5f250bda5f72fc689b87434a1c9ab6c2fb532bf42"
+    },
+    {
+      "path": "APEX2_VEHICLE_11_RELATORIO_TECNICO.md",
+      "sha256": "7d80ee85c0ffe6f39bda7413bc4354b74f8c89dd72e0451c4916967670ca450c"
+    },
+    {
+      "path": "APEX2_VEHICLE_11_CHANGELOG.md",
+      "sha256": "f11b2f04e2070bab31ea9f5ab8b1f0d75db096ad8ed76cdeb5e4b074dbbb5b4b"
+    },
+    {
+      "path": "LEIA_PRIMEIRO_APEX2_VEHICLE_11.md",
+      "sha256": "6b7f8a5cca5dd9b856319f75448d8a87fdd04b8dd98a56c42f7312922c6d7647"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/benchmark.json",
+      "sha256": "ea845e8724d4052bf469f8275be17ae6ab6838ec7b0575f0a4e4cf7308cdd5c4"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/core_ab.json",
+      "sha256": "8722e85b2909501feabf06939a4e2bd6342489651d782fb851af9accf6508b15"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/matriz_testes.json",
+      "sha256": "8cb1c83cd416887aa9b6289f74251435ae9449270c74242ea0da792e4aaf6d6a"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/import.log",
+      "sha256": "78d97d852f9259f276df3f8eb4598e7fa709ad6946e9bbc78148efdcefcb03d6"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/vehicle_unit.log",
+      "sha256": "180a8bf0145c6e8ffb6bfc00d7d5df351ae40b4dffd8c65182bca03bb64f9167"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/vehicle_determinism.log",
+      "sha256": "a1eaf0a06d0e9ecfdbbd6fd5ed9dbae1cfa8f4257bd2be2bf29ec6383585cebf"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/vehicle_pit_v21.log",
+      "sha256": "98bb5a9359dafc062c8f19000dff821163211b8743a80a467b330724d8541eb9"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/vehicle_benchmark.log",
+      "sha256": "0eff721ee837a89c29596237995e933af4d5474d471c85e1bc3db50932f96556"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/legacy_kernel.log",
+      "sha256": "bc20d1e8c4c52650389f5fcc5bd4fcb46922a672b740d99c1dc7ac989b2d1d85"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/legacy_queue.log",
+      "sha256": "a978b3e2dc27ba6b81603dc8c2a1411a1ad12c1037619c242ef9edb4ea2c4570"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/legacy_replay.log",
+      "sha256": "4093fac5141af706cb7a6e26bc7669e25ecff7cb5492b0dcd848ebae1a19fd93"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/primary_contract.log",
+      "sha256": "14e6c6282c9ddcd1b05ace8186b2f8a5877573d9ab222fd4c1c4cf1d23b62483"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/hud_unit.log",
+      "sha256": "cc6f9c6c9cfaceeb7a8d0d11c880f4ee606edae6abd6ae18e55ad99af308741b"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/hud_integration.log",
+      "sha256": "34af4256a29cc34b3ae48d5cc21470a9d8b92ddb4ce6616ef2ee2f770f5291f5"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/hud_pending.log",
+      "sha256": "f65322c9c75f88bd5376fa7af7c42aae2a629c6f93b8ca93c9522a864c43775d"
+    },
+    {
+      "path": "qa/apex2_vehicle_11/logs/core_ab.log",
+      "sha256": "97d38f2aa2c7e9f3009af12dbc7049c98965aa15da48b15cdc5e1935547861b7"
+    }
+  ],
+  "preserved_files": 2867,
+  "preserved_production_hashes": true,
+  "note": "Next Engine experimental only; no production scripts, scenes, project config or saves modified."
+}

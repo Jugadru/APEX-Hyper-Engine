@@ -1,0 +1,3 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CAREER_20_SEASON_STRESS {"checks":1184,"elapsed_seconds":2.528,"errors":[],"last_save_bytes":155180,"not_covered":"No simulated race physics; historical year remains 2012; does not test multi-year career UI","pass":true,"races_committed":400,"seasons":20,"test":"20_championships_data_layer_stress"}

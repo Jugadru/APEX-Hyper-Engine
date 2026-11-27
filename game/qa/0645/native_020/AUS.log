@@ -1,0 +1,22 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+GP_START code=AUS seed=6400 step=0.20 engine=4.7.2-stable (official)
+GP_PROGRESS code=AUS lap=4/58 sim_s=300.0 wall_s=8.4
+GP_PROGRESS code=AUS lap=7/58 sim_s=600.0 wall_s=17.5
+GP_PROGRESS code=AUS lap=11/58 sim_s=900.0 wall_s=26.4
+GP_PROGRESS code=AUS lap=14/58 sim_s=1200.0 wall_s=35.7
+GP_PROGRESS code=AUS lap=17/58 sim_s=1500.0 wall_s=44.0
+GP_PROGRESS code=AUS lap=20/58 sim_s=1800.0 wall_s=51.9
+GP_PROGRESS code=AUS lap=24/58 sim_s=2100.0 wall_s=59.8
+GP_PROGRESS code=AUS lap=27/58 sim_s=2400.0 wall_s=67.5
+GP_PROGRESS code=AUS lap=31/58 sim_s=2700.0 wall_s=74.7
+GP_PROGRESS code=AUS lap=34/58 sim_s=3000.0 wall_s=81.9
+GP_PROGRESS code=AUS lap=37/58 sim_s=3300.0 wall_s=88.4
+GP_PROGRESS code=AUS lap=40/58 sim_s=3600.0 wall_s=94.3
+GP_PROGRESS code=AUS lap=44/58 sim_s=3900.0 wall_s=100.4
+GP_PROGRESS code=AUS lap=47/58 sim_s=4200.0 wall_s=105.5
+GP_PROGRESS code=AUS lap=51/58 sim_s=4500.0 wall_s=110.7
+GP_PROGRESS code=AUS lap=54/58 sim_s=4800.0 wall_s=115.7
+GP_PROGRESS code=AUS lap=57/58 sim_s=5100.0 wall_s=120.8
+GP_PASS code=AUS laps=58 time=5305 temp_min=33.3 temp_max=37.3 grip_min=1.065 grip_max=1.112 rubber_start=8 rubber_max=44 wet=false stops=48 winner=Fernando Alonso
+APEX_0645_TEST_OK complete_grands_prix=1

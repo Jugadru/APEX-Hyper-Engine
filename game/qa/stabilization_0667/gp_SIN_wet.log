@@ -1,0 +1,6 @@
+CMD: /mnt/data/apex_v0664_work/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path /mnt/data/APEX_STABILIZACAO_0667/project -s res://tests/racecraft_0662_gp.gd
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+RACECRAFT_0662_GP_PASS { "track": "SIN", "laps": 3, "ticks": 2050, "hash": "48085a06fed3d7761a58206673c03685043645d813ea809e0b76c968e94439c9", "live_ms": 15932, "replay_ms": 24471, "counts": { "approaches": 35, "attack_signals": 6, "defense_signals": 1, "yield_signals": 0, "duel_entries": 5, "blocked_ticks": 6170, "confirmed_passes": 0, "position_gains_other": 40, "contacts": 0, "driving_errors": 0 } }
+
+RESULT: {"test": "gp_SIN_wet", "script": "racecraft_0662_gp.gd", "started": "2026-11-16 00:06:20", "status": "PASS", "exit_code": 0, "elapsed_seconds": 41.556}

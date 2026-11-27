@@ -1,0 +1,8 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+SOUL_0650_MIGRATION_FAIL caixa legado importado
+SOUL_0650_MIGRATION_FAIL oficina 9.9 preservada
+SCRIPT ERROR: Invalid access to property or key 'Estrategista' on a base object of type 'Dictionary'.
+          at: _run (res://tests/soul_staff_0650_migration_test.gd:33)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tests/soul_staff_0650_migration_test.gd:33)

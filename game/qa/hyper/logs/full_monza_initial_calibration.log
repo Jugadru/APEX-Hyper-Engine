@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+PROGRESS ITA 5050 leader laps=10 fuel=125363
+PROGRESS ITA 10050 leader laps=20 fuel=103344
+PROGRESS ITA 15050 leader laps=31 fuel=79571
+PROGRESS ITA 20050 leader laps=41 fuel=58830
+PROGRESS ITA 25050 leader laps=51 fuel=34664
+HYPER_FULL {"attempts":171,"checkpoint_parity":true,"clock_s":5292.2,"complete":24,"elapsed_ms":81041,"hash":"3f2652d0ebf7edca911c9a6d4a2552c2b0fd0f2be9ca0f8d5303fae57e1079e5","passes":133,"retired":0,"status":"PASS","stops":108,"ticks":26461,"track":"ITA","weather":"Seco","winner":"Sebastian Vettel"}

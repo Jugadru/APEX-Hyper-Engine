@@ -1,0 +1,50 @@
+{
+  "notes": "Same Core2 sports physics and rules in both; measured headless CPU test with fixed ticks, not FPS",
+  "rows": [
+    {
+      "fps_test": false,
+      "identical_hashes": true,
+      "legacy_us_per_tick": 7895.61875,
+      "primary_us_per_tick": 7783.78125,
+      "same_physics": true,
+      "seed": 6701,
+      "ticks": 160,
+      "track": "GBR",
+      "weather": "Seco"
+    },
+    {
+      "fps_test": false,
+      "identical_hashes": true,
+      "legacy_us_per_tick": 7578.25625,
+      "primary_us_per_tick": 7543.35625,
+      "same_physics": true,
+      "seed": 6701,
+      "ticks": 160,
+      "track": "BEL",
+      "weather": "Chuva intensa"
+    },
+    {
+      "fps_test": false,
+      "identical_hashes": true,
+      "legacy_us_per_tick": 8626.9375,
+      "primary_us_per_tick": 8102.3375,
+      "same_physics": true,
+      "seed": 6701,
+      "ticks": 160,
+      "track": "ITA",
+      "weather": "Seco"
+    },
+    {
+      "fps_test": false,
+      "identical_hashes": true,
+      "legacy_us_per_tick": 7845.525,
+      "primary_us_per_tick": 7675.55,
+      "same_physics": true,
+      "seed": 6701,
+      "ticks": 160,
+      "track": "SIN",
+      "weather": "Chuva intensa"
+    }
+  ],
+  "status": "PASS"
+}
