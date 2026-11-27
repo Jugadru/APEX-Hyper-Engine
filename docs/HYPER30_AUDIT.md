@@ -20,3 +20,6 @@ P2: replay holds full event/command history and synchronously seeks; memory and 
 P2: part/project state validation and source inventory allowlists need stronger cross-field invariants and independent manifest hashes. Architect bridge, packaging and release quality remain pending.
 ## Acceptance
 No merge until exact-head isolated/game FAST and paired complete GPs + actual career GP pass. No FULL season or GPU claims. Audit is based on inspected source and logs; suspected balance/performance risks are hypotheses, not measured failures.
+
+## Additional confirmed regression
+The inherited command queue authorizes set_auto only for revision 2, while the Hyper kernel implements it for every revision. Fix acceptance for revisions 2–5, Manual only, with actual Manual → AUTO tests on all four and negative AI tests. Autonomous full-race behavior is unchanged by this acceptance change; verify exact baseline hashes. Also note MAX_COMMANDS=4096 caps the entire historical ledger, not pending commands; long races/high command counts may exhaust it. Pending lookup is indexed, but validation still scans historical records. Benchmark and redesign with bounded history plus a replay journal; do not silently drop commands.

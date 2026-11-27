@@ -17,6 +17,19 @@ func run()->void:
 	ck(m.lateral_mm==280 and m.pitch_millirad==-10 and m.roll_load_permille==500,"bounded lane and load proxies")
 	M.condition_tick(m,5000000,true);ck(m.health==998,"stress-weighted wear by distance")
 	ck(M.incident(m,"SPIN")==85 and m.damage==85,"incident damage")
+	for revision in [2,3,4,5]:
+		var control_kernel=K.new()
+		var control_scenario:Dictionary=S.create("ITA","Seco",2026)
+		control_scenario.hyper22_physics=revision==3;control_scenario.hyper23_physics=revision==4;control_scenario.hyper30_physics=revision==5
+		ck(control_kernel.initialize(control_scenario),"control init "+str(revision))
+		var control_id:int=int(control_kernel.state.cars[0].id)
+		ck(bool(control_kernel.submit({"type":"set_pace","source":"Manual","car_id":control_id,"pace":"Atacar"}).accepted),"manual pace accepted "+str(revision))
+		control_kernel.step_ticks(4)
+		ck(str(control_kernel.state.cars[0].driver.control_mode)=="MANUAL","manual mode "+str(revision))
+		ck(bool(control_kernel.submit({"type":"set_auto","source":"Manual","car_id":control_id}).accepted),"auto accepted "+str(revision))
+		control_kernel.step_ticks(4)
+		ck(str(control_kernel.state.cars[0].driver.control_mode)=="AUTO","auto restored "+str(revision))
+		ck(not bool(control_kernel.submit({"type":"set_auto","source":"AI","car_id":control_id}).accepted),"AI cannot release manual "+str(revision))
 	var k=K.new();var s:Dictionary=S.create("ITA","Seco",2026);s.hyper30_physics=true;s.hyper_errors_enabled=false
 	ck(k.initialize(s) and k.state.hyper_evolution_revision==5,"revision 5")
 	var r=R.new();r.attach(k);k.step_ticks(300);r.observed(k)
