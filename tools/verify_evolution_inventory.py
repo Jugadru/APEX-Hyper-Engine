@@ -18,8 +18,8 @@ for item in data["included"]:
         raise SystemExit("invalid inventory path")
     expected[str(p)] = (item["bytes"], item["sha256"])
 actual = {p.relative_to(root / "game").as_posix(): p for p in (root / "game").rglob("*") if p.is_file()}
-changed = ["experimental/apex2/vehicle_dynamics.gd","experimental/hyper/kernel.gd","experimental/apex2/vehicle_kernel_11.gd","experimental/hyper2/kernel.gd","experimental/hyper2/console.gd","tests/hyper2/test_manual_wet.gd","tests/hyper2/full_race.gd"]
-added = ["experimental/hyper2/powertrain_22.gd","tests/hyper2/test_hyper22.gd"]
+changed = ["experimental/apex2/vehicle_dynamics.gd","experimental/hyper/kernel.gd","experimental/apex2/vehicle_kernel_11.gd","experimental/hyper2/kernel.gd","experimental/hyper2/console.gd","tests/hyper2/test_manual_wet.gd","tests/hyper2/full_race.gd","experimental/hyper/traffic.gd"]
+added = ["experimental/hyper2/powertrain_22.gd","tests/hyper2/test_hyper22.gd","experimental/hyper2/dynamics_23.gd","tests/hyper2/test_hyper23.gd"]
 if not set(changed) <= set(expected) or set(added) & set(expected):
     raise SystemExit("invalid evolution allowlist")
 if set(actual) != set(expected) | set(added):
