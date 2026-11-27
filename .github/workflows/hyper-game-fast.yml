@@ -21,7 +21,7 @@ jobs:
           EXPECTED: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           test "$(git rev-parse HEAD)" = "$EXPECTED"
-          python3 tools/verify_game_inventory.py
+          python3 tools/verify_evolution_inventory.py
       - uses: chickensoft-games/setup-godot@ac93246ea68518a384c1c280a496e5989341f2f6
         with:
           version: '4.7.2'
@@ -38,10 +38,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for item in test_evolution test_calendar test_replay_quality test_manual_wet test_workshop test_menu test_ui; do
+          for item in test_evolution test_calendar test_replay_quality test_manual_wet test_workshop test_menu test_ui test_hyper22; do
             echo "HYPER_FIXTURE $item"
             timeout 240s godot --headless --path game --rendering-method gl_compatibility --script "res://tests/hyper2/$item.gd" > "/tmp/$item.log" 2>&1 || { cat "/tmp/$item.log"; exit 1; }
             cat "/tmp/$item.log"
             if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:|^FAIL ' "/tmp/$item.log"; then exit 1; fi
           done
+          timeout 240s godot --headless --path game --rendering-method gl_compatibility --script res://tests/hyper2/test_manual_wet.gd -- hyper22 > /tmp/hyper22-wet.log 2>&1 || { cat /tmp/hyper22-wet.log; exit 1; }
+          cat /tmp/hyper22-wet.log
+          grep -q '"status":"PASS"' /tmp/hyper22-wet.log
+          if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' /tmp/hyper22-wet.log; then exit 1; fi
           echo HYPER_GAME_FAST_PASS

@@ -5,6 +5,7 @@ extends RefCounted
 ## centi-degrees Celsius, permille and micro-wear. No wall-clock or RNG.
 ## Normalized 2D circuit silhouettes are NOT surveyed track geometry;
 ## segment lengths/radii are synthetic approximations for isolated tests.
+const Powertrain22 = preload("res://experimental/hyper2/powertrain_22.gd")
 const STEP_MS: int = 200
 const LAP_UNITS: int = 1000000
 const MAX_V_MM_S: int = 106000
@@ -157,6 +158,7 @@ static func _profile_index(profile: Array, location_mm: int) -> int:
 static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns: int, ambient_centi: int, step_ms: int = STEP_MS) -> void:
 	var dyn: Dictionary = car.dynamics
 	var old_velocity: int = int(dyn.speed_mm_s)
+	var advanced: bool = dyn.has(Powertrain22.KEY)
 	var mass_kg: int = int(dyn.dry_mass_kg) + int(dyn.fuel_g / 1000)
 	var mu: int = friction_mu(str(car.tire), water_microns, int(dyn.tire_temp_centi), int(dyn.wear_micro))
 	if car.has("hyper_setup_grip_permille"): mu=int(mu*clampi(int(car.hyper_setup_grip_permille),980,1030)/1000)
@@ -176,7 +178,12 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 		if distance > 850000:
 			break
 		var corner_limit: int = _corner_cap_mm_s(int(point.radius_mm), mass_kg, mu, int(dyn.downforce_milli))
-		var stopping_cap: int = mini(MAX_V_MM_S, integer_sqrt(corner_limit * corner_limit + 2 * brake_decel * distance))
+		var approach_decel: int = brake_decel
+		if advanced:
+			# Conservative endpoint grip instead of relying on high-speed downforce
+			# that disappears while slowing for the corner.
+			approach_decel = maxi(2500,int(_grip_force_n(mass_kg,mini(old_velocity,corner_limit),mu,int(dyn.downforce_milli))*1000/mass_kg))
+		var stopping_cap: int = mini(MAX_V_MM_S, integer_sqrt(corner_limit * corner_limit + 2 * approach_decel * distance))
 		cap = mini(cap, stopping_cap)
 	# 1.3 opt-in traffic braking envelope; absent for all legacy 1.1/1.2 runs.
 	# The cap limits target speed, never boosts acceleration or teleports the car.
@@ -190,7 +197,16 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	var rolling_n: int = int(mass_kg * 14 / 100)
 	var available_drive_n: int = engine_n - drag_n - rolling_n if car.has("hyper") else maxi(0, engine_n - drag_n - rolling_n)
 	var braking: bool = old_velocity > cap
+	if advanced:
+		var offer: int = int(car.get("hyper_kers_power_w",0))
+		var base_power: int = maxi(0,int(dyn.wheel_power_w)-offer) if int(dyn.fuel_g)>0 else 0
+		var p: Dictionary = Powertrain22.evaluate(dyn[Powertrain22.KEY],old_velocity,throttle,base_power,offer if base_power>0 else 0,grip_n,braking,step_ms)
+		p.drag_n=drag_n;p.rolling_n=rolling_n;p.mass_g=int(dyn.dry_mass_kg)*1000+int(dyn.fuel_g)
+		dyn[Powertrain22.KEY]=p
+		engine_n=int(p.engine_force_n)
+		available_drive_n=engine_n-drag_n-rolling_n
 	var force_n: int = -grip_n if braking else available_drive_n
+	if advanced and braking: force_n-=drag_n+rolling_n
 	var acceleration_mm_s2: int = int(force_n * 1000 / mass_kg)
 	var next_speed: int = clampi(old_velocity + int(acceleration_mm_s2 * step_ms / 1000), 0, MAX_V_MM_S)
 	if not braking:
@@ -200,13 +216,16 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	dyn.distance_remainder = posmod(distance_numerator, 1000)
 	dyn.distance_mm = int(dyn.distance_mm) + distance_delta_mm
 	dyn.speed_mm_s = next_speed
+	if advanced: dyn[Powertrain22.KEY].rpm=clampi(Powertrain22.raw_rpm(next_speed,int(dyn[Powertrain22.KEY].gear)),Powertrain22.IDLE,Powertrain22.LIMIT)
 	dyn.last_force_n = force_n
 	dyn.last_brake_n = grip_n if braking else 0
 	dyn.last_grip_n = grip_n
 	dyn.last_target_speed_mm_s = cap
 	# Energy at the wheels / assumed overall efficiency * petrol energy density.
 	var delivered_power_w: int = mini(power_requested_w, int(engine_n * old_velocity / 1000)) if not braking else 0
-	if car.has("hyper_kers_power_w"):
+	if advanced:
+		delivered_power_w=int(dyn[Powertrain22.KEY].v8_wheel_w)
+	elif car.has("hyper_kers_power_w"):
 		delivered_power_w = maxi(0, delivered_power_w - int(car.hyper_kers_power_w))
 	# Hyper fixes the legacy experimental unit conversion (1000x too high).
 	# W * ms -> J, then kg -> g; permille efficiency adds one factor of 1000.
