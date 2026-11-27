@@ -1,0 +1,10 @@
+.godot/
+__pycache__/
+*.pyc
+*.log
+*.zip
+*.tar.xz
+*.bin
+*.pck
+.env
+staging/
