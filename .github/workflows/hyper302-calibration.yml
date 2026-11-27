@@ -71,4 +71,7 @@ jobs:
           }
           assert load("/tmp/hyper301.log")["hash"] == expected[os.environ["TRACK"]], "approved rev6 sporting hash changed"
           print("HYPER302_LEGACY_HASH_PASS")
+          if os.environ["TRACK"] == "ITA":
+              assert load("/tmp/hyper302.log")["hash"] == "7ba2e8f0d78a6c016c946c51d20e42098e60680123fbce02cee9f2ff24bebe4d", "optimized geometry changed reference result"
+              print("HYPER302_OPTIMIZED_HASH_PASS")
           PY

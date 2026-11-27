@@ -36,6 +36,40 @@ static func integer_sqrt(value: int) -> int:
 		y = int((x + int(value / x)) / 2)
 	return x
 
+# The float root is only a seed: exact integer comparisons certify the
+# floor. Bound the fast domain so multiplication cannot overflow.
+static func exact_root_fast(value:int)->int:
+	if value<=0:return 0
+	if value>4503599627370496:return integer_sqrt(value)
+	var root:int=int(sqrt(float(value)))
+	while root*root>value:root-=1
+	while (root+1)*(root+1)<=value:root+=1
+	return root
+
+# Revision 7 only. Squaring is monotone for these nonnegative speed caps.
+# Keep the minimum squared cap and take one final root, rather than one
+# root per future sample. No changed lookahead distance or grip constants.
+static func canonical_preview(profile:Array,lap_mm:int,position_mm:int,index:int,current_radius:int,mass_kg:int,mu:int,downforce:int,old_velocity:int,corner_margin:int)->int:
+	var best:int=MAX_V_MM_S*MAX_V_MM_S
+	for ahead in range(mini(128,profile.size())):
+		var point:Dictionary=profile[(index+ahead)%profile.size()]
+		var distance:int=0 if ahead==0 else posmod(int(point.start_mm)-position_mm,lap_mm)
+		if distance>850000:break
+		var radius:int=current_radius if ahead==0 else int(point.radius_mm)
+		if radius>=MAX_RADIUS_MM:continue
+		var denominator:int=mass_kg*2000000000-mu*downforce*radius
+		var limit:int=MAX_V_MM_S
+		if denominator>0:
+			var numerator:int=mu*mass_kg*981*20*radius
+			limit=mini(MAX_V_MM_S,exact_root_fast(int(numerator/denominator)*1000000))
+		limit=int(limit*corner_margin/1000)
+		var squared:int=limit*limit
+		if squared>=best:continue
+		var decel:int=maxi(2500,int(_grip_force_n(mass_kg,mini(old_velocity,limit),mu,downforce)*1000/mass_kg))
+		decel=maxi(1500,int(decel*800/1000))
+		best=mini(best,squared+2*decel*distance)
+	return exact_root_fast(best)
+
 static func track_profile(points: Array, lap_mm: int) -> Array:
 	if lap_mm < 1000000 or lap_mm > 30000000 or points.size() < 8 or points.size() > 1000:
 		return []
@@ -193,28 +227,31 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 		budget=Dynamics23.budget(grip_n,lateral_demand)
 		long_limit=int(budget.long_limit_n)
 		brake_decel=maxi(2500,int(long_limit*1000/mass_kg))
-	# Anticipate upcoming geometry by stopping-distance energy equation v²=v0²+2*a*s.
-	for ahead in range(mini(128 if canonical else 10, profile.size())):
-		var k: int = (index + ahead) % profile.size()
-		var point: Dictionary = profile[k]
-		var next_pos: int = int(point.start_mm)
-		var distance: int = posmod(next_pos - position_mm, lap_mm)
-		if ahead == 0:
-			distance = 0
-		if distance > 850000:
-			break
-		var sample_radius:int=current_radius if canonical and ahead==0 else int(point.radius_mm)
-		var corner_limit: int = _corner_cap_mm_s(sample_radius, mass_kg, mu, int(dyn.downforce_milli))
-		if combined and sample_radius<MAX_RADIUS_MM:
-			corner_limit=int(corner_limit*corner_margin/1000)
-		var approach_decel: int = brake_decel
-		if advanced:
-			# Conservative endpoint grip instead of relying on high-speed downforce
-			# that disappears while slowing for the corner.
-			approach_decel = maxi(2500,int(_grip_force_n(mass_kg,mini(old_velocity,corner_limit),mu,int(dyn.downforce_milli))*1000/mass_kg))
-		if combined: approach_decel=maxi(1500,int(approach_decel*800/1000))
-		var stopping_cap: int = mini(MAX_V_MM_S, integer_sqrt(corner_limit * corner_limit + 2 * approach_decel * distance))
-		cap = mini(cap, stopping_cap)
+	if canonical:
+		cap=canonical_preview(profile,lap_mm,position_mm,index,current_radius,mass_kg,mu,int(dyn.downforce_milli),old_velocity,corner_margin)
+	else:
+		# Anticipate upcoming geometry by stopping-distance energy equation v²=v0²+2*a*s.
+		for ahead in range(mini(10, profile.size())):
+			var k: int = (index + ahead) % profile.size()
+			var point: Dictionary = profile[k]
+			var next_pos: int = int(point.start_mm)
+			var distance: int = posmod(next_pos - position_mm, lap_mm)
+			if ahead == 0:
+				distance = 0
+			if distance > 850000:
+				break
+			var sample_radius:int=current_radius if canonical and ahead==0 else int(point.radius_mm)
+			var corner_limit: int = _corner_cap_mm_s(sample_radius, mass_kg, mu, int(dyn.downforce_milli))
+			if combined and sample_radius<MAX_RADIUS_MM:
+				corner_limit=int(corner_limit*corner_margin/1000)
+			var approach_decel: int = brake_decel
+			if advanced:
+				# Conservative endpoint grip instead of relying on high-speed downforce
+				# that disappears while slowing for the corner.
+				approach_decel = maxi(2500,int(_grip_force_n(mass_kg,mini(old_velocity,corner_limit),mu,int(dyn.downforce_milli))*1000/mass_kg))
+			if combined: approach_decel=maxi(1500,int(approach_decel*800/1000))
+			var stopping_cap: int = mini(MAX_V_MM_S, integer_sqrt(corner_limit * corner_limit + 2 * approach_decel * distance))
+			cap = mini(cap, stopping_cap)
 	# 1.3 opt-in traffic braking envelope; absent for all legacy 1.1/1.2 runs.
 	# The cap limits target speed, never boosts acceleration or teleports the car.
 	if car.has("traffic_speed_cap_mm_s"):
