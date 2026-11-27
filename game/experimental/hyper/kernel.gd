@@ -1,6 +1,7 @@
 extends "res://experimental/apex2/driver_kernel_12.gd"
 ## Hyper Evolution: isolated playable successor to Racecraft 1.3.
 const Resolver = preload("res://experimental/hyper/traffic.gd")
+const Control306 = preload("res://experimental/hyper2/race_control_306.gd")
 const RACECRAFT_TAG: String = "APEX2_HYPER_2.0_ALPHA1"
 
 const IndexedQueue = preload("res://experimental/hyper/indexed_queue.gd")
@@ -52,6 +53,8 @@ func step_tick() -> bool:
 	var prior_distances: Dictionary = {}
 	for car in state.cars:
 		prior_distances[int(car.id)] = int(car.dynamics.distance_mm)
+	var control_snapshot:Dictionary={}
+	if state.has(Control306.KEY) and int(state.mega_control.remaining)>0:control_snapshot=Control306.begin(state[Control306.KEY],state.cars,int(state.lap_length_mm))
 	var action: Dictionary = Resolver.plan(state.cars, state.track_profile, int(state.lap_length_mm), int(state.tick) + 1,int(state.water_microns))
 	if state.has("wet_attack_reasons"):
 		for reason in action.wet_reasons:state.wet_attack_reasons[reason]=int(state.wet_attack_reasons[reason])+int(action.wet_reasons[reason])
@@ -59,6 +62,7 @@ func step_tick() -> bool:
 		var id: int = int(car.id)
 		car.racecraft = action.states[id]
 		car.traffic_speed_cap_mm_s = int(action.speed_caps[id])
+		if not control_snapshot.is_empty():car.traffic_speed_cap_mm_s=mini(int(car.traffic_speed_cap_mm_s),int(control_snapshot.caps.get(id,Control306.CAP_MM_S)))
 	_wake_grid(action.wake_gaps)
 	for car in state.cars:
 		Env.drs_update(car,state.hyper_drs_zones,int(action.physical_front_gaps.get(int(car.id),state.lap_length_mm)),int(state.water_microns))
@@ -99,6 +103,9 @@ func step_tick() -> bool:
 			_event("racecraft_overtake_confirmed", id, {"defender_id": opponent_id, "gap_mm": new_delta, "lane": str(r.lane)})
 			Resolver._phase(r, "RECOVER", int(state.tick), [], id, "pass_confirmed")
 			r.cooldown_until = int(state.tick) + 35
+	if not control_snapshot.is_empty():
+		for warning in Control306.settle(state[Control306.KEY],control_snapshot.rows,Control306.snapshot(state.cars),int(state.mega_control.remaining)<=1,int(state.lap_length_mm)):
+			_event(str(warning.type),int(warning.car_id),warning)
 	return true
 
 func _apply_command(command: Dictionary) -> Dictionary:
