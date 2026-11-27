@@ -205,7 +205,14 @@ func restore(data: Dictionary) -> bool:
 	elif candidate.has("wet_attack_reasons"):return false
 	if int(candidate.hyper_evolution_revision)==CONTROL_REV:
 		if not candidate.get("cars") is Array or not RaceControl.valid(candidate.get(RaceControl.KEY),candidate.cars):return false
-		if candidate[RaceControl.KEY].phase=="VSC" and int(candidate.mega_control.remaining)<=0:return false
+		var monitor:Dictionary=candidate[RaceControl.KEY]
+		var remaining:int=int(candidate.mega_control.remaining)
+		var deployments:int=int(candidate.mega_control.deployments)
+		# Deployment is announced after motion; the monitor begins on the next tick.
+		var awaiting_first:bool=remaining==Mega.CONTROL_TICKS
+		if int(monitor.deployments)!=deployments-(1 if awaiting_first else 0):return false
+		if int(monitor.total_ticks)!=deployments*Mega.CONTROL_TICKS-remaining:return false
+		if (monitor.phase=="VSC")!=(remaining>0 and not awaiting_first):return false
 	elif candidate.has(RaceControl.KEY):return false
 	for car in candidate.get("cars",[]):
 		if not car is Dictionary or not car.get("evolution") is Dictionary: return false

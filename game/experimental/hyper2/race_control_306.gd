@@ -85,11 +85,14 @@ static func settle(x:Dictionary,before:Dictionary,after:Dictionary,last_tick:boo
 			if not after.has(b) or not bool(before[b].eligible) or not bool(after[b].eligible):continue
 			var old:int=int(before[a].distance)-int(before[b].distance)
 			var now:int=int(after[a].distance)-int(after[b].distance)
-			if absi(old)>50000 or now==0:continue
-			var crossing:bool=(old<0 and now>0) or (old>0 and now<0) or (old==0 and now<0)
+			if absi(old)>50000:continue
+			# Classification breaks equal distances by ascending car id.
+			# Since a < b, an exact tie places a ahead; do not lose a
+			# crossing that lands exactly on the other car for one tick.
+			var crossing:bool=(old>=0)!=(now>=0)
 			var pair:String="%d:%d"%[a,b]
 			if crossing and not x.reported_pairs.has(pair):
 				x.reported_pairs[pair]=true;x.order_warnings=int(x.order_warnings)+1
-				warnings.append({"type":"race_control_order_warning","car_id":a if now>0 else b,"other_id":b if now>0 else a})
+				warnings.append({"type":"race_control_order_warning","car_id":a if now>=0 else b,"other_id":b if now>=0 else a})
 	if last_tick:x.phase="GREEN"
 	return warnings

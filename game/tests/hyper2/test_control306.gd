@@ -33,8 +33,21 @@ func run()->void:
 	var y:Dictionary=C.initial();C.settle(y,before.rows,exempt,false)
 	ck(y.order_warnings==0,"incident or pit exemption")
 	ck(C.valid(x,field),"ledger valid")
+	var tie:Dictionary=before.rows.duplicate(true)
+	tie[a].distance=int(tie[b].distance)
+	var tie_monitor:Dictionary=C.initial()
+	var tie_warnings:Array=C.settle(tie_monitor,before.rows,tie,false)
+	ck(tie_monitor.order_warnings==1 and tie_warnings[0].car_id==a,"exact tie uses classification order")
+	C.settle(tie_monitor,tie,after,false)
+	ck(tie_monitor.order_warnings==1,"crossing not double counted after tie")
 	k.step_ticks(300)
-	k.state.mega_control.remaining=100;k.state.mega_control.incidents=1;k.state.mega_control.deployments=1
+	# Trigger the normal incident → damage → neutralization path, not a
+	# direct edit to the neutralization timer. Errors otherwise disabled.
+	var incident:Dictionary=k.state.cars[0]
+	incident.evolution.error_count+=1;incident.evolution.error_kind="SPIN"
+	k.step_tick()
+	ck(int(incident.mega_30.damage)==85 and int(k.state.mega_control.remaining)==100,"spin deploys control through kernel")
+	var pre=K.new();ck(pre.restore(k.checkpoint()),"restore announced deployment before first tick")
 	var replay=R.new();replay.attach(k)
 	var attempts:int=int(k.state.racecraft_attempts)
 	var bad_drs:int=0
@@ -54,6 +67,14 @@ func run()->void:
 	ck(sought!=null and sought.sporting_hash()==k.sporting_hash(),"replay across VSC")
 	var invalid:Dictionary=k.checkpoint();invalid.state.race_control_306.total_ticks=-1
 	ck(not copy.restore(invalid),"reject malformed control ledger")
+	var inconsistent:Dictionary=k.checkpoint();inconsistent.state.race_control_306.total_ticks+=1
+	ck(not copy.restore(inconsistent),"reject inconsistent timer ledger")
+	incident.evolution.error_count+=1;incident.evolution.error_kind="SPIN"
+	k.step_tick()
+	ck(int(k.state.mega_control.remaining)==100,"second deployment")
+	k.step_ticks(100)
+	ck(int(k.state.race_control_306.deployments)==2 and int(k.state.race_control_306.total_ticks)==200 and k.state.race_control_306.phase=="GREEN","second deployment ledger")
+	ck(copy.restore(k.checkpoint()),"restore after repeated deployments")
 	var legacy=K.new();var old:Dictionary=S.create("ITA","Seco",2026);old.hyper305_physics=true
 	ck(legacy.initialize(old) and not legacy.state.has(C.KEY),"legacy isolated")
 	var ui=UI.instantiate();root.add_child(ui);await process_frame
