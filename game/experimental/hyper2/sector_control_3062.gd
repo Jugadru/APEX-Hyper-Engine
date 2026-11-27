@@ -4,7 +4,7 @@ extends RefCounted
 ## These are game reference sectors, not surveyed FIA timing loops.
 const KEY:="sector_control_3062"
 const Mega=preload("res://experimental/hyper2/mega_30.gd")
-const Control=preload("res://experimental/hyper2/race_control_306.gd")
+const RaceControl=preload("res://experimental/hyper2/race_control_306.gd")
 const STEP_US:=200000
 const TARGET_MM:=100000
 const TOLERANCE_US:=200000
@@ -42,7 +42,7 @@ static func valid(x:Variant,lap:int,tick:int,deployments:int)->bool:
 	if int(x.deployment)==0:return x==initial()
 	if int(x.last_tick)<0 or int(x.last_cross_us)<-1 or int(x.last_cross_us)>tick*STEP_US:return false
 	if int(x.next_mm)!=next_boundary(int(x.last_distance),lap):return false
-	if int(x.last_cross_us)>=0 and int(x.eligible_ticks)<=Control.GRACE_TICKS:return false
+	if int(x.last_cross_us)>=0 and int(x.eligible_ticks)<=RaceControl.GRACE_TICKS:return false
 	if int(x.samples)==0:return int(x.elapsed_us)==0 and int(x.reference_us)==0 and int(x.delta_us)==0
 	return int(x.elapsed_us)>0 and int(x.elapsed_us)<=Mega.CONTROL_TICKS*STEP_US and int(x.reference_us)>0 and int(x.reference_us)<=TARGET_MM*1000000/Mega.CONTROL_CAP and int(x.delta_us)==int(x.elapsed_us)-int(x.reference_us)
 
@@ -58,7 +58,7 @@ static func observe(x:Dictionary,before:Dictionary,after:Dictionary,lap:int,tick
 	x.last_tick=tick;x.last_distance=end
 	x.eligible_ticks=mini(Mega.CONTROL_TICKS,int(x.eligible_ticks)+1)
 	# Exclude deceleration grace and the first partial microsector after it.
-	if int(x.eligible_ticks)<=Control.GRACE_TICKS:
+	if int(x.eligible_ticks)<=RaceControl.GRACE_TICKS:
 		x.next_mm=next_boundary(end,lap);x.last_cross_us=-1;return evidence
 	if end==start:return evidence
 	while int(x.next_mm)<=end:
