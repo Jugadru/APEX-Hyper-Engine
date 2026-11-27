@@ -18,3 +18,18 @@ The tool verifies the exact archive hash, rejects unsafe paths, symlinks, duplic
 5. Only after baseline passes, integrate candidate with one proposal/settle point. Preserve sporting revision and old checkpoint isolation. Compare A/B, then version 2.2.
 
 The existing isolated lab and its FAST workflow are not full game baseline. The original PR #185 in APEX-Simulation stays as historical evidence; no merge or closure is required for this bootstrap. CI failure 45924213279 occurred before Godot because the Core 2 base changed between event and merge checkout. Do not disable that project's guard.
+
+## Local transfer helper
+
+If the agent cannot materialize the 122 MB archive, the owner can use a fresh clone and the original ZIP. The tool does not download the game or run its code. It stages the verified source under `game/` so original Godot paths remain relative to `game/project.godot`. It excludes generated Godot caches and Git metadata, blocks likely credential files and oversized individual Git blobs, and records all inclusions/exclusions. The original archive remains untouched. Public/private visibility is not a technical blocker; the owner must ensure the files can be redistributed before pushing.
+
+```sh
+git clone https://github.com/Jugadru/APEX-Hyper-Engine.git
+cd APEX-Hyper-Engine
+python3 tools/transfer_alpha2.py "/path/to/APEX_MOTORSPORT_MANAGER_NEXT_ENGINE_2.1_HYPER_EVOLUTION_ALPHA2_COMPLETO.zip"
+# Review staged files and docs/ALPHA2_IMPORT_INVENTORY.json.
+git commit -m "Import verified Hyper 2.1 Alpha 2 baseline"
+git push -u origin migration/alpha2-full-baseline
+```
+
+Alternatively, after review of the source archive and rights, use `--push` on the first invocation to commit and push in one step. No force push or main update. Git authentication and author identity must already be configured on the local machine. If Git rejects a path or file, do not remove it silently; report the error. A pushed branch is not a validated baseline; open a PR and add actual Godot game integration checks before merging. Existing isolated FAST remains laboratory-only.
