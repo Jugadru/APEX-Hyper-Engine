@@ -8,6 +8,7 @@ extends RefCounted
 const Powertrain22 = preload("res://experimental/hyper2/powertrain_22.gd")
 const Dynamics23 = preload("res://experimental/hyper2/dynamics_23.gd")
 const Energy301 = preload("res://experimental/hyper2/energy_301.gd")
+const Geometry302 = preload("res://experimental/hyper2/geometry_302.gd")
 const STEP_MS: int = 200
 const LAP_UNITS: int = 1000000
 const MAX_V_MM_S: int = 106000
@@ -174,6 +175,8 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	var brake_decel: int = maxi(2500, int(grip_n * 1000 / mass_kg))
 	var position_mm: int = posmod(int(dyn.distance_mm), lap_mm)
 	var index: int = _profile_index(profile, position_mm)
+	var canonical:bool=profile[index].has("curvature")
+	var current_radius:int=Geometry302.radius_at(profile,lap_mm,position_mm) if canonical else int(profile[index].radius_mm)
 	var cap: int = MAX_V_MM_S
 	var load: Dictionary = {}
 	var corner_margin: int = 1000
@@ -184,14 +187,14 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 		load= Dynamics23.loads(mass_kg,_aero_force_n(int(dyn.downforce_milli),old_velocity),int(dyn[Dynamics23.KEY].accel_mm_s2))
 		grip_n=int(grip_n*int(load.scale)/1000)
 		corner_margin=Dynamics23.margin(car,water_microns)
-		var radius_now:int=int(profile[index].radius_mm)
+		var radius_now:int=current_radius
 		# The sentinel describes a straight, not a physical 1000 m curve.
 		lateral_demand=0 if radius_now>=MAX_RADIUS_MM else int(mass_kg*old_velocity*old_velocity/maxi(1,radius_now*1000))
 		budget=Dynamics23.budget(grip_n,lateral_demand)
 		long_limit=int(budget.long_limit_n)
 		brake_decel=maxi(2500,int(long_limit*1000/mass_kg))
 	# Anticipate upcoming geometry by stopping-distance energy equation v²=v0²+2*a*s.
-	for ahead in range(mini(10, profile.size())):
+	for ahead in range(mini(128 if canonical else 10, profile.size())):
 		var k: int = (index + ahead) % profile.size()
 		var point: Dictionary = profile[k]
 		var next_pos: int = int(point.start_mm)
@@ -200,8 +203,9 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 			distance = 0
 		if distance > 850000:
 			break
-		var corner_limit: int = _corner_cap_mm_s(int(point.radius_mm), mass_kg, mu, int(dyn.downforce_milli))
-		if combined and int(point.radius_mm)<MAX_RADIUS_MM:
+		var sample_radius:int=current_radius if canonical and ahead==0 else int(point.radius_mm)
+		var corner_limit: int = _corner_cap_mm_s(sample_radius, mass_kg, mu, int(dyn.downforce_milli))
+		if combined and sample_radius<MAX_RADIUS_MM:
 			corner_limit=int(corner_limit*corner_margin/1000)
 		var approach_decel: int = brake_decel
 		if advanced:
@@ -272,7 +276,7 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 		info.long_limit_n=long_limit;info.long_used_n=brake_force if braking else engine_n
 		info.reserve_permille=int(budget.reserve_permille);info.saturated=bool(budget.saturated)
 		info.accel_mm_s2=int((next_speed-old_velocity)*1000/maxi(1,step_ms));info.margin_permille=corner_margin
-		info.phase=Dynamics23.phase(int(profile[index].radius_mm),int(profile[(index+1)%profile.size()].radius_mm),int(profile[posmod(index-1,profile.size())].radius_mm))
+		info.phase=Dynamics23.phase(current_radius,int(profile[(index+1)%profile.size()].radius_mm),int(profile[posmod(index-1,profile.size())].radius_mm))
 		info.target_mm_s=cap
 	# Energy at the wheels / assumed overall efficiency * petrol energy density.
 	var delivered_power_w: int = mini(power_requested_w, int(engine_n * old_velocity / 1000)) if not braking else 0
@@ -293,7 +297,7 @@ static func advance(car: Dictionary, profile: Array, lap_mm: int, water_microns:
 	var spec: Dictionary = TYRES.get(str(car.tire), TYRES["Médio"])
 	var temperature_excess: int = maxi(0, int(dyn.tire_temp_centi) - int(spec.optimal_centi) - 900)
 	var thermal_wear_permille: int = mini(1700, 1000 + int(temperature_excess / 20))
-	var radius: int = int(profile[index].radius_mm)
+	var radius: int = current_radius
 	var lateral_force: int = int(mass_kg * old_velocity * old_velocity / maxi(1, radius * 1000))
 	var lateral_use: int = mini(1000, int(lateral_force * 1000 / maxi(1, grip_n)))
 	var work_multiplier: int = 1000 + int(lateral_use / 3) + (220 if braking else 0)

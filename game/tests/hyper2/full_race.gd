@@ -12,6 +12,7 @@ func run() -> void:
 	if "hyper23" in args: scenario.hyper23_physics=true
 	if "hyper30" in args: scenario.hyper30_physics=true
 	if "hyper301" in args: scenario.hyper301_physics=true
+	if "hyper302" in args: scenario.hyper302_physics=true
 	if not k.initialize(scenario): quit(1); return
 	var begin: int = Time.get_ticks_msec()
 	var resume_checked: bool = false

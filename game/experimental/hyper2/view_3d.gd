@@ -36,12 +36,18 @@ func configure(raw: Array,title_text: String,teams: Array,colors: Dictionary)->v
 	for i in range(points.size()):
 		lengths.append(total); total+=points[i].distance_to(points[(i+1)%points.size()])
 	var route: PackedVector2Array=points.duplicate(); route.append(points[0]); track_3d.set_track_data(route,title_text,teams)
+func configure_profile(profile:Array,lap:int,title_text:String,teams:Array,colors:Dictionary)->void:
+	points.clear();lengths.clear();previous.clear();targets.clear();team_colors=colors.duplicate();total=float(lap)
+	for sample in profile:
+		points.append(Vector2(float(sample.x)/1000.0,float(sample.y)/1000.0));lengths.append(float(sample.start_mm))
+	var route:PackedVector2Array=points.duplicate();route.append(points[0]);track_3d.set_track_data(route,title_text,teams)
 func point(progress: float)->Vector2:
 	if total<=0: return Vector2.ZERO
 	var target: float=fposmod(progress,1.0)*total
 	var i: int=clampi(lengths.bsearch(target,true)-1,0,points.size()-1)
 	var b: Vector2=points[(i+1)%points.size()]
-	return points[i].lerp(b,clampf((target-lengths[i])/maxf(0.00001,points[i].distance_to(b)),0,1))
+	var end_mm:float=total if i==points.size()-1 else lengths[i+1]
+	return points[i].lerp(b,clampf((target-lengths[i])/maxf(0.00001,end_mm-lengths[i]),0,1))
 func feed(cars: Array,id: int,interval: float=0.25)->void:
 	previous=targets; targets={}; age=0.0; duration=maxf(0.01,interval); selected_id=id
 	for car in cars:
@@ -50,7 +56,10 @@ func feed(cars: Array,id: int,interval: float=0.25)->void:
 		if car.has("mega_30"):lane=float(car.mega_30.lateral_mm)/1000.0
 		targets[int(car.id)]={"id":int(car.id),"team":str(car.team),"color":str(team_colors.get(str(car.team),"#bbbbbb")),"progress":float(car.progress_units)/1000000.0,"race_lane":lane,"grid":int(car.grid),"tire":str(car.tire),"drs_active":bool(car.hyper.drs_active),"combat_target_id":int(car.racecraft.target_id),"combat_state":str({"ATTACK":"attacking","SIDE_BY_SIDE":"duel","PREPARE":"preparing"}.get(str(car.racecraft.phase),"clear")),"finished":false}
 func _process(delta:float)->void:
-	if not is_visible_in_tree() or total<=0 or targets.is_empty(): return
+	if not is_visible_in_tree() or total<=0:return
+	if targets.is_empty():
+		if not previous.is_empty():track_3d.set_race_cars([],selected_id,delta);previous.clear()
+		return
 	age+=delta
 	var alpha: float=clampf(age/duration,0,1)
 	var field: Array=[]; var selected: Dictionary={}; var rival: Variant=null
