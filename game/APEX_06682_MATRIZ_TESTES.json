@@ -1,0 +1,127 @@
+{
+  "version": "0.6.6.8.2",
+  "classification": "HYBRID_COMPATIBILITY",
+  "status_counts": {
+    "PASS": 13,
+    "FAIL": 0,
+    "INCONCLUSIVE": 1,
+    "BLOCKED": 1,
+    "NOT_RUN": 4
+  },
+  "tests": [
+    {
+      "name": "Godot 4.7.2 editor import",
+      "status": "PASS",
+      "evidence": "apex2_06682_import.log",
+      "notes": "Headless editor initialization, no parser errors"
+    },
+    {
+      "name": "Primary runtime contract, four circuits",
+      "status": "PASS",
+      "evidence": "apex2_06682_primary_contract_v2.log",
+      "notes": "86 assertions; 220 ticks / track; every sporting hash Core2 equals APEX2 hybrid"
+    },
+    {
+      "name": "Real game scene integration",
+      "status": "PASS",
+      "evidence": "primary_06682_scene.log",
+      "notes": "17 assertions: runtime primary, 24 cars, 3D, V21 and HUD"
+    },
+    {
+      "name": "HUD ReBroadcast integration",
+      "status": "PASS",
+      "evidence": "apex2_06682_reg_hud_rebroadcast_0668_integration.log",
+      "notes": "34 assertions"
+    },
+    {
+      "name": "Replay 200 ticks & speed regression",
+      "status": "PASS",
+      "evidence": "apex2_06682_reg_replay_0660_test.log",
+      "notes": "Existing official replay regression"
+    },
+    {
+      "name": "APEX2 experimental kernel determinism",
+      "status": "PASS",
+      "evidence": "apex2_06682_test_kernel.log",
+      "notes": "525 checks, still isolated"
+    },
+    {
+      "name": "APEX2 experimental Command Queue",
+      "status": "PASS",
+      "evidence": "apex2_06682_test_pit_queue.log",
+      "notes": "97 checks, still isolated"
+    },
+    {
+      "name": "Wet Spa V21 pit guard through lap 5",
+      "status": "PASS",
+      "evidence": "apex2_06682_pit_v21_wet.log",
+      "notes": "2,504 ticks; no early pit under heavy rain"
+    },
+    {
+      "name": "Real graphics 3D 1600x900 and 2D 1920x1080",
+      "status": "PASS",
+      "evidence": "apex2_06682_visual.log",
+      "notes": "Actual Godot OpenGL/Mesa Xvfb capture"
+    },
+    {
+      "name": "Real Pit Wall screens 1600/1920",
+      "status": "PASS",
+      "evidence": "apex2_06682_pitwall_graphics.log",
+      "notes": "No failed calls in second graphical run; audio unavailable"
+    },
+    {
+      "name": "Monza 53-lap sporting/seek regression",
+      "status": "PASS",
+      "evidence": "apex2_06682_monza_full.log",
+      "notes": "24,431 ticks, historical SHA-256 and read-only seeks"
+    },
+    {
+      "name": "Same-physics headless CPU A/B",
+      "status": "PASS",
+      "evidence": "qa/apex2_primary_06682/benchmark.json",
+      "notes": "Four circuits, 160 ticks / engine; not an FPS benchmark"
+    },
+    {
+      "name": "Core2 fallback setting",
+      "status": "PASS",
+      "evidence": "apex2_06682_primary_contract_v2.log",
+      "notes": "ProjectSettings apex2/primary_controller=false"
+    },
+    {
+      "name": "GP full distance in other 3 tracks",
+      "status": "NOT_RUN",
+      "evidence": "",
+      "notes": "Beyond current short-scenario coverage"
+    },
+    {
+      "name": "Real user GPU and FPS comparison",
+      "status": "NOT_RUN",
+      "evidence": "",
+      "notes": "Requires target user PC, screenshots on Mesa are not GPU field results"
+    },
+    {
+      "name": "Next Engine full native replacement of Core2 sport physics",
+      "status": "BLOCKED",
+      "evidence": "",
+      "notes": "1.0 integrator lacks physics, pits, tyre strategy and racecraft parity"
+    },
+    {
+      "name": "20-season save endurance",
+      "status": "NOT_RUN",
+      "evidence": "",
+      "notes": "Outside v0.6.6.8.2 migration scope"
+    },
+    {
+      "name": "Headless Pit Wall screenshot attempt",
+      "status": "INCONCLUSIVE",
+      "evidence": "apex2_06682_reg_retest_pitwall_0667_queue_aware.log",
+      "notes": "Dummy renderer returned null texture; re-run with graphical Xvfb passed"
+    },
+    {
+      "name": "Native screen resolution 1366x768 real GPU",
+      "status": "NOT_RUN",
+      "evidence": "",
+      "notes": "Previously virtual X11 gave 1365x768; not repeated on target hardware"
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+RACECRAFT_0662_GP_PASS { "track": "ITA", "laps": 3, "ticks": 1553, "hash": "5d4c508a64dce8d1c481a3661f56c6bdf97a2a7a7bab37a5e290be5e54188592", "live_ms": 25877, "replay_ms": 17953, "counts": { "approaches": 181, "attack_signals": 84, "defense_signals": 9, "yield_signals": 4, "duel_entries": 8, "blocked_ticks": 7143, "confirmed_passes": 5, "position_gains_other": 63, "contacts": 0, "driving_errors": 0 } }

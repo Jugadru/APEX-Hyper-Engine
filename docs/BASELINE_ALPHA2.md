@@ -1,0 +1,3 @@
+# Hyper Alpha 2 — independent baseline candidate
+
+Source import commit 5fc77b058ad752248b328c8804bf4e0f8bf4b22c; owner-generated inventory 3134 files, none excluded. Archive SHA recorded as dbb2759f637f702c2dcf6d2f914a325828651cb05e34a86152c9c2b833fdfd6b. Byte verification and original game directional tests added. No changes to game files in this PR. Hosted Godot 4.7.2 headless, no GPU, FULL suite or entire career. Scope includes real game import, original evolution/calendar/replay/manual wet V21/workshop/menu/UI fixtures. Await exact candidate results before merge. User authorized independent development and transfer; third-party rights not independently audited. Existing public imported archive is not a new release.

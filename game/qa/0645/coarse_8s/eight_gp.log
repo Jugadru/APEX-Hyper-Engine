@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+GP_PASS code=AUS laps=58 time=5320 temp_min=33.3 temp_max=37.2 grip_min=1.075 grip_max=1.110 rubber_start=8 rubber_max=42 wet=false stops=48 winner=Fernando Alonso
+GP_PASS code=MAL laps=56 time=6704 temp_min=26.5 temp_max=37.4 grip_min=0.742 grip_max=0.758 rubber_start=8 rubber_max=8 wet=true stops=76 winner=Fernando Alonso
+GP_PASS code=MON laps=78 time=6192 temp_min=34.7 temp_max=38.8 grip_min=1.132 grip_max=1.177 rubber_start=8 rubber_max=47 wet=false stops=72 winner=Sebastian Vettel
+GP_PASS code=GBR laps=52 time=5352 temp_min=16.6 temp_max=34.1 grip_min=0.942 grip_max=1.096 rubber_start=8 rubber_max=34 wet=true stops=91 winner=Fernando Alonso
+GP_PASS code=BEL laps=44 time=5824 temp_min=15.4 temp_max=26.3 grip_min=0.818 grip_max=0.849 rubber_start=8 rubber_max=8 wet=true stops=70 winner=Sebastian Vettel
+GP_PASS code=ITA laps=53 time=4720 temp_min=37.8 temp_max=41.7 grip_min=1.027 grip_max=1.062 rubber_start=8 rubber_max=37 wet=false stops=24 winner=Fernando Alonso
+GP_PASS code=SIN laps=59 time=6944 temp_min=25.7 temp_max=43.9 grip_min=0.919 grip_max=1.031 rubber_start=8 rubber_max=30 wet=true stops=112 winner=Fernando Alonso
+GP_PASS code=BRA laps=71 time=5632 temp_min=35.6 temp_max=40.2 grip_min=1.061 grip_max=1.110 rubber_start=8 rubber_max=51 wet=false stops=42 winner=Sebastian Vettel
+APEX_0645_TEST_OK complete_grands_prix=8

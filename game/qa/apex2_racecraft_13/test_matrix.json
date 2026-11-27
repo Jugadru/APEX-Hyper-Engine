@@ -1,0 +1,215 @@
+{
+  "version": "APEX2_NEXT_ENGINE_1.3_RACECRAFT_EXPERIMENTAL",
+  "cases": [
+    {
+      "area": "Arquivo-base",
+      "case": "CRC e SHA-256 1.2",
+      "status": "PASS",
+      "evidence": "ZIP fonte SHA-256 b5dad47f0e0ab5e38317c8adfb4302749cfa6bbf87f62511ac4174fcc749cb44",
+      "notes": ""
+    },
+    {
+      "area": "Engine",
+      "case": "Godot 4.7.2 import headless single-threaded",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/logs/import_single_thread.log",
+      "notes": ""
+    },
+    {
+      "area": "Novo módulo",
+      "case": "Racecraft 1.3 unit/fixture",
+      "status": "PASS",
+      "evidence": "tests/apex2/test_racecraft_13.gd: 37 assertions",
+      "notes": "including actual measured pass and no fabricated position exchange"
+    },
+    {
+      "area": "Novo módulo",
+      "case": "Determinismo (4 pistas) e checkpoints",
+      "status": "PASS",
+      "evidence": "tests/apex2/test_racecraft_determinism_13.gd: 53 assertions",
+      "notes": ""
+    },
+    {
+      "area": "Novo módulo",
+      "case": "Monza curta 24 carros",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/stress.json: 2200 ticks, 2 confirmed passes",
+      "notes": ""
+    },
+    {
+      "area": "Novo módulo",
+      "case": "Monza prolongada e replay",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/long_run.json: 8000 ticks, 2 confirmed passes",
+      "notes": ""
+    },
+    {
+      "area": "Motor experimental",
+      "case": "Kernel 1.0",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/logs/test_kernel.log: 525 assertions",
+      "notes": ""
+    },
+    {
+      "area": "Comandos",
+      "case": "Command Queue",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/logs/test_pit_queue.log: 97 assertions",
+      "notes": ""
+    },
+    {
+      "area": "Vehicle 1.1",
+      "case": "Causalidade e matemática",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/logs/test_vehicle_11.log: 31 assertions",
+      "notes": ""
+    },
+    {
+      "area": "Vehicle 1.1",
+      "case": "Determinismo",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/logs/test_vehicle_determinism_11.log: 45 assertions",
+      "notes": ""
+    },
+    {
+      "area": "Pit",
+      "case": "V21 experimental",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/logs/test_vehicle_pit_11.log",
+      "notes": ""
+    },
+    {
+      "area": "Driver Brain 1.2",
+      "case": "Decisões e comandos",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/logs/test_driver_12.log: 51 assertions",
+      "notes": ""
+    },
+    {
+      "area": "Driver Brain 1.2",
+      "case": "Determinismo",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/logs/test_driver_determinism_12.log: 53 assertions",
+      "notes": ""
+    },
+    {
+      "area": "UI oficial",
+      "case": "HUD unitária",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/logs/hud_rebroadcast_0668_unit.log",
+      "notes": ""
+    },
+    {
+      "area": "UI oficial",
+      "case": "HUD integração",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/logs/hud_rebroadcast_0668_integration.log: 34 assertions",
+      "notes": ""
+    },
+    {
+      "area": "UI oficial",
+      "case": "HUD ordens pendentes",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/logs/hud_rebroadcast_06681_pending_orders.log: 30 assertions",
+      "notes": ""
+    },
+    {
+      "area": "Jogo oficial",
+      "case": "Cena principal e controlador de ticks",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/logs/primary_06682_scene.log: 17 assertions",
+      "notes": ""
+    },
+    {
+      "area": "Benchmark",
+      "case": "Medição headless 4 pistas",
+      "status": "PASS",
+      "evidence": "qa/apex2_racecraft_13/benchmark.json: 160 ticks/modelo/pista",
+      "notes": ""
+    },
+    {
+      "area": "Benchmark",
+      "case": "Generalização de desempenho ou FPS",
+      "status": "INCONCLUSIVE",
+      "evidence": "Benchmark curto com conjunto diferente de regras, sem GPU real",
+      "notes": ""
+    },
+    {
+      "area": "Jogo oficial",
+      "case": "Teste de contrato A/B extenso",
+      "status": "INCONCLUSIVE",
+      "evidence": "Interrompido por limite de execução na auditoria, sem conclusão",
+      "notes": ""
+    },
+    {
+      "area": "Jogo oficial",
+      "case": "Corrida completa de Monza no Core 2 nesta release",
+      "status": "NOT_RUN",
+      "evidence": "Não rerodada; código de produção sem alterações",
+      "notes": ""
+    },
+    {
+      "area": "Jogo oficial",
+      "case": "Captura 3D nova nesta release",
+      "status": "NOT_RUN",
+      "evidence": "Não há alterações de apresentação; capturas anteriores não substituem teste novo",
+      "notes": ""
+    },
+    {
+      "area": "Ambiente do usuário",
+      "case": "FPS no PC real",
+      "status": "NOT_RUN",
+      "evidence": "Depende de execução pelo usuário",
+      "notes": ""
+    },
+    {
+      "area": "Motor experimental",
+      "case": "Contato e penalidades físicas completas",
+      "status": "NOT_RUN",
+      "evidence": "Fora do escopo do resolvedor 1.3",
+      "notes": ""
+    },
+    {
+      "area": "Motor experimental",
+      "case": "Corredores calibrados com largura oficial",
+      "status": "NOT_RUN",
+      "evidence": "Geometria sintética",
+      "notes": ""
+    },
+    {
+      "area": "Arquivos",
+      "case": "Preservação byte a byte da base exceto Vehicle experimental",
+      "status": "PASS",
+      "evidence": "Verificação zipfile SHA-256 de 2.933 arquivos; 1 alterado",
+      "notes": ""
+    },
+    {
+      "area": "ZIP final — extração limpa",
+      "case": "Primeira importação headless com --single-threaded-scene",
+      "status": "FAIL",
+      "evidence": "APEX2_RACECRAFT_13_CLEAN_IMPORT.log (externo): exit 139, segmentation fault durante reimportação",
+      "notes": "Causa não isolada; também observada em versão 1.2 e pode ser infraestrutura do editor; não mascarar como PASS."
+    },
+    {
+      "area": "ZIP final — extração limpa",
+      "case": "Repetição da importação após falha",
+      "status": "PASS",
+      "evidence": "APEX2_RACECRAFT_13_CLEAN_IMPORT_RETRY.log (externo): exit 0",
+      "notes": "Contorno não equivale a homologação de importação pela primeira vez."
+    },
+    {
+      "area": "ZIP final — extração limpa",
+      "case": "Testes 1.3 de 37, determinismo 53 e cena 17",
+      "status": "PASS",
+      "evidence": "Logs separados APEX2_13_FINAL_*.log (externos), exit 0",
+      "notes": "Executados diretamente a partir de cópia extraída do ZIP final."
+    }
+  ],
+  "counts": {
+    "PASS": 21,
+    "FAIL": 1,
+    "INCONCLUSIVE": 2,
+    "BLOCKED": 0,
+    "NOT_RUN": 5
+  }
+}

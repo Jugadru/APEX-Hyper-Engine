@@ -1,0 +1,192 @@
+{
+  "release": "APEX2 Next Engine 1.2 Driver Brain Experimental",
+  "baseline_zip": "APEX_MOTORSPORT_MANAGER_APEX2_NEXT_ENGINE_1.1_VEHICLE_DYNAMICS_EXPERIMENTAL_COMPLETO.zip",
+  "baseline_sha256": "66fbf719d5098dbe9948348bf9dab94edd2b4f1effca7baaf257fc005013a6a4",
+  "preserved_baseline_files_unchanged": 2896,
+  "modified_existing_files": [],
+  "new_files": [
+    {
+      "path": "experimental/apex2/driver_brain.gd",
+      "size": 6090,
+      "sha256": "e7cca5be18960e23b87b81288db7fed0fa9d6ce3bda3d49ef36818d1c0e57e21"
+    },
+    {
+      "path": "experimental/apex2/driver_brain.gd.uid",
+      "size": 19,
+      "sha256": "30a1c25a39601dffa94bb02bfc23c14d8f8b3cf8b34abb8505e06a53d82143e5"
+    },
+    {
+      "path": "experimental/apex2/driver_kernel_12.gd",
+      "size": 5217,
+      "sha256": "c483ca3096fc0626f11879a11087a53e979869d61adbb5d6838441672caf495f"
+    },
+    {
+      "path": "experimental/apex2/driver_kernel_12.gd.uid",
+      "size": 20,
+      "sha256": "970915a95a1acc78004abac69a7c8b17637297d9e9d8585bfd8b2336f9959046"
+    },
+    {
+      "path": "tests/apex2/test_driver_12.gd",
+      "size": 9126,
+      "sha256": "3cfededcee95b31e3fd163634584e11e7e9fca689723faaea852aa7b5227bee9"
+    },
+    {
+      "path": "tests/apex2/test_driver_12.gd.uid",
+      "size": 19,
+      "sha256": "aaaeae036c5c124e687d758470d77f80f3941259b39f396b991af7c9b302784f"
+    },
+    {
+      "path": "tests/apex2/test_driver_determinism_12.gd",
+      "size": 3163,
+      "sha256": "e165ea111e26a19a98ff78ed6f7583c06e884b601023c66782f882347182c116"
+    },
+    {
+      "path": "tests/apex2/test_driver_determinism_12.gd.uid",
+      "size": 20,
+      "sha256": "65c42941cfbdad6bb1a0fa2f573e9ed9ce70cebea62355041682c3b026cec6fb"
+    },
+    {
+      "path": "tests/apex2/test_driver_stress_12.gd",
+      "size": 2049,
+      "sha256": "a8f453e2661b0152486edfaf47a0bb659dcf2dcb55de7f2712d1eb451db04b75"
+    },
+    {
+      "path": "tests/apex2/test_driver_stress_12.gd.uid",
+      "size": 20,
+      "sha256": "455bfd4b750ceb9da1fda0a06a0d220fcef24ede08972547ff592bc698f6c77a"
+    },
+    {
+      "path": "tests/apex2/benchmark_driver_12.gd",
+      "size": 2691,
+      "sha256": "4da6f0c6c84b33ed730517414784470ac444052ac08f3a9cc1cc3d23ae922acc"
+    },
+    {
+      "path": "tests/apex2/benchmark_driver_12.gd.uid",
+      "size": 20,
+      "sha256": "3ea292d4c6ef959d20ea67e8dd56ed4779c63cf29c13d6fd6472ceab88b478ac"
+    },
+    {
+      "path": "qa/apex2_driver_12/benchmark_driver_12.json",
+      "size": 5913,
+      "sha256": "3cfe90e6abdf694e0366af00b139b504fdfbfe09aa9d659994b8927c9416111f"
+    },
+    {
+      "path": "APEX2_DRIVER_12_TESTES.json",
+      "size": 4569,
+      "sha256": "235d04a6cf74503398afddc417eb5fe879fdb98ba35db73e377e9c0217c3e460"
+    },
+    {
+      "path": "APEX2_DRIVER_12_RELATORIO_TECNICO.md",
+      "size": 6900,
+      "sha256": "a876c51f05bd837cd4a490d28d8a6e1b6dbce3df00ef359a6b24855d34ef63fc"
+    },
+    {
+      "path": "APEX2_DRIVER_12_CHANGELOG.md",
+      "size": 732,
+      "sha256": "e3c6c4520c77279469097121755d7a4d7651ccdfc8d1df2c0a182cd9dc822f48"
+    },
+    {
+      "path": "LEIA_PRIMEIRO_APEX2_DRIVER_12.md",
+      "size": 2021,
+      "sha256": "7e6de1baa52767eaefb36e5dd28c7368ca0def86e990d6e1c0333a0b558f3ed4"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/benchmark_driver_12.log",
+      "size": 677,
+      "sha256": "254d91dd694a59cd2a6ba95ff3e5644f1461739d47090a2226999ce173cb8cb1"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/clean_import_default_failed.log",
+      "size": 33061,
+      "sha256": "4895d6647e3c6e2eeb3607178cb7ab69e0b0ff9e50c444e122c2d5fbbc91a442"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/clean_import_single_thread_retry.log",
+      "size": 35423,
+      "sha256": "7f569cebc1a172cbb0d1b8c794ec05dec7d753156b64caf982e23d8e5711a37c"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/fresh_single_thread_import.log",
+      "size": 35346,
+      "sha256": "861ec2d184f4bde5dd29540b94b342639f9ae4156227a8764b68b6b35ad4a9f3"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/hud_rebroadcast_06681_pending_orders.log",
+      "size": 389,
+      "sha256": "f65322c9c75f88bd5376fa7af7c42aae2a629c6f93b8ca93c9522a864c43775d"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/hud_rebroadcast_0668_integration.log",
+      "size": 380,
+      "sha256": "34af4256a29cc34b3ae48d5cc21470a9d8b92ddb4ce6616ef2ee2f770f5291f5"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/hud_rebroadcast_0668_unit.log",
+      "size": 390,
+      "sha256": "cc6f9c6c9cfaceeb7a8d0d11c880f4ee606edae6abd6ae18e55ad99af308741b"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/import_472_editor.log",
+      "size": 1775,
+      "sha256": "7ad2acb258b0a1f7c69ed61402e64cca4824de3ee91d413598d53f91acb1e4dc"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/primary_06682_contract.log",
+      "size": 820,
+      "sha256": "14e6c6282c9ddcd1b05ace8186b2f8a5877573d9ab222fd4c1c4cf1d23b62483"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/primary_06682_scene.log",
+      "size": 369,
+      "sha256": "09b7b2e54c8688f388607bef46a4f1e5a30e0695d21ae4683080ad6747f50b5f"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/test_driver_12.log",
+      "size": 365,
+      "sha256": "f13a503f421f0a5cfaf00d392fdb6c0ab63257e4c45748e9b1442c386ca4370d"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/test_driver_determinism_12.log",
+      "size": 793,
+      "sha256": "d40c9c08f78994991c298aa8f97da87cc024812f348d50e02127d6b24d1b6584"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/test_driver_stress_12.log",
+      "size": 405,
+      "sha256": "2a6406f429ac24577e8b56bbd3b39c96bacae4dd7e3ccfcf210ba339eea5b926"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/test_kernel.log",
+      "size": 431,
+      "sha256": "bc20d1e8c4c52650389f5fcc5bd4fcb46922a672b740d99c1dc7ac989b2d1d85"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/test_pit_queue.log",
+      "size": 431,
+      "sha256": "a978b3e2dc27ba6b81603dc8c2a1411a1ad12c1037619c242ef9edb4ea2c4570"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/test_replay.log",
+      "size": 434,
+      "sha256": "4093fac5141af706cb7a6e26bc7669e25ecff7cb5492b0dcd848ebae1a19fd93"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/test_vehicle_11.log",
+      "size": 436,
+      "sha256": "180a8bf0145c6e8ffb6bfc00d7d5df351ae40b4dffd8c65182bca03bb64f9167"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/test_vehicle_determinism_11.log",
+      "size": 790,
+      "sha256": "06f5f1bfa7cc7a9e1e66bca80fc86c093134b0ef8ba1c4df776afd2ab5143ce6"
+    },
+    {
+      "path": "qa/apex2_driver_12/logs/test_vehicle_pit_11.log",
+      "size": 439,
+      "sha256": "f8f8ff500448b3cd20472ff99e4eda1ebdde57b9e25dcd42635dd99e438148d4"
+    }
+  ],
+  "manifest_self_excluded_from_new_files_hash_list": true,
+  "game_production_code_untouched": true,
+  "qa_paths": "qa/apex2_driver_12"
+}

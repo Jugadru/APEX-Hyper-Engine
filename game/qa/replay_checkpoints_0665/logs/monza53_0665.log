@@ -1,0 +1,9 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+CHECKPOINT_0665_FULL_PROGRESS {"checkpoints":9,"elapsed_seconds":172.295665,"leader_lap":10,"tick":4000}
+CHECKPOINT_0665_FULL_PROGRESS {"checkpoints":9,"elapsed_seconds":302.787778,"leader_lap":19,"tick":8000}
+CHECKPOINT_0665_FULL_PROGRESS {"checkpoints":9,"elapsed_seconds":387.270546,"leader_lap":28,"tick":12000}
+CHECKPOINT_0665_FULL_PROGRESS {"checkpoints":9,"elapsed_seconds":449.141154,"leader_lap":37,"tick":16000}
+CHECKPOINT_0665_FULL_PROGRESS {"checkpoints":9,"elapsed_seconds":503.409469,"leader_lap":46,"tick":20000}
+CHECKPOINT_0665_FULL_PROGRESS {"checkpoints":9,"elapsed_seconds":554.716498,"leader_lap":53,"tick":24000}
+CHECKPOINT_0665_FULL_PASS {"archive_bytes":41544880,"checkpoints":[0,2400,4200,6600,7800,10200,15000,19800,24300],"hash":"2a7e27179177858b8754a0c65666b325499e4aa13d423de060181b11d9ae1c4b","load_s":2.31097,"save_s":2.886446,"seeks":[{"hash_match":true,"seconds":45.470788,"tick":10000},{"hash_match":true,"seconds":2.660841,"tick":20000},{"hash_match":true,"seconds":2.25448,"tick":24431}],"ticks":24431}

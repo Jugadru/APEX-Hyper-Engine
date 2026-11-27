@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+APEX2_DRIVER_12_HASH GBR tick=440 hash=b59a872c38832e7667ba18e0e83eff925cb5a9776a7dcd44e202164b443c4341
+APEX2_DRIVER_12_HASH BEL tick=440 hash=e7792fe481a02e3e62d4100c9784e6a4bdbb3301908f591cb4ac5f2f28c6a18f
+APEX2_DRIVER_12_HASH ITA tick=440 hash=dbb0afbe8215c0464ee3bab2561aa7d2bb16efa75b2fe4dc899ffd6783acd75e
+APEX2_DRIVER_12_HASH SIN tick=440 hash=a263174cbb813927bbfbc95ee30ac77f8fd70aa6567d024eaae35c97ef3e293d
+APEX2_DRIVER_DETERMINISM_12_PASS checks=53 problems=[]

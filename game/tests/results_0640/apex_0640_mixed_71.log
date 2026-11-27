@@ -1,0 +1,7 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+APEX 0640 MIXED GP RESULT {"auto_pits":[21,46],"clock":5639.99999999706,"drivers":24,"errors":0,"invalid_laps":0,"laps":71,"manual_pits":[23,48],"steps":1410,"track":"BRA"}
+APEX 0640 MIXED GP PASS

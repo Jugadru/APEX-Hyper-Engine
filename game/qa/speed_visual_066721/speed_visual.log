@@ -1,0 +1,14 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+SPEED_PROFILE speed=1.0 stationary_new=12 stationary_old=12
+SPEED_PROFILE speed=5.0 stationary_new=2 stationary_old=2
+SPEED_VISUAL_066721_PASS {"1x":{"cv_new":0.00000000000000518720210617653,"cv_old":1.251132055394,"last_progress":0.018,"static_frames_new":12,"static_frames_prior":12,"ticks":9},"5x":{"cv_new":0.00000000000000587183863213579,"cv_old":0.279461476970842,"last_progress":0.0980000000000001,"static_frames_new":2,"static_frames_prior":2,"ticks":49}}
+WARNING: 1 RID of type "CanvasItem" was leaked.
+   at: _free_rids (servers/rendering/renderer_canvas_cull.cpp:2733)
+WARNING: 6 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 2 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

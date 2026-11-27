@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+APEX_06499_MODEL_TRACK_PASS GBR lap=3 pit_loss=21.5 cases=6
+APEX_06499_MODEL_TRACK_PASS ITA lap=3 pit_loss=19.5 cases=6
+APEX_06499_MODEL_TRACK_PASS SIN lap=3 pit_loss=23.0 cases=6
+APEX_06499_MODEL_PASS actual 3-track telemetry, projection bounds, confirmed/potential stack, clipped horizon and pure previews

@@ -1,0 +1,22 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+GP_START code=GBR seed=6403 step=0.20 engine=4.7.2-stable (official)
+GP_PROGRESS code=GBR lap=4/52 sim_s=300.0 wall_s=24.6
+GP_PROGRESS code=GBR lap=7/52 sim_s=600.0 wall_s=34.6
+GP_PROGRESS code=GBR lap=10/52 sim_s=900.0 wall_s=44.3
+GP_PROGRESS code=GBR lap=13/52 sim_s=1200.0 wall_s=54.5
+GP_PROGRESS code=GBR lap=16/52 sim_s=1500.0 wall_s=61.7
+GP_PROGRESS code=GBR lap=19/52 sim_s=1800.0 wall_s=66.3
+GP_PROGRESS code=GBR lap=22/52 sim_s=2100.0 wall_s=70.5
+GP_PROGRESS code=GBR lap=25/52 sim_s=2400.0 wall_s=74.9
+GP_PROGRESS code=GBR lap=28/52 sim_s=2700.0 wall_s=79.2
+GP_PROGRESS code=GBR lap=31/52 sim_s=3000.0 wall_s=83.4
+GP_PROGRESS code=GBR lap=34/52 sim_s=3300.0 wall_s=87.5
+GP_PROGRESS code=GBR lap=36/52 sim_s=3600.0 wall_s=91.7
+GP_PROGRESS code=GBR lap=39/52 sim_s=3900.0 wall_s=96.2
+GP_PROGRESS code=GBR lap=42/52 sim_s=4200.0 wall_s=101.8
+GP_PROGRESS code=GBR lap=45/52 sim_s=4500.0 wall_s=108.8
+GP_PROGRESS code=GBR lap=48/52 sim_s=4800.0 wall_s=114.8
+GP_PROGRESS code=GBR lap=51/52 sim_s=5100.0 wall_s=120.6
+GP_PASS code=GBR laps=52 time=5287 temp_min=15.0 temp_max=34.1 grip_min=0.904 grip_max=1.098 rubber_start=8 rubber_max=35 wet=true stops=78 winner=Fernando Alonso
+APEX_0645_TEST_OK complete_grands_prix=1

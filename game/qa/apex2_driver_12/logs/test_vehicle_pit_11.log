@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+APEX2_VEHICLE_PIT_V21_PASS crossing_tick=38931 hash=f1cb47aa6cc29b6f0d62dbf39f2dadc3f1911b78086ab0553a58c2cb5b695cf3

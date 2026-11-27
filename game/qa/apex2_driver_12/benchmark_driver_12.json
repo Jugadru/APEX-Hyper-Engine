@@ -1,0 +1,200 @@
+{
+  "hardware": "current host Godot headless",
+  "label": "Experimental only — 24 cars, median of three runs each, 180 timed ticks after 20 warmup",
+  "not_core2_comparison": true,
+  "not_fps": true,
+  "scenarios": [
+    {
+      "driver_12_median_us_per_tick": 1356.93,
+      "driver_12_samples": [
+        {
+          "events": 84,
+          "hash": "37e7325ca5699bb2f1bc057c6cf79612de2c99b5ac5e51ae7bf5358e34b1998e",
+          "ticks": 180,
+          "us_per_tick": 1116.36
+        },
+        {
+          "events": 84,
+          "hash": "37e7325ca5699bb2f1bc057c6cf79612de2c99b5ac5e51ae7bf5358e34b1998e",
+          "ticks": 180,
+          "us_per_tick": 1356.93
+        },
+        {
+          "events": 84,
+          "hash": "37e7325ca5699bb2f1bc057c6cf79612de2c99b5ac5e51ae7bf5358e34b1998e",
+          "ticks": 180,
+          "us_per_tick": 2255.85
+        }
+      ],
+      "overhead_percent": 33.92,
+      "rules_parity": false,
+      "track": "GBR",
+      "vehicle_11_median_us_per_tick": 1013.26,
+      "vehicle_11_samples": [
+        {
+          "events": 24,
+          "hash": "ff3d8f5ecff6ae0142a08099b57efd65b1262c976626bf34b97296c070148a4f",
+          "ticks": 180,
+          "us_per_tick": 986.7
+        },
+        {
+          "events": 24,
+          "hash": "ff3d8f5ecff6ae0142a08099b57efd65b1262c976626bf34b97296c070148a4f",
+          "ticks": 180,
+          "us_per_tick": 1013.26
+        },
+        {
+          "events": 24,
+          "hash": "ff3d8f5ecff6ae0142a08099b57efd65b1262c976626bf34b97296c070148a4f",
+          "ticks": 180,
+          "us_per_tick": 3276.04
+        }
+      ],
+      "weather": "Seco"
+    },
+    {
+      "driver_12_median_us_per_tick": 6507.71,
+      "driver_12_samples": [
+        {
+          "events": 86,
+          "hash": "8d3945415a27e216ace5354bfcf26c41d69e86b3b6388247a0c003622492e6c0",
+          "ticks": 180,
+          "us_per_tick": 6507.71
+        },
+        {
+          "events": 86,
+          "hash": "8d3945415a27e216ace5354bfcf26c41d69e86b3b6388247a0c003622492e6c0",
+          "ticks": 180,
+          "us_per_tick": 1263.29
+        },
+        {
+          "events": 86,
+          "hash": "8d3945415a27e216ace5354bfcf26c41d69e86b3b6388247a0c003622492e6c0",
+          "ticks": 180,
+          "us_per_tick": 7235.53
+        }
+      ],
+      "overhead_percent": 127.23,
+      "rules_parity": false,
+      "track": "BEL",
+      "vehicle_11_median_us_per_tick": 2863.88,
+      "vehicle_11_samples": [
+        {
+          "events": 24,
+          "hash": "f626bf01d989073469cdeed0078e9aa75450774e6552dc7349397a7a10efcf03",
+          "ticks": 180,
+          "us_per_tick": 4027.95
+        },
+        {
+          "events": 24,
+          "hash": "f626bf01d989073469cdeed0078e9aa75450774e6552dc7349397a7a10efcf03",
+          "ticks": 180,
+          "us_per_tick": 968.23
+        },
+        {
+          "events": 24,
+          "hash": "f626bf01d989073469cdeed0078e9aa75450774e6552dc7349397a7a10efcf03",
+          "ticks": 180,
+          "us_per_tick": 2863.88
+        }
+      ],
+      "weather": "Chuva intensa"
+    },
+    {
+      "driver_12_median_us_per_tick": 2172.94,
+      "driver_12_samples": [
+        {
+          "events": 76,
+          "hash": "b5b6a52009dc70b6374c7a6a4bd1b0da68bcfa21ec951f57a0855efb4e5b606d",
+          "ticks": 180,
+          "us_per_tick": 2172.94
+        },
+        {
+          "events": 76,
+          "hash": "b5b6a52009dc70b6374c7a6a4bd1b0da68bcfa21ec951f57a0855efb4e5b606d",
+          "ticks": 180,
+          "us_per_tick": 2577.9
+        },
+        {
+          "events": 76,
+          "hash": "b5b6a52009dc70b6374c7a6a4bd1b0da68bcfa21ec951f57a0855efb4e5b606d",
+          "ticks": 180,
+          "us_per_tick": 1825.91
+        }
+      ],
+      "overhead_percent": 1.32,
+      "rules_parity": false,
+      "track": "ITA",
+      "vehicle_11_median_us_per_tick": 2144.53,
+      "vehicle_11_samples": [
+        {
+          "events": 24,
+          "hash": "c7193575130444b6b872cbd48e22e82d340f7a821d17a8adb320b798631cd8a3",
+          "ticks": 180,
+          "us_per_tick": 2144.53
+        },
+        {
+          "events": 24,
+          "hash": "c7193575130444b6b872cbd48e22e82d340f7a821d17a8adb320b798631cd8a3",
+          "ticks": 180,
+          "us_per_tick": 2624.57
+        },
+        {
+          "events": 24,
+          "hash": "c7193575130444b6b872cbd48e22e82d340f7a821d17a8adb320b798631cd8a3",
+          "ticks": 180,
+          "us_per_tick": 1048.04
+        }
+      ],
+      "weather": "Seco"
+    },
+    {
+      "driver_12_median_us_per_tick": 1238.64,
+      "driver_12_samples": [
+        {
+          "events": 76,
+          "hash": "2a97bee4cc7755d6212340c93d5827540f54846c35db83f6d6eeefaa64075456",
+          "ticks": 180,
+          "us_per_tick": 1238.64
+        },
+        {
+          "events": 76,
+          "hash": "2a97bee4cc7755d6212340c93d5827540f54846c35db83f6d6eeefaa64075456",
+          "ticks": 180,
+          "us_per_tick": 1221.67
+        },
+        {
+          "events": 76,
+          "hash": "2a97bee4cc7755d6212340c93d5827540f54846c35db83f6d6eeefaa64075456",
+          "ticks": 180,
+          "us_per_tick": 1686.51
+        }
+      ],
+      "overhead_percent": 11.51,
+      "rules_parity": false,
+      "track": "SIN",
+      "vehicle_11_median_us_per_tick": 1110.83,
+      "vehicle_11_samples": [
+        {
+          "events": 24,
+          "hash": "686c48cbeae6edffe4a8321967c1cf7eb576d6a77961160a70fcc1b22745bf88",
+          "ticks": 180,
+          "us_per_tick": 1146.07
+        },
+        {
+          "events": 24,
+          "hash": "686c48cbeae6edffe4a8321967c1cf7eb576d6a77961160a70fcc1b22745bf88",
+          "ticks": 180,
+          "us_per_tick": 1045.43
+        },
+        {
+          "events": 24,
+          "hash": "686c48cbeae6edffe4a8321967c1cf7eb576d6a77961160a70fcc1b22745bf88",
+          "ticks": 180,
+          "us_per_tick": 1110.83
+        }
+      ],
+      "weather": "Chuva intensa"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+APEX_0638_FULL {"code":"BRA","errors":0,"finish_lap_count":14,"lapped":10,"lead_lap":71,"manual":false,"nonpass_gains":157,"ontrack_passes":92,"p2_gap":1.79999999999836,"p2_gap_label":"+1.80s","pits_all":48,"pits_ferrari":4,"record_rejected":0,"steps":1412,"time":5647.99999999705,"tyre_warnings":0,"weather":"Chuva forte","winner":"Sebastian Vettel"}
+APEX 0638 FULL GP TEST PASS

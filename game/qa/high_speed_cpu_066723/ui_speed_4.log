@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+HIGH_SPEED_UI {"accumulator":0.0,"cpu_limited_frames":0,"fast_view_2d":true,"frames":60,"hash":"37b9a7df0ff421d65852e5f1892a7f4343328ec8a5ebc48387a6ccd5dfd965b1","max_frame_ms":42.765,"mean_frame_ms":13.9960166666667,"p95_frame_ms":29.712,"requested_speed":16.0,"ticks":80,"ticks_per_frame":[1,1,2,1,1,1,2,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,2,1,1,1,2,1,2,1,1,2,1,1,2],"time_ms":839.761}

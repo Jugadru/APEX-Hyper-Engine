@@ -1,0 +1,10 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+APEX2_PRIMARY_SCENARIO_PASS GBR ticks=220 hash=3b80f70034ae5b50123dc812bd1357ffe0a2c7015d51bdc8860dcb9fa3f43d3e
+APEX2_PRIMARY_SCENARIO_PASS BEL ticks=220 hash=0730621f5bceca4a27cc6505bf2ca2b36712e89ee72c6cbf5fdc834e4e4f3258
+APEX2_PRIMARY_SCENARIO_PASS ITA ticks=220 hash=f8b9a66d5651b4a2a454d0384637723c682df2ba525fa738d43496136ddb744a
+APEX2_PRIMARY_SCENARIO_PASS SIN ticks=220 hash=b72631d41e100070722a0918d3e3a886acffeae1ec4651326a56d34cfcef25d8
+APEX2_PRIMARY_CONTRACT_PASS checks=86 problems=[]

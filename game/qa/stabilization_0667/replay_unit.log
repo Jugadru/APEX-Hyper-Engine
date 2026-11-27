@@ -1,0 +1,6 @@
+CMD: /mnt/data/apex_v0664_work/godot/Godot_v4.7.2-stable_linux.x86_64 --headless --path /mnt/data/APEX_STABILIZACAO_0667/project -s res://tests/replay_0660_test.gd
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+REPLAY_UNIT_PASS { "pass": true, "ticks": 200, "speeds": [1, 2, 5, 16, 32], "wall_s": 16.39308, "checkpoint_bytes": 220640, "replay_bytes": 160936 }
+
+RESULT: {"test": "replay_unit", "script": "replay_0660_test.gd", "started": "2026-11-16 00:02:56", "status": "PASS", "exit_code": 0, "elapsed_seconds": 17.379}

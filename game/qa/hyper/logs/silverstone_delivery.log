@@ -1,0 +1,12 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+PROGRESS GBR 5050 leader laps=7 fuel=131688
+PROGRESS GBR 10050 leader laps=15 fuel=117226
+PROGRESS GBR 15050 leader laps=22 fuel=100104
+PROGRESS GBR 20050 leader laps=30 fuel=85469
+PROGRESS GBR 25050 leader laps=37 fuel=68918
+PROGRESS GBR 30050 leader laps=45 fuel=53935
+HYPER_FULL {"attempts":50,"checkpoint_parity":true,"clock_s":7005.8,"complete":24,"elapsed_ms":66110,"hash":"ea20b47202bb8351e0bb11feb3656152a6de227c9d5657f103cd8fbea9287d50","passes":9,"retired":0,"status":"PASS","stops":72,"ticks":35029,"track":"GBR","weather":"Chuva intensa","winner":"Jenson Button"}

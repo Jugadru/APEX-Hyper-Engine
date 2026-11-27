@@ -1,0 +1,6 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+TV_DIRECTOR_0667_ISOLATION_PASS {"hash":"b0f63df8f8c9bd957c3bcb90c5010587cb466997e102fb84db589a0400ebc0fb","pass":true,"race_rng_state_identical":true,"seed":660,"telemetry_identical":true,"ticks":750,"track":"GBR","unique_focal_cars":1,"weather":"Chuva intensa"}

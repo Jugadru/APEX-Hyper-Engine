@@ -1,0 +1,3 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+REPLAY_GP_PASS { "track": "GBR", "weather": "Seco", "laps": 3, "ticks": 1669, "live_ms": 11511.009, "replay_ms": 12233.683, "bytes": 3385272, "pit_phases": ["approach", "dock", "service", "queue", "repair", "safety_hold", "exit"], "pit_checkpoint_count": 7, "hash": "aea8a24d1c7746c57cdb18bf3c85ae01f5ec64e7f64480077e7f9c9227456f30", "pass": true }

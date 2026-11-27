@@ -1,0 +1,8 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+SCRIPT ERROR: Assertion failed: double stack did not wait while incident repaired
+          at: _run (res://tests/pit_incidents_double_stack_test.gd:35)
+          GDScript backtrace (most recent call first):
+              [0] _run (res://tests/pit_incidents_double_stack_test.gd:35)
+
+TIMEOUT

@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+WARNING: Started the engine as `root`/superuser. This is a security risk, and subsystems like audio may not work correctly.
+Set the environment variable `GODOT_SILENCE_ROOT_WARNING` to 1 to silence this warning.
+     at: setup2 (main/main.cpp:3581)
+
+APEX2_BENCH_VEHICLE_11 {"gpu_fps_measured":false,"physics_parity":false,"reference_events":0,"reference_us_per_tick":35.4333333333333,"seed":6701,"supports_ai":false,"supports_full_pit":false,"ticks":120,"track":"GBR","vehicle_11_us_per_tick":1054.31666666667,"vehicle_events":24,"weather":"Seco"}
+APEX2_BENCH_VEHICLE_11 {"gpu_fps_measured":false,"physics_parity":false,"reference_events":0,"reference_us_per_tick":37.3666666666667,"seed":6701,"supports_ai":false,"supports_full_pit":false,"ticks":120,"track":"BEL","vehicle_11_us_per_tick":945.233333333333,"vehicle_events":24,"weather":"Chuva intensa"}
+APEX2_BENCH_VEHICLE_11 {"gpu_fps_measured":false,"physics_parity":false,"reference_events":0,"reference_us_per_tick":36.025,"seed":6701,"supports_ai":false,"supports_full_pit":false,"ticks":120,"track":"ITA","vehicle_11_us_per_tick":944.816666666667,"vehicle_events":24,"weather":"Seco"}
+APEX2_BENCH_VEHICLE_11 {"gpu_fps_measured":false,"physics_parity":false,"reference_events":0,"reference_us_per_tick":48.0416666666667,"seed":6701,"supports_ai":false,"supports_full_pit":false,"ticks":120,"track":"SIN","vehicle_11_us_per_tick":1015.85833333333,"vehicle_events":24,"weather":"Chuva intensa"}
+APEX2_VEHICLE_11_BENCHMARK_PASS scenarios=4
+WALL_SEC=1.24 RSS_KB=129284

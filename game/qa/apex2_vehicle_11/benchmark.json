@@ -1,0 +1,62 @@
+{
+  "classification": "MICROBENCHMARK_NOT_EQUIVALENCE",
+  "notes": "Vehicle1.1 adds physics while reference integrates a constant lap fraction; neither replaces production Core2; headless CPU measurement only.",
+  "rows": [
+    {
+      "gpu_fps_measured": false,
+      "physics_parity": false,
+      "reference_events": 0,
+      "reference_us_per_tick": 35.4333333333333,
+      "seed": 6701,
+      "supports_ai": false,
+      "supports_full_pit": false,
+      "ticks": 120,
+      "track": "GBR",
+      "vehicle_11_us_per_tick": 1054.31666666667,
+      "vehicle_events": 24,
+      "weather": "Seco"
+    },
+    {
+      "gpu_fps_measured": false,
+      "physics_parity": false,
+      "reference_events": 0,
+      "reference_us_per_tick": 37.3666666666667,
+      "seed": 6701,
+      "supports_ai": false,
+      "supports_full_pit": false,
+      "ticks": 120,
+      "track": "BEL",
+      "vehicle_11_us_per_tick": 945.233333333333,
+      "vehicle_events": 24,
+      "weather": "Chuva intensa"
+    },
+    {
+      "gpu_fps_measured": false,
+      "physics_parity": false,
+      "reference_events": 0,
+      "reference_us_per_tick": 36.025,
+      "seed": 6701,
+      "supports_ai": false,
+      "supports_full_pit": false,
+      "ticks": 120,
+      "track": "ITA",
+      "vehicle_11_us_per_tick": 944.816666666667,
+      "vehicle_events": 24,
+      "weather": "Seco"
+    },
+    {
+      "gpu_fps_measured": false,
+      "physics_parity": false,
+      "reference_events": 0,
+      "reference_us_per_tick": 48.0416666666667,
+      "seed": 6701,
+      "supports_ai": false,
+      "supports_full_pit": false,
+      "ticks": 120,
+      "track": "SIN",
+      "vehicle_11_us_per_tick": 1015.85833333333,
+      "vehicle_events": 24,
+      "weather": "Chuva intensa"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+GP_START code=BEL seed=6404 step=0.20 engine=4.7.2-stable (official)
+GP_PROGRESS code=BEL lap=3/44 sim_s=300.0 wall_s=4.0
+GP_PROGRESS code=BEL lap=5/44 sim_s=600.0 wall_s=8.5
+GP_PROGRESS code=BEL lap=8/44 sim_s=900.0 wall_s=12.9
+GP_PROGRESS code=BEL lap=10/44 sim_s=1200.0 wall_s=17.5
+GP_PROGRESS code=BEL lap=12/44 sim_s=1500.0 wall_s=22.3
+GP_PROGRESS code=BEL lap=14/44 sim_s=1800.0 wall_s=26.6
+GP_PROGRESS code=BEL lap=17/44 sim_s=2100.0 wall_s=31.3
+GP_PROGRESS code=BEL lap=19/44 sim_s=2400.0 wall_s=35.9
+GP_PROGRESS code=BEL lap=22/44 sim_s=2700.0 wall_s=40.3
+GP_PROGRESS code=BEL lap=24/44 sim_s=3000.0 wall_s=44.9
+GP_PROGRESS code=BEL lap=26/44 sim_s=3300.0 wall_s=49.4
+GP_PROGRESS code=BEL lap=28/44 sim_s=3600.0 wall_s=54.0
+GP_PROGRESS code=BEL lap=31/44 sim_s=3900.0 wall_s=58.8
+GP_PROGRESS code=BEL lap=33/44 sim_s=4200.0 wall_s=63.5
+GP_PROGRESS code=BEL lap=36/44 sim_s=4500.0 wall_s=68.4
+GP_PROGRESS code=BEL lap=38/44 sim_s=4800.0 wall_s=75.8
+GP_PROGRESS code=BEL lap=40/44 sim_s=5100.0 wall_s=87.0
+GP_PROGRESS code=BEL lap=42/44 sim_s=5400.0 wall_s=92.0
+GP_PROGRESS code=BEL lap=44/44 sim_s=5700.0 wall_s=97.3
+GP_PASS code=BEL laps=44 time=5802 temp_min=15.3 temp_max=26.3 grip_min=0.818 grip_max=0.916 rubber_start=8 rubber_max=8 wet=true stops=69 winner=Sebastian Vettel
+APEX_0645_TEST_OK complete_grands_prix=1

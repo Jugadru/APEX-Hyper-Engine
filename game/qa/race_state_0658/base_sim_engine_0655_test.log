@@ -1,0 +1,5 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+ENGINE_SPACE_CASE_PASS width=4.2 passed=false clock=100.000000000001
+ENGINE_SPACE_CASE_PASS width=8.8 passed=true clock=27.3999999999999
+SIM_ENGINE_PASS no rendering / narrow blocked / wide passed / defense / ranking / events / deterministic

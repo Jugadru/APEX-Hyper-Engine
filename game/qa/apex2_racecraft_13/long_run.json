@@ -1,0 +1,15 @@
+{
+  "aborts": 27,
+  "attempts": 2,
+  "cars": 24,
+  "circuit": "Monza",
+  "elapsed_ms": 15983.866,
+  "event_count": 298,
+  "hash_after_resume": "16295a53611b43bd30178244a103cb7409ecf1eb48c5da6dd45135d1f6b64bd6",
+  "passes": 2,
+  "replay_parity": true,
+  "status": "PASS",
+  "ticks": 8000,
+  "valid_pass_events": true,
+  "weather": "Seco"
+}
