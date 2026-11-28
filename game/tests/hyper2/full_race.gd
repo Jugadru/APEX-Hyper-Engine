@@ -59,10 +59,10 @@ func run() -> void:
 			reason_counts[reason]=int(reason_counts.get(reason,0))+1
 	print("PIT_REASON_COUNTS ",JSON.stringify(reason_counts))
 	if int(k.state.hyper_evolution_revision)==15:
-		var early_attacks:int=0
+		var follow_attacks:int=0
 		for event in k.state.events:
-			if event.type=="racecraft_phase" and event.get("reason","")=="wet_early_clear_corridor":early_attacks+=1
-		print("WET_EARLY_RETAINED_EVENTS ",early_attacks)
+			if event.type=="racecraft_phase" and event.get("reason","")=="wet_follow_clear_corridor":follow_attacks+=1
+		print("WET_FOLLOW_RETAINED_EVENTS ",follow_attacks)
 	if int(k.state.hyper_evolution_revision)>=13:
 		var samples:int=0;var warnings:int=0
 		for car in k.state.cars:
