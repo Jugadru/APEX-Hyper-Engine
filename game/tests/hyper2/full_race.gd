@@ -6,8 +6,11 @@ func run() -> void:
 	var args: PackedStringArray = OS.get_cmdline_user_args()
 	var code: String = args[0] if args.size() > 0 else "ITA"
 	var weather: String = args[1] if args.size() > 1 else "Seco"
+	var seed:int=2026
+	for arg in args:
+		if arg.begins_with("seed="):seed=int(arg.trim_prefix("seed="))
 	var k = K.new()
-	var scenario: Dictionary = S.create(code, "Seco" if weather=="Variável" else weather, 2026)
+	var scenario: Dictionary = S.create(code, "Seco" if weather=="Variável" else weather, seed)
 	if weather=="Variável":scenario.hyper_weather=[{"tick":600,"water":2200},{"tick":1800,"water":4400},{"tick":4500,"water":2600},{"tick":7000,"water":500},{"tick":12000,"water":4600},{"tick":15000,"water":2500},{"tick":19000,"water":0}]
 	if "hyper22" in args: scenario.hyper22_physics=true
 	if "hyper23" in args: scenario.hyper23_physics=true
@@ -21,6 +24,7 @@ func run() -> void:
 	if "hyper3061" in args: scenario.hyper3061_physics=true
 	if "hyper3062" in args: scenario.hyper3062_physics=true
 	if "hyper3063" in args: scenario.hyper3063_physics=true
+	if "hyper3064" in args: scenario.hyper3064_physics=true
 	if not k.initialize(scenario): quit(1); return
 	var begin: int = Time.get_ticks_msec()
 	var resume_checked: bool = false
@@ -45,7 +49,7 @@ func run() -> void:
 		if row.finished and not row.retired and row.laps == k.state.race_laps: complete += 1
 		stops += int(row.stops)
 	var ok: bool = bool(k.state.finished) and complete > 0 and complete + retired == 24 and resume_checked and stops > 0
-	print("HYPER_FULL ", JSON.stringify({"status":"PASS" if ok else "FAIL","track":code,"weather":weather,"ticks":k.state.tick,"clock_s":float(k.state.clock_ms)/1000.0,"elapsed_ms":Time.get_ticks_msec()-begin,"complete":complete,"retired":retired,"stops":stops,"passes":k.state.racecraft_passes,"attempts":k.state.racecraft_attempts,"hash":k.sporting_hash(),"checkpoint_parity":resume_checked,"winner":k.classification()[0].name}))
+	print("HYPER_FULL ", JSON.stringify({"status":"PASS" if ok else "FAIL","track":code,"weather":weather,"seed":seed,"ticks":k.state.tick,"clock_s":float(k.state.clock_ms)/1000.0,"elapsed_ms":Time.get_ticks_msec()-begin,"complete":complete,"retired":retired,"stops":stops,"passes":k.state.racecraft_passes,"attempts":k.state.racecraft_attempts,"hash":k.sporting_hash(),"checkpoint_parity":resume_checked,"winner":k.classification()[0].name}))
 	if k.state.has("wet_attack_reasons"):print("WET_ATTACK_REASONS ",JSON.stringify(k.state.wet_attack_reasons))
 	if k.state.has("race_control_306"):print("RACE_CONTROL_SUMMARY ",JSON.stringify(k.state.race_control_306))
 	var reason_counts:Dictionary={}
@@ -54,6 +58,11 @@ func run() -> void:
 			var reason:String=str(event.get("reason","unknown"))
 			reason_counts[reason]=int(reason_counts.get(reason,0))+1
 	print("PIT_REASON_COUNTS ",JSON.stringify(reason_counts))
+	if int(k.state.hyper_evolution_revision)==15:
+		var early_attacks:int=0
+		for event in k.state.events:
+			if event.type=="racecraft_phase" and event.get("reason","")=="wet_early_clear_corridor":early_attacks+=1
+		print("WET_EARLY_RETAINED_EVENTS ",early_attacks)
 	if int(k.state.hyper_evolution_revision)>=13:
 		var samples:int=0;var warnings:int=0
 		for car in k.state.cars:
