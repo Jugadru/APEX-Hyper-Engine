@@ -19,6 +19,8 @@ func run() -> void:
 	if "hyper305" in args: scenario.hyper305_physics=true
 	if "hyper306" in args: scenario.hyper306_physics=true
 	if "hyper3061" in args: scenario.hyper3061_physics=true
+	if "hyper3062" in args: scenario.hyper3062_physics=true
+	if "hyper3063" in args: scenario.hyper3063_physics=true
 	if not k.initialize(scenario): quit(1); return
 	var begin: int = Time.get_ticks_msec()
 	var resume_checked: bool = false
@@ -52,4 +54,9 @@ func run() -> void:
 			var reason:String=str(event.get("reason","unknown"))
 			reason_counts[reason]=int(reason_counts.get(reason,0))+1
 	print("PIT_REASON_COUNTS ",JSON.stringify(reason_counts))
+	if int(k.state.hyper_evolution_revision)>=13:
+		var samples:int=0;var warnings:int=0
+		for car in k.state.cars:
+			samples+=int(car.sector_control_3062.samples);warnings+=int(car.sector_control_3062.warnings)
+		print("SECTOR_CONTROL_SUMMARY ",JSON.stringify({"samples":samples,"warnings":warnings}))
 	quit(0 if ok else 1)
