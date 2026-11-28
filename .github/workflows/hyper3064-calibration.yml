@@ -76,7 +76,7 @@ jobs:
           set -euo pipefail
           for mode in hyper3063 hyper3064; do
             echo "MODE=$mode TRACK=$TRACK WEATHER=$WEATHER SEED=$RACE_SEED"
-            timeout 360s godot --headless --path game --rendering-method gl_compatibility --script res://tests/hyper2/full_race.gd -- "$TRACK" "$WEATHER" "$mode" "seed=$RACE_SEED" 2>&1 | tee "/tmp/$mode.log"
+            timeout 360s godot --headless --path game --rendering-method gl_compatibility --script res://tests/hyper2/full_race.gd -- "$TRACK" "$WEATHER" "$mode" "seed=$RACE_SEED" wet_audit 2>&1 | tee "/tmp/$mode.log"
             if grep -E 'SCRIPT ERROR:|Parse Error:|^ERROR:' "/tmp/$mode.log"; then exit 1; fi
           done
           PYTHONPATH=tools python3 - <<'PY'
@@ -95,5 +95,24 @@ jobs:
           if weather=="Seco":
               for field in ("ticks","complete","retired","stops","passes","attempts","winner"):
                   assert old[field]==new[field], f"dry sporting regression: {field}"
+          from pathlib import Path
+          def audit(path):
+              rows=[json.loads(line.split("WET_CAUSAL_AUDIT ",1)[1]) for line in Path(path).read_text().splitlines() if line.startswith("WET_CAUSAL_AUDIT ")]
+              assert len(rows)==1 and rows[0]["status"]=="PASS"
+              assert rows[0]["seed"]==seed and rows[0]["weather"]==weather
+              return rows[0]["counts"]
+          a,b=audit("/tmp/hyper3063.log"),audit("/tmp/hyper3064.log")
+          assert a.get("attempts",0)==old["attempts"] and a.get("passes",0)==old["passes"]
+          assert b.get("attempts",0)==new["attempts"] and b.get("passes",0)==new["passes"]
+          pinned={
+              ("ITA","Seco",2026):("22411ef24f4f461a0a52be4445978e5f62031c5070c1e98fdca71772dccd9934","aae5166defb37edfb73a3b453837bba86516ba3f96c32bf5a5ca075f18a2ca3d"),
+              ("GBR","Chuva intensa",2026):("0d1a289249b7057baf21d3c185799086f5f598880dd0ba4d3a659ac126685c95","0ff06d292723da8c4fe330529fd612a95acf8b7f3b7e19554faee6fe4b926fb7"),
+              ("GBR","Chuva intensa",2027):("8949839017e09cd04be83e8c41914145d269c932ecf075419bcf19603e7ea66b","e61291570d799db50fc75f824cd9acda55308d875610f523b90531bd1aa7ffe4"),
+              ("GBR","Chuva intensa",2028):("9e44b3092036d51e4cf9793471edb3f40e43d6ec0265666181017552591b9e6a","8137e8e5238ffed6ae4eab911a0f4fa0f8ab91588cf6deb08b0ccd19b6cc1e23"),
+              ("GBR","Variável",2026):("ff94611ed982c5aefc0eac2cbd797ea90b5787c64dfb9b466e2c6be2ef010dda","6879272e00ef84dd8915516b77db5ac52f19788deec3f38b644e24e9e0318f9d"),
+              ("GBR","Variável",2027):("ef2874372cab62cc00d29ae03308fb786d92052a608c631f5d3cba63c481ee69","802c62caa859f125facb481469a208be8e20b38156438cf75dcb82201d3609e6"),
+              ("GBR","Variável",2028):("0d753d201a625e6d42d6095524ee5ffa714b9821d0aea4ea2922baaf181de5fd","d3c6c94a51152f7bdd1679c36928920e4447459ec8f4cf9c88a82ec6932801be"),
+          }
+          assert (old["hash"],new["hash"])==pinned[(track,weather,seed)], "audit changed sporting hash"
           print("HYPER3064_CALIBRATION_PASS")
           PY
