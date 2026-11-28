@@ -33,7 +33,7 @@ static func prepare(car:Dictionary,gap:int,closing:int,water:int)->bool:
 	var x:Dictionary=car[KEY]
 	if str(car.driver.intent)=="PREPARE_ATTACK":return closing>=-200
 	return approach(car,gap,closing,water) and (int(x.initiative)>=550 or closing>=1200)
-static func reason(car:Dictionary,profile:Array,lap:int,distance:int,gap:int,closing:int,water:int)->String:
+static func reason(car:Dictionary,profile:Array,lap:int,distance:int,gap:int,closing:int,water:int,min_gap_override:int=-1)->String:
 	if bool(car.get("mega_30",{}).get("neutral",false)):return "neutral"
 	if protected(car):return "error"
 	var x:Dictionary=car[KEY]
@@ -42,7 +42,7 @@ static func reason(car:Dictionary,profile:Array,lap:int,distance:int,gap:int,clo
 	var d:Dictionary=car.dynamics.dynamics_23;var t:Dictionary=car.dynamics.tyres_304
 	# Require both axles to retain a reserve, not merely the aggregate.
 	if bool(d.saturated) or int(d.reserve_permille)<300 or int(t.front_reserve_n)*1000<300*int(t.front_grip_n) or int(t.rear_reserve_n)*1000<300*int(t.rear_grip_n) or int(t.normal_n)<=0:return "reserve"
-	if gap<8000+water/2 or gap>29000:return "gap"
+	if gap<(8000+water/2 if min_gap_override<0 else min_gap_override) or gap>29000:return "gap"
 	var threshold:int=clampi(1100-int(x.initiative),250,1000)
 	if closing<threshold and not (gap<=22000 and closing>=-150 and int(x.initiative)>=500):return "closing"
 	if water>=4500 and (int(car.wet_303.control)<65 or gap<10000):return "visibility"

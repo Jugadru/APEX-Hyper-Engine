@@ -7,6 +7,7 @@ extends RefCounted
 const Dynamics23 = preload("res://experimental/hyper2/dynamics_23.gd")
 const Geometry302 = preload("res://experimental/hyper2/geometry_302.gd")
 const Wet303 = preload("res://experimental/hyper2/wet_303.gd")
+const WetRacecraft3064 = preload("res://experimental/hyper2/wet_racecraft_3064.gd")
 const Style305 = preload("res://experimental/hyper2/racecraft_305.gd")
 const SCHEMA: int = 13
 const PHASES: Array[String] = ["CRUISE", "APPROACH", "PREPARE", "ATTACK", "SIDE_BY_SIDE", "DEFEND", "ABORT", "RECOVER"]
@@ -65,7 +66,7 @@ static func _can_pass(profile: Array, lap_mm: int, distance_mm: int) -> bool:
 	if profile[0].has("curvature"):return Geometry302.radius_at(profile,lap_mm,location)>=CORNER_PASS_MIN_RADIUS_MM
 	return int(profile[Geometry302.index(profile,location)].radius_mm) >= CORNER_PASS_MIN_RADIUS_MM
 
-static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: int=0) -> Dictionary:
+static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: int=0, wet_refinement:bool=false, audit:Dictionary={}) -> Dictionary:
 	## No writes to the supplied roster. Loop order is by stable car id.
 	var by_id: Dictionary = {}
 	var ids: Array[int] = []
@@ -134,6 +135,8 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 		if by_id.has(target_id):
 			target_gap = int(by_id[target_id].dynamics.distance_mm) - distance
 			if bool(r.get("lapping",false)):target_gap=wrapped_delta(int(by_id[target_id].dynamics.distance_mm),distance,lap_mm)
+		if audit.has("enabled") and styled:
+			WetRacecraft3064.count_sample(audit,"phase:"+WetRacecraft3064.climate(water)+":"+phase)
 		if phase == "DEFEND":
 			# Defender holds a single lawful move until attacker leaves the duel.
 			var attacker: Dictionary = by_id.get(target_id, {})
@@ -167,10 +170,21 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 		elif phase == "PREPARE":
 			var wet_mode:bool=car.has(Wet303.KEY) and water>700
 			var wet_reason:String=""
+			var close_follow:bool=false
+			if audit.has("enabled") and wet_mode and styled and by_id.has(target_id):
+				var gate:String=WetRacecraft3064.gate_reason(car,by_id[target_id],target_gap,speed-int(by_id[target_id].dynamics.speed_mm_s),water)
+				WetRacecraft3064.count_sample(audit,"follow_gate:"+gate)
+				if gate=="eligible":
+					WetRacecraft3064.count_sample(audit,"follow_reason:"+WetRacecraft3064.reason(car,by_id[target_id],profile,lap_mm,distance,target_gap,speed-int(by_id[target_id].dynamics.speed_mm_s),water))
+			if wet_refinement and wet_mode and styled and by_id.has(target_id):
+				close_follow=WetRacecraft3064.window(car,by_id[target_id],target_gap,speed-int(by_id[target_id].dynamics.speed_mm_s),water)
 			if (wet_mode or styled) and by_id.has(target_id) and target_gap<=INITIATE_MM:
 				wet_reason=Style305.reason(car,profile,lap_mm,distance,target_gap,speed-int(by_id[target_id].dynamics.speed_mm_s),water) if styled else Wet303.attack_reason(car,Geometry302.radius_at(profile,lap_mm,distance),target_gap,speed-int(by_id[target_id].dynamics.speed_mm_s),water)
+				if close_follow:wet_reason=WetRacecraft3064.reason(car,by_id[target_id],profile,lap_mm,distance,target_gap,speed-int(by_id[target_id].dynamics.speed_mm_s),water)
 				if wet_reason=="eligible" and claims.has(target_id):wet_reason="claim"
 				if wet_mode:wet_reasons[wet_reason]=int(wet_reasons[wet_reason])+1
+				if audit.has("enabled") and wet_mode:
+					WetRacecraft3064.count_sample(audit,"prepare:"+WetRacecraft3064.climate(water)+":"+("lapping" if bool(r.get("lapping",false)) else "sporting")+":"+wet_reason)
 			if not by_id.has(target_id) or bool(by_id[target_id].finished) or str(by_id[target_id].pit_stage) != "TRACK" or target_gap < -5000 or target_gap > SEARCH_MM:
 				_phase(r, "ABORT", tick, transitions, id, "gap_changed")
 				r.aborts = int(r.aborts) + 1
@@ -201,7 +215,7 @@ static func plan(roster: Array, profile: Array, lap_mm: int, tick: int, water: i
 					r.lane = selected
 					r.attempts = int(r.attempts) + 1
 					claims[target_id] = id
-					_phase(r, "ATTACK", tick, transitions, id, "clear_alternative_corridor")
+					_phase(r, "ATTACK", tick, transitions, id, "wet_follow_clear_corridor" if close_follow else "clear_alternative_corridor")
 					if wet_mode:wet_reasons.committed=int(wet_reasons.committed)+1
 				else:
 					if staged_defense:
