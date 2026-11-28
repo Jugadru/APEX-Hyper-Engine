@@ -38,6 +38,10 @@ func run()->void:
 	var candidate:Dictionary=T.plan(roster,profile,lap,10,5000,true)
 	ck(legacy.states[int(car.id)].phase=="PREPARE" and candidate.states[int(car.id)].phase=="ATTACK","actual resolver close-follow attack only when enabled")
 	ck(candidate.transitions.any(func(e:Dictionary)->bool:return e.reason=="wet_follow_clear_corridor"),"causal event reason")
+	var audit:Dictionary={"enabled":true}
+	ck(T.plan(roster,profile,lap,10,5000,true,audit)==candidate,"audit does not change plan")
+	ck(int(audit.get("follow_gate:eligible",0))==1 and int(audit.get("follow_reason:eligible",0))==1,"audit records real gate and reason")
+	ck(W.gate_reason(car,defender,9900,0,5000)=="below_floor","explicit failed gate")
 	ck(roster==before,"read-only resolver")
 	roster.reverse();ck(T.plan(roster,profile,lap,10,5000,true)==candidate,"stable roster ordering")
 	ck(T.plan(roster,profile,lap,10,0,true)==T.plan(roster,profile,lap,10,0),"dry parity")
@@ -56,8 +60,13 @@ func run()->void:
 		blocker.finished=false;blocker.pit_stage="TRACK";blocker.pace="Conservar";blocker.racecraft=T.initial_state();blocker.dynamics.distance_mm=100000;blocker.dynamics.speed_mm_s=40000
 	left.racecraft.lane="LEFT";right.racecraft.lane="RIGHT"
 	ck(T.plan([car,defender,left,right],profile,lap,10,5000,true).states[int(car.id)].phase!="ATTACK","occupied corridors block close-follow attack")
+	var mirror=K.new();ck(mirror.initialize(s),"audit parity mirror")
+	k.wet_racecraft_audit={"enabled":true}
 	var replay=R.new();replay.attach(k)
 	for i in range(900):k.step_tick();replay.observed(k)
+	mirror.step_ticks(900)
+	ck(k.sporting_hash()==mirror.sporting_hash(),"audit excluded from sporting state")
+	ck(int(k.wet_racecraft_audit.get("attempts",0))==int(k.state.racecraft_attempts) and int(k.wet_racecraft_audit.get("passes",0))==int(k.state.racecraft_passes),"audit reconciles sporting totals")
 	var copy=K.new();ck(copy.restore(k.checkpoint()),"checkpoint")
 	var sought=replay.seek(900);ck(sought!=null and sought.sporting_hash()==k.sporting_hash(),"replay")
 	k.step_ticks(50);copy.step_ticks(50);ck(k.sporting_hash()==copy.sporting_hash(),"continuation")
