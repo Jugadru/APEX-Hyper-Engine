@@ -26,6 +26,7 @@ func run() -> void:
 	if "hyper3063" in args: scenario.hyper3063_physics=true
 	if "hyper3064" in args: scenario.hyper3064_physics=true
 	if not k.initialize(scenario): quit(1); return
+	if "wet_audit" in args:k.wet_racecraft_audit={"enabled":true}
 	var begin: int = Time.get_ticks_msec()
 	var resume_checked: bool = false
 	var last_report: int = 0
@@ -68,4 +69,9 @@ func run() -> void:
 		for car in k.state.cars:
 			samples+=int(car.sector_control_3062.samples);warnings+=int(car.sector_control_3062.warnings)
 		print("SECTOR_CONTROL_SUMMARY ",JSON.stringify({"samples":samples,"warnings":warnings}))
+	if "wet_audit" in args:
+		var audit:Dictionary=k.wet_racecraft_audit
+		var consistent:bool=int(audit.get("attempts",0))==int(k.state.racecraft_attempts) and int(audit.get("passes",0))==int(k.state.racecraft_passes)
+		print("WET_CAUSAL_AUDIT ",JSON.stringify({"status":"PASS" if consistent else "FAIL","counts":audit,"seed":race_seed,"weather":weather}))
+		ok=ok and consistent
 	quit(0 if ok else 1)
