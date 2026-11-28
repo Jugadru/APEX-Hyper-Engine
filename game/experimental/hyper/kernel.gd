@@ -58,7 +58,7 @@ func step_tick() -> bool:
 		prior_distances[int(car.id)] = int(car.dynamics.distance_mm)
 	var control_snapshot:Dictionary={}
 	if state.has(Control306.KEY) and int(state.mega_control.remaining)>0:control_snapshot=Control306.begin(state[Control306.KEY],state.cars,int(state.lap_length_mm))
-	var action: Dictionary = Resolver.plan(state.cars, state.track_profile, int(state.lap_length_mm), int(state.tick) + 1,int(state.water_microns))
+	var action: Dictionary = Resolver.plan(state.cars, state.track_profile, int(state.lap_length_mm), int(state.tick) + 1,int(state.water_microns),int(state.get("hyper_evolution_revision",0))>=15)
 	if state.has("wet_attack_reasons"):
 		for reason in action.wet_reasons:state.wet_attack_reasons[reason]=int(state.wet_attack_reasons[reason])+int(action.wet_reasons[reason])
 	for car in state.cars:
