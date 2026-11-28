@@ -43,7 +43,7 @@ func run()->void:
 	car.dynamics.tyres_304.rear_reserve_n=100
 	ck(W.reason(car,profile,lap,100000,34000,3000,5000)=="reserve","rear axle protection")
 	car.dynamics.tyres_304.rear_reserve_n=3000
-	var tight:Array=[{"start_mm":0,"radius_mm":50000,"curvature":20},{"start_mm":500000,"radius_mm":50000,"curvature":20}]
+	var tight:Array=[{"start_mm":0,"radius_mm":50000,"curvature":20000},{"start_mm":500000,"radius_mm":50000,"curvature":20000}]
 	ck(W.reason(car,tight,lap,100000,34000,3000,5000)=="geometry","tight corner protection")
 	car.wet_303.observed_water=3000;ck(not W.window(car,34000,3000,5000),"weather adaptation guard")
 	car.wet_303.observed_water=5000;car.mega_30.neutral=true
