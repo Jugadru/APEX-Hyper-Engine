@@ -1,5 +1,8 @@
 extends "res://experimental/apex2/driver_kernel_12.gd"
 ## Hyper Evolution: isolated playable successor to Racecraft 1.3.
+const WetAudit3064 = preload("res://experimental/hyper2/wet_racecraft_3064.gd")
+# External test-only telemetry, not part of sporting state or checkpoint.
+var wet_racecraft_audit:Dictionary={}
 const Resolver = preload("res://experimental/hyper/traffic.gd")
 const Control306 = preload("res://experimental/hyper2/race_control_306.gd")
 const Stewards3063 = preload("res://experimental/hyper2/race_stewards_3063.gd")
@@ -58,7 +61,7 @@ func step_tick() -> bool:
 		prior_distances[int(car.id)] = int(car.dynamics.distance_mm)
 	var control_snapshot:Dictionary={}
 	if state.has(Control306.KEY) and int(state.mega_control.remaining)>0:control_snapshot=Control306.begin(state[Control306.KEY],state.cars,int(state.lap_length_mm))
-	var action: Dictionary = Resolver.plan(state.cars, state.track_profile, int(state.lap_length_mm), int(state.tick) + 1,int(state.water_microns),int(state.get("hyper_evolution_revision",0))>=15)
+	var action: Dictionary = Resolver.plan(state.cars, state.track_profile, int(state.lap_length_mm), int(state.tick) + 1,int(state.water_microns),int(state.get("hyper_evolution_revision",0))>=15,wet_racecraft_audit)
 	if state.has("wet_attack_reasons"):
 		for reason in action.wet_reasons:state.wet_attack_reasons[reason]=int(state.wet_attack_reasons[reason])+int(action.wet_reasons[reason])
 	for car in state.cars:
@@ -84,6 +87,11 @@ func step_tick() -> bool:
 			car.hyper.finish_tick = int(state.tick)
 			_event("hyper_retired", int(car.id), {"reason": "fuel_exhausted"})
 	for transition in action.transitions:
+		if wet_racecraft_audit.has("enabled"):
+			var audit_car:Dictionary=action.states[int(transition.car_id)]
+			WetAudit3064.count_sample(wet_racecraft_audit,"transition:"+WetAudit3064.climate(int(state.water_microns))+":"+("lapping" if bool(audit_car.get("lapping",false)) else "sporting")+":"+str(transition.phase)+":"+str(transition.reason))
+			if str(transition.phase)=="ATTACK":WetAudit3064.count_sample(wet_racecraft_audit,"attempts")
+			if str(transition.reason)=="wet_follow_clear_corridor":WetAudit3064.count_sample(wet_racecraft_audit,"follow_commits")
 		if str(transition.phase) == "ATTACK": state.racecraft_attempts = int(state.racecraft_attempts) + 1
 		if str(transition.phase) == "ABORT": state.racecraft_aborts = int(state.racecraft_aborts) + 1
 		_event(str(transition.type), int(transition.car_id), {"phase": str(transition.phase), "reason": str(transition.reason)})
@@ -103,6 +111,9 @@ func step_tick() -> bool:
 		if old_delta <= Resolver.CROSS_CONFIRM_MM and new_delta > Resolver.CROSS_CONFIRM_MM and str(r.lane) != str(target.racecraft.lane):
 			r.passes = int(r.passes) + 1
 			state.racecraft_passes = int(state.racecraft_passes) + 1
+			if wet_racecraft_audit.has("enabled"):
+				WetAudit3064.count_sample(wet_racecraft_audit,"passes")
+				WetAudit3064.count_sample(wet_racecraft_audit,"pass:"+WetAudit3064.climate(int(state.water_microns)))
 			_event("racecraft_overtake_confirmed", id, {"defender_id": opponent_id, "gap_mm": new_delta, "lane": str(r.lane)})
 			Resolver._phase(r, "RECOVER", int(state.tick), [], id, "pass_confirmed")
 			r.cooldown_until = int(state.tick) + 35
